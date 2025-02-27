@@ -15,10 +15,12 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  cursor: pointer;
 }
 
 .cart-icon {
   position: relative;
+  cursor: pointer;
 }
 
 .cart-count {
@@ -33,6 +35,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   font-size: 12px;
 }
 
