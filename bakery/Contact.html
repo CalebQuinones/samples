@@ -20,28 +20,42 @@
     <div class="top-banner">
         <p>10% off for your second order!</p>
     </div>
-
     <header>
         <nav class="container">
             <div class="logo">
                 <img src="logo.png">
                 <span>Triple J & Rose's Bakery</span>
             </div>
-            <button class="nav-toggle" aria-label="Toggle navigation">
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
                 <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            </label>
             <div class="nav-links">
                 <ul>
-                    <li><a href="TriplesJ_sandroseBakery.html">Home</a></li>
+                    <li><a href="TriplesJ_sandroseBakery.html" class="active">Home</a></li>
                     <li><a href="MenuSection.html">Menu</a></li>
                     <li><a href="Abouts.html">About</a></li>
                     <li><a href="Contact.html">Contact</a></li>
                 </ul>
             </div>
+            <div class="cart-profile">
+              <div class="cart-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="cart-count"></span>
+              </div>
+              <div class="profile-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+              </div>
+          </div>
         </nav>
-    </header>   
+    </header></header>   
 
     <section>
            <img src="meltdown1.png" class="melt">
@@ -49,28 +63,26 @@
              <h2>Contact Us</h2>
            </div>
     
-           <div class="contains">
-            <div class="info-panel">
-                <h2>
-                    Have Questions? Feedback?
-                    Your Thoughts Matter to Us!</h2>
-                <p>Need assistance? Please complete our brief inquiry form to contact us. We will respond promptly.</p>
-            </div>
+           
             <div class="form-panel">
                 <form>
+                    <h1>We'd Love To Hear From You!</h1>
+                    <p>Need assistance? Please complete our brief inquiry form to contact us. We will respond promptly.</p> <br>
+                    <br>
+
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group"><p>First Name</p>
                             <input type="text" placeholder="Enter first name" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group"><p>Last Name</p>
                             <input type="text" placeholder="Enter last name" required>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group"><p>Address</p>
                             <input type="email" placeholder="Enter your email address" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group"><p>Number</p>
                             <input type="tel" placeholder="+63" required>
                         </div>
                     </div>
@@ -83,6 +95,9 @@
         </div>
     </section>
     <section>
+        
+    </section>
+    <section>
     <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15452.11962132778!2d121.0519816!3d14.4829723!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cf0c38d4663f%3A0x316dfb3b2003f0ce!2sTriple%20J%20and%20Rose&#39;s%20Bakery!5e0!3m2!1sen!2sph!4v1733152230083!5m2!1sen!2sph" 
     width="650" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     <div class="our">
@@ -93,7 +108,7 @@
         <div class="address">
           <img src="loc.png" alt="Address icon">
           <span>001 Road 10 Joseph Sitt Bagumbayan, Taguig City</span>
-        </div>
+        </div> 
         <div class="email">
           <img src="msg.png" alt="Email icon">
           <span>bascalmaylene@gmail.com</span>
