@@ -12,7 +12,33 @@
     box-sizing: border-box;
 }
 
+.cart-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+}
 
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--pink);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+}
 .container {
   width: 90%;
   max-width: 1200px;
