@@ -38,6 +38,7 @@
     cursor: pointer;
     font-size: 12px;
   }
+  
 
 .container {
     width: 90%;
@@ -412,7 +413,7 @@ textarea {
     position:   absolute;
     top: 100px;
     left: -2px;
-    width: 1521px;
+    width: 1525px;
     height: 550px;
     border: #E44486;
     z-index: -3;
@@ -458,11 +459,13 @@ iframe {
   .our h1 {
     font-size: 3rem;
     margin-bottom: 0.2rem;
+    
   }
   
   .our p {
     font-size: 1rem;
     margin-bottom: 0.5rem;
+    
   }
   
   .our .address,

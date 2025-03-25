@@ -109,19 +109,35 @@
                 </select>
             </div>
         </div>
+        <div class="custom-cake-banner">
+            <h3>Customize your own cake!</h3>
+            <button class="custom-order-btn">CUSTOM ORDER</button>
+        </div>
 
         <div class="product-grid">
             <div class="product-card">
                 <div class="product-image"></div>
                 <div class="product-details">
                     <h3 class="product-name">Product Name</h3>
+                    <!-- STAR RATING ADDED HERE -->
+                    <div class="product-rating">
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star">★</span>
+                    </div>
                     <p class="product-price">Php 1,200</p>
+                    <!-- QUANTITY CONTROL ADDED HERE -->
+                    <div class="quantity-control">
+                        <button class="quantity-btn minus">-</button>
+                        <span class="quantity">1</span>
+                        <button class="quantity-btn plus">+</button>
+                    </div>
                     <button class="add-to-order">Add to order</button>
                 </div>
             </div>
-  </div>
         </div>
-    </div>
     </section>
     <footer>
       <div class="footer-content">
@@ -131,7 +147,7 @@
           <div class="footer-contact">
             <p>001 Road 10 Joseph Sitt Bagumbayan, Taguig City</p>
             <p>Call us: +63 918 746 4342</p>
-            <p>Email: bascalmaylene@gmail.com</p>
+            <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f694978595979a9b978f9a939893b6919b979f9ad895999b">[email&#160;protected]</a></p>
           </div>
           <div class="footer-social">
               <a href="#"><i class="fab fa-facebook"></i></a>
@@ -150,7 +166,7 @@
           <p>&copy; 2024 Triple J's Bakery. All rights reserved.</p>
       </div>
   </footer>
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         document.addEventListener('DOMContentLoaded', function() {
           const slidesContainer = document.querySelector('.slides');
           const slides = document.querySelectorAll('.slide');
@@ -226,6 +242,30 @@
           });
         });
       </script>
+       <script>
+        // Simple JavaScript to handle quantity buttons
+        document.addEventListener('DOMContentLoaded', function() {
+    // Use event delegation to handle quantity controls for all product cards
+    document.querySelector('.product-grid').addEventListener('click', function(e) {
+        // Check if the clicked element is a quantity button
+        if (e.target.classList.contains('quantity-btn')) {
+            const quantityElement = e.target.parentElement.querySelector('.quantity');
+            let quantity = parseInt(quantityElement.textContent);
+
+            if (e.target.classList.contains('plus')) {
+                // Increase quantity (no upper limit specified)
+                quantityElement.textContent = quantity + 1;
+            } else if (e.target.classList.contains('minus')) {
+                // Decrease quantity, but never go below 1
+                if (quantity > 1) {
+                    quantityElement.textContent = quantity - 1;
+                }
+            }
+        }
+    });
+});
+
+    </script>
 
       
       <script>
@@ -367,11 +407,49 @@ function displayProducts(productsToShow) {
             <div class="product-image" style="background-image: url(${product.image})"></div>
             <div class="product-details">
                 <h3 class="product-name">${product.name}</h3>
+                <!-- STAR RATING ADDED HERE -->
+                <div class="product-rating">
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star">★</span>
+                </div>
                 <p class="product-price">Php ${product.price.toLocaleString()}</p>
+                <!-- QUANTITY CONTROL ADDED HERE -->
+                <div class="quantity-control">
+                    <button class="quantity-btn minus">-</button>
+                    <span class="quantity">1</span>
+                    <button class="quantity-btn plus">+</button>
+                </div>
                 <button class="add-to-order">Add to order</button>
             </div>
         </div>
     `).join('');
+    
+    // ADDED EVENT LISTENERS FOR QUANTITY BUTTONS
+    const plusButtons = document.querySelectorAll('.plus');
+    const minusButtons = document.querySelectorAll('.minus');
+    
+    plusButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event bubbling
+            const quantityElement = this.parentElement.querySelector('.quantity');
+            let quantity = parseInt(quantityElement.textContent);
+            quantityElement.textContent = quantity + 1;
+        });
+    });
+    
+    minusButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event bubbling
+            const quantityElement = this.parentElement.querySelector('.quantity');
+            let quantity = parseInt(quantityElement.textContent);
+            if (quantity > 1) {
+                quantityElement.textContent = quantity - 1;
+            }
+        });
+    });
 }
 
 // Function to filter products
