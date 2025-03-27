@@ -12,7 +12,33 @@
     box-sizing: border-box;
 }
 
+.cart-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+}
 
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--pink);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+}
 .container {
   width: 90%;
   max-width: 1200px;
@@ -241,7 +267,40 @@ nav {
      transform: translateY(-3px);
  }
 }
+.custom-cake-banner {
+  background-color: #ff8bb4; /* Updated to match the bright pink color in the image */
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 50px;
+  text-align: center;
+  border: none; /* Removed the blue border */
+}
 
+.custom-cake-banner h3 {
+  color: #525252; /* Darker text color */
+  margin-bottom: 15px;
+  font-family: "madimi one";
+  font-size: 40px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Added text shadow for the effect shown */
+}
+
+.custom-order-btn {
+  background-color: white;
+  color: #555;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added subtle shadow to the button */
+}
+
+.custom-order-btn:hover {
+  background-color: #f8f8f8;
+  transform: scale(1.05);
+}
 /* Existing styles... */
 
 @media screen and (max-width: 430px) {
@@ -733,6 +792,115 @@ nav {
   margin-bottom: 10px;
 }
 
+/* New styles for star ratings */
+/* ADD THESE CSS STYLES TO YOUR MENU3.CSS FILE */
+
+/* Star ratings */
+.product-rating {
+  display: flex;
+  margin: 5px 0;
+  justify-content: flex-start;
+  margin-left: 12px;
+}
+
+.star {
+  color: #e0e0e0;
+  font-size: 16px;
+  margin-right: 2px;
+}
+
+.star.filled {
+  color: #FFD700;
+}
+
+/* Quantity controls */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100px;
+  margin-left: 12px;
+}
+
+.quantity-btn {
+  background: #f5f5f5;
+  border: none;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-btn:hover {
+  background: #e0e0e0;
+}
+
+.quantity {
+  padding: 0 10px;
+  min-width: 30px;
+  text-align: center;
+}
+
+.product-details {
+  width: 100%;
+  padding: 0 10px;
+  text-align: center;
+}
+
+.product-name {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.product-price {
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.add-to-order {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 10px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.add-to-order:hover {
+  background-color: #45a049;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(3, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    margin: 0 20px;
+  }
+}
 
 .product-image:hover {
   transform: scale(1.05);

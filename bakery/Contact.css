@@ -1,7 +1,7 @@
 :root {
     --primary: #E84B8A;
     --primary-dark: #D63F7A;
-    --secondary: #FFE6F0;
+    --secondary: #FFD7E9;
     --text: #333333;
     --text-light: #666666;
     --white: #FFFFFF;
@@ -11,6 +11,34 @@
     padding: 0;
     box-sizing: border-box;
 }
+.cart-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+  }
+  
+  .cart-icon {
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--pink);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  
 
 .container {
     width: 90%;
@@ -245,7 +273,8 @@ nav {
 }
 .form-panel{
     position: relative;
-    left: 200px;
+    left: 150px;
+    top: 400px;
 }
 @media screen and (max-width: 768px) {
     .contains {
@@ -258,7 +287,41 @@ nav {
         max-width: none;
     }
 }
-
+.business-hours-card {
+    background-color: #FFBBD7;
+    border-radius: 12px;
+    width: 500px;
+    overflow: hidden;
+    position: relative;
+    left: 880px;
+    top: -215px;
+}
+.business-hours-title {
+    display: flex;
+    align-items: center;
+    background-color: #FFF1F7;
+    padding: 15px 20px;
+}
+.business-hours-title .clock-icon {
+    margin-right: 10px;
+    font-size: 24px;
+}
+.business-hours-title h2 {
+    margin: 0;
+    font-family: 'Madimi One', cursive;
+}
+.business-hours-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 20px;
+}
+.business-hours-content .day {
+    font-weight: bold;
+}
+.business-hours-content .hours {
+    text-align: right;
+}
 
 .loc{
     position: absolute;
@@ -337,6 +400,7 @@ nav {
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin-top: 75px;
+    font-family: "madimi one";
 }
 
 .form-row {
@@ -384,7 +448,7 @@ textarea {
     position:   absolute;
     top: 100px;
     left: -2px;
-    width: 1521px;
+    width: 1525px;
     height: 550px;
     border: #E44486;
     z-index: -3;
@@ -413,10 +477,69 @@ textarea {
 }
 iframe {
     position: relative;
-    left: 100px;
-    top: 350px;
+    left: 880px;
+    top: -180px;
     margin-bottom: 130px;
+    width: 500px;
+    height: 320px;
   }
+  .icon{
+    padding: -30px;
+    height: 30px;
+    width: 50px;
+  }
+.iframe{
+    border: 2px #FFF1F7;
+    padding: 10px;
+    font-family: "madimi one";
+    border-radius: 15px 15px 0px 0px;
+    background-color: #FFF1F7;
+    width: 500px;
+    position: relative;
+    left: 880px;
+    top: -170px;
+  }
+
+
+  .contact-card {
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    left: 180px;
+    top: -200px;
+}
+.contact-header {
+    background-color: #FFF1F7;
+    padding: 15px 20px;
+    font-weight: bold;
+}
+.contact-body {
+    background-color: #FFBBD7;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+
+}
+.contact-item {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+.contact-item-icon {
+    margin-right: 10px;
+    color: #333;
+    font-family: "madimi one";
+}
+.contact-item-content {
+    display: flex;
+    flex-direction: column;
+}
+.contact-item-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
   
   .our {
     position: relative;
@@ -430,11 +553,13 @@ iframe {
   .our h1 {
     font-size: 3rem;
     margin-bottom: 0.2rem;
+    
   }
   
   .our p {
     font-size: 1rem;
     margin-bottom: 0.5rem;
+    
   }
   
   .our .address,

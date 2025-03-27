@@ -19,26 +19,40 @@
     <div class="top-banner">
         <p>10% off for your second order!</p>
     </div>
-
     <header>
         <nav class="container">
             <div class="logo">
                 <img src="logo.png">
                 <span>Triple J & Rose's Bakery</span>
             </div>
-            <button class="nav-toggle" aria-label="Toggle navigation">
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
                 <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            </label>
             <div class="nav-links">
                 <ul>
-                    <li><a href="TriplesJ_sandroseBakery.html">Home</a></li>
+                    <li><a href="TriplesJ_sandroseBakery.html" class="active">Home</a></li>
                     <li><a href="MenuSection.html">Menu</a></li>
                     <li><a href="Abouts.html">About</a></li>
                     <li><a href="Contact.html">Contact</a></li>
                 </ul>
             </div>
+            <div class="cart-profile">
+              <div class="cart-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="cart-count"></span>
+              </div>
+              <div class="profile-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+              </div>
+          </div>
         </nav>
     </header>
     <section>
@@ -124,54 +138,63 @@
                     <img src="Copy of Quotation.png" class="imiji">
                     <h1>Hear what our customers <br> are saying about us</h1>
                     <p>We prioritize our customers' feedback and strive for their <br>complete satisfaction. Check out some of their experiences!</p>
-                    <button class="navigation-btn left" aria-label="Scroll Left">
-                        &#10094;
-                    </button>
-                    <button class="navigation-btn right" aria-label="Scroll Right">
-                        &#10095;
-                    </button>
                 </div>
                 <div class="right-col">
                     <div class="containerss">
                         <div class="work-showcase-wrapper">
-                            
-            
-                            <div class="work-showcase" id="workShowcase">
-                                <div class="work-container" id="workContainer">
-                                    <div class="work-item">
-                                        <img src="Reviews1.jpg" alt="Web Design Project">
-                                        <div class="work-item-content">
-                                            <h3>Annie Andrade</h3>
-                                            <p> I was blown away by the cake formy daughter's birthday! It was not only beautiful but also the best cake we've ever tasted. Thank you, Triple J & Rose's Bakery, for making her day extra special!</p>
-                                        </div>
+                            <div class="review-slider">
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <img src="Reviews1.jpg" alt="Annie Andrade" class="reviewer-image">
+                                        <h3>Annie Andrade</h3>
                                     </div>
-                                    <div class="work-item">
-                                        <img src="Reviews2.jpg" alt="Branding Project">
-                                        <div class="work-item-content">
-                                            <h3>James Quinones</h3>
-                                            <p>Tripl J has exceeded our expectations everytime we order. Their creativity and costumer service are top-notch. We higly recommend them for any special occasion!</p>
-                                        </div>
+                                    <div class="review-content">
+                                        I was blown away by the cake for my daughter's birthday! It was not only beautiful but also the best cake we've ever tasted. Thank you, Triple J & Rose's Bakery, for making her day extra special!
                                     </div>
-                                    <div class="work-item">
-                                        <img src="Jeo.jpg" alt="UI/UX Project">
-                                        <div class="work-item-content">
-                                            <h3>Jeo Duyan</h3>
-                                            <p>The cake looked exactly like the picture I provided. This was the best cake I've ever had. Thank you for making my special day so memorable.
-                                            </p>
-                                        </div>
+                                    <div class="review-stars">
+                                        <div class="star-rating" style="--percent: 100%"></div>
                                     </div>
-                                    <div class="work-item">
-                                        <img src="Aj.jpg" alt="Motion Graphics Project">
-                                        <div class="work-item-content">
-                                            <h3>AJ Castro</h3>
-                                            <p>I love the texture. Triple J created the most stunning cake for my wedding! The flavors were incredible, and the design was exactly what I envisioned. Their team was so attentive and made the process enjoyable.</p>
-                                          </div>
+                                </div>
+                        
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <img src="Reviews2.jpg" alt="Maria Rodriguez" class="reviewer-image">
+                                        <h3>James Quinones</h3>
+                                    </div>
+                                    <div class="review-content">
+                                        Triple J has exceeded our expectations everytime we order. Their creativity and customer service are top-notch. We highly recommend them for any special occasion!
+                                    </div>
+                                    <div class="review-stars">
+                                        <div class="star-rating" style="--percent: 100%"></div>
+                                    </div>
+                                </div>
+                        
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <img src="Jeo.jpg" alt="David Chen" class="reviewer-image">
+                                        <h3>Jeo Duyan</h3>
+                                    </div>
+                                    <div class="review-content">
+                                        The cake looked exactly like the picture I provided. This was the best cake I've ever had. Thank you for making my special day so memorable.
+                                    </div>
+                                    <div class="review-stars">
+                                        <div class="star-rating" style="--percent: 100%"></div>
+                                    </div>
+                                </div>
+                        
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <img src="Aj.jpg" alt="Emily Thompson" class="reviewer-image">
+                                        <h3>Aj Castro</h3>
+                                    </div>
+                                    <div class="review-content">
+                                        I love the texture. Triple J created the most stunning cake for my wedding! The flavors were incredible, and the design was exactly what I envisioned. Their team was so attentive and made the process enjoyable.
+                                    </div>
+                                    <div class="review-stars">
+                                        <div class="star-rating" style="--percent: 100%"></div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
             </section>
             <section>
                 <div class="likod">
