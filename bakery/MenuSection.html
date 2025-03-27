@@ -180,6 +180,215 @@
                 </div>
             </div>
         </div>
+
+        <!-- Photo Upload Modal -->
+        <div class="photo-upload-modal" id="photoUploadModal">
+            <div class="modal-content">
+                <button class="close-modal" id="closePhotoModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                
+                <h2>Upload Your Dream Cake</h2>
+                <p class="modal-subtitle">Choose your perfect reference image - we'll bring your dream design to life!</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="#E84B8A" stroke-width="2"/>
+                                <path d="M12 8V16" stroke="#E84B8A" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M8 12H16" stroke="#E84B8A" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <p>Click to Upload or Drag and Drop</p>
+                    </div>
+                    <input type="file" id="cakePhotoInput" accept="image/*" class="file-input">
+                    <div class="preview-container" id="previewContainer"></div>
+                </div>
+                
+                <div class="cake-details-section">
+                    <h3>Cake Details</h3>
+                    <form id="cakeDetailsForm">
+                        <div class="form-group">
+                            <label for="cakeSize">Cake Size</label>
+                            <select id="cakeSize" required>
+                                <option value="" disabled selected>Select size</option>
+                                <option value="6">6 inches</option>
+                                <option value="8">8 inches</option>
+                                <option value="10">10 inches</option>
+                                <option value="12">12 inches</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cakeFlavor">Cake Flavor</label>
+                            <select id="cakeFlavor" required>
+                                <option value="" disabled selected>Select flavor</option>
+                                <option value="vanilla">Vanilla</option>
+                                <option value="chocolate">Chocolate</option>
+                                <option value="redvelvet">Red Velvet</option>
+                                <option value="carrot">Carrot</option>
+                                <option value="ube">Ube</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fillingType">Filling Type</label>
+                            <select id="fillingType" required>
+                                <option value="" disabled selected>Select filling</option>
+                                <option value="buttercream">Buttercream</option>
+                                <option value="ganache">Chocolate Ganache</option>
+                                <option value="fruit">Fresh Fruit</option>
+                                <option value="custard">Custard</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="frostingType">Frosting Type</label>
+                            <select id="frostingType" required>
+                                <option value="" disabled selected>Select frosting</option>
+                                <option value="buttercream">Buttercream</option>
+                                <option value="fondant">Fondant</option>
+                                <option value="whipped">Whipped Cream</option>
+                                <option value="ganache">Ganache</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="specialInstructions">Special Instructions</label>
+                            <textarea id="specialInstructions" placeholder="Any special requests or details about your cake design..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="submit-order-btn">SUBMIT ORDER</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Checkout Modal -->
+<div class="checkout-modal" id="checkoutModal">
+    <div class="checkout-content">
+        <div class="checkout-header">
+            <h2>Checkout</h2>
+            <button class="close-checkout" id="closeCheckout">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 6L18 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="checkout-body">
+            <div class="checkout-left">
+                <div class="back-to-cart">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 19L5 12L12 5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Back to cart</span>
+                </div>
+
+                <div class="checkout-section">
+                    <h3>Review your purchases</h3>
+                    <div class="cart-items">
+                        <!-- Cart items will be dynamically inserted here -->
+                        <div class="cart-item">
+                            <div class="item-image">
+                                <img src="placeholder.jpg" alt="Item image">
+                            </div>
+                            <div class="item-details">
+                                <h4>Item name is here</h4>
+                                <p>Php 1,500</p>
+                            </div>
+                        </div>
+                        <div class="cart-item">
+                            <div class="item-image">
+                                <img src="placeholder.jpg" alt="Item image">
+                            </div>
+                            <div class="item-details">
+                                <h4>Item name is here</h4>
+                                <p>Php 1,200</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-section">
+                    <h3>Delivery Options</h3>
+                    <div class="delivery-options">
+                        <div class="delivery-option">
+                            <input type="radio" id="standardDelivery" name="deliveryOption" value="standard" checked>
+                            <label for="standardDelivery">
+                                <div class="option-title">Php 50 - Standard delivery</div>
+                                <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
+                            </label>
+                        </div>
+                        <div class="delivery-option">
+                            <input type="radio" id="pickupOption" name="deliveryOption" value="pickup">
+                            <label for="pickupOption">
+                                <div class="option-title">No cost - Pick-up</div>
+                                <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-right">
+                <div class="payment-details">
+                    <h3>Payment Details</h3>
+                    <p class="payment-subtitle">Complete your order by providing your payment details</p>
+
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="Enter your email here..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fullname">Fullname</label>
+                            <input type="text" id="fullname" placeholder="Enter your fullname here..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Delivery Address</label>
+                            <input type="text" id="address" placeholder="Enter your address..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deliveryDate">Delivery date/Pick-up date</label>
+                            <input type="date" id="deliveryDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Payment</label>
+                            <div class="payment-options">
+                                <div class="payment-option">
+                                    <input type="radio" id="cardPayment" name="paymentMethod" value="card" checked>
+                                    <label for="cardPayment">Card</label>
+                                </div>
+                                <div class="payment-option">
+                                    <input type="radio" id="gcashPayment" name="paymentMethod" value="gcash">
+                                    <label for="gcashPayment">
+                                        <img src="https://www.gcash.com/wp-content/uploads/2019/04/gcash-logo.png" alt="GCash" class="payment-icon">
+                                    </label>
+                                </div>
+                                <div class="view-all-options">
+                                    <span>View all options</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="confirm-button">CONFIRM</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            
     </section>
         <div class="product-grid">
             <div class="product-card">
@@ -333,64 +542,175 @@
 });
 
     </script>
+ <script>
+    // Select all delivery option elements
+    const deliveryOptions = document.querySelectorAll('.delivery-option');
+
+    // Add click event listener to each delivery option
+    deliveryOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove 'selected' class from all options
+            deliveryOptions.forEach(opt => {
+                opt.classList.remove('selected');
+                // Uncheck radio buttons
+                opt.querySelector('input[type="radio"]').checked = false;
+            });
+
+            // Add 'selected' class to clicked option
+            this.classList.add('selected');
+            // Check the radio button for the clicked option
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+  // Get DOM elements
+  const submitOrderBtn = document.querySelector(".submit-order-btn")
+  const checkoutModal = document.getElementById("checkoutModal")
+  const closeCheckout = document.getElementById("closeCheckout")
+  const modalOverlay = document.getElementById("modalOverlay")
+  const paymentForm = document.getElementById("paymentForm")
+
+  // Function to open checkout modal
+  function openCheckoutModal() {
+    // Display the overlay and modal
+    modalOverlay.style.display = "block"
+    checkoutModal.style.display = "block"
+
+    // Force a reflow before adding the active class for the transition
+    void modalOverlay.offsetWidth
+    void checkoutModal.offsetWidth
+
+    // Add active class for fade-in effect
+    modalOverlay.classList.add("active")
+    checkoutModal.classList.add("active")
+
+    // Prevent scrolling when modal is open
+    document.body.style.overflow = "hidden"
+  }
+
+  // Function to close checkout modal
+  function closeCheckoutModal() {
+    // Remove active class first (for fade-out effect)
+    modalOverlay.classList.remove("active")
+    checkoutModal.classList.remove("active")
+
+    // Wait for transition to complete before hiding elements
+    setTimeout(() => {
+      modalOverlay.style.display = "none"
+      checkoutModal.style.display = "none"
+      document.body.style.overflow = "auto" // Re-enable scrolling
+    }, 300) // Match this with your CSS transition time
+  }
+
+  // Event listeners
+  if (submitOrderBtn) {
+    submitOrderBtn.addEventListener("click", (e) => {
+      e.preventDefault() // Prevent form submission
+
+      // First close the photo upload modal if it's open
+      const photoUploadModal = document.getElementById("photoUploadModal")
+      if (photoUploadModal) {
+        photoUploadModal.classList.remove("active")
+        setTimeout(() => {
+          photoUploadModal.style.display = "none"
+        }, 300)
+      }
+
+      // Then open the checkout modal
+      openCheckoutModal()
+    })
+  }
+
+  if (closeCheckout) {
+    closeCheckout.addEventListener("click", closeCheckoutModal)
+  }
+
+  if (modalOverlay) {
+    modalOverlay.addEventListener("click", (e) => {
+      // Only close if the overlay itself is clicked, not its children
+      if (e.target === modalOverlay) {
+        closeCheckoutModal()
+      }
+    })
+  }
+
+  // Handle payment form submission
+  if (paymentForm) {
+    paymentForm.addEventListener("submit", (e) => {
+      e.preventDefault()
+      alert("Order confirmed! Thank you for your purchase.")
+      closeCheckoutModal()
+    })
+  }
+
+  // Add event listener to the back to cart button
+  const backToCartBtn = document.querySelector(".back-to-cart")
+  if (backToCartBtn) {
+    backToCartBtn.addEventListener("click", closeCheckoutModal)
+  }
+})
+
+    </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+       document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
     const customOrderBtn = document.getElementById('customOrderBtn');
     const modalOverlay = document.getElementById('modalOverlay');
     const customCakeModal = document.getElementById('customCakeModal');
+    const photoUploadModal = document.getElementById('photoUploadModal');
     const closeModal = document.getElementById('closeModal');
+    const closePhotoModal = document.getElementById('closePhotoModal');
     const chooseLaterBtn = document.querySelector('.choose-later-btn');
     const startCustomizingBtn = document.querySelector('.start-customizing-btn');
     const orderOptions = document.querySelectorAll('.order-option');
+    const uploadArea = document.getElementById('uploadArea');
+    const cakePhotoInput = document.getElementById('cakePhotoInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const cakeDetailsForm = document.getElementById('cakeDetailsForm');
     
-    // Function to open modal with blur effect
-    function openModal() {
+    // Function to open modal with backdrop effect
+    function openModal(modal) {
         // Display the overlay and modal
         modalOverlay.style.display = 'block';
-        customCakeModal.style.display = 'block';
+        modal.style.display = 'block';
         
         // Force a reflow before adding the active class for the transition
         void modalOverlay.offsetWidth;
-        void customCakeModal.offsetWidth;
+        void modal.offsetWidth;
         
         // Add active class for fade-in effect
         modalOverlay.classList.add('active');
-        customCakeModal.classList.add('active');
+        modal.classList.add('active');
         
-        // Apply blur to everything except the modal
-        document.body.querySelectorAll('*:not(.custom-cake-modal):not(.custom-cake-modal *)').forEach(element => {
-            if (element !== modalOverlay && !modalOverlay.contains(element) && 
-                element !== customCakeModal && !customCakeModal.contains(element)) {
-                element.classList.add('blur-background');
-            }
-        });
-        
+        // No more blur effect, just use the overlay as backdrop
         document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
     }
     
-    // Function to close modal and remove blur
+    // Function to close modal
     function closeModalFunc() {
         // Remove active class first (for fade-out effect)
         modalOverlay.classList.remove('active');
         customCakeModal.classList.remove('active');
-        
-        // Remove blur from all elements
-        document.body.querySelectorAll('.blur-background').forEach(element => {
-            element.classList.remove('blur-background');
-        });
+        photoUploadModal.classList.remove('active');
         
         // Wait for transition to complete before hiding elements
         setTimeout(() => {
             modalOverlay.style.display = 'none';
             customCakeModal.style.display = 'none';
+            photoUploadModal.style.display = 'none';
             document.body.style.overflow = 'auto'; // Re-enable scrolling
         }, 300); // Match this with your CSS transition time
     }
     
     // Event listeners
-    customOrderBtn.addEventListener('click', openModal);
+    customOrderBtn.addEventListener('click', function() {
+        openModal(customCakeModal);
+    });
+    
     closeModal.addEventListener('click', closeModalFunc);
+    closePhotoModal.addEventListener('click', closeModalFunc);
     modalOverlay.addEventListener('click', closeModalFunc);
     chooseLaterBtn.addEventListener('click', closeModalFunc);
     
@@ -423,24 +743,116 @@
                 alert('Redirecting to cake customization page...');
                 // window.location.href = 'cake-customizer.html';
             } else {
-                // Open file upload dialog
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = 'image/*';
-                fileInput.click();
+                // Close the first modal
+                customCakeModal.classList.remove('active');
+                customCakeModal.style.display = 'none';
                 
-                fileInput.addEventListener('change', function() {
-                    if (this.files && this.files[0]) {
-                        alert('Photo uploaded successfully! Our team will contact you shortly.');
-                        closeModalFunc();
-                    }
-                });
+                // Open the photo upload modal
+                openModal(photoUploadModal);
             }
         } else {
             // If no option is selected, default to customization
             alert('Redirecting to cake customization page...');
             // window.location.href = 'cake-customizer.html';
         }
+    });
+    
+    // Handle file upload area
+    uploadArea.addEventListener('click', function() {
+        cakePhotoInput.click();
+    });
+    
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', function() {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        
+        if (e.dataTransfer.files.length) {
+            handleFileUpload(e.dataTransfer.files[0]);
+        }
+    });
+    
+    cakePhotoInput.addEventListener('change', function() {
+        if (this.files.length) {
+            handleFileUpload(this.files[0]);
+        }
+    });
+    
+    function handleFileUpload(file) {
+        if (!file.type.match('image.*')) {
+            alert('Please upload an image file');
+            return;
+        }
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Clear previous preview
+            previewContainer.innerHTML = '';
+            
+            // Create image preview
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'preview-image';
+            
+            // Create remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-image-btn';
+            removeBtn.innerHTML = '×';
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                previewContainer.innerHTML = '';
+                uploadArea.querySelector('.upload-placeholder').style.display = 'flex';
+                cakePhotoInput.value = '';
+            });
+            
+            // Add elements to preview container
+            previewContainer.appendChild(img);
+            previewContainer.appendChild(removeBtn);
+            
+            // Hide placeholder
+            uploadArea.querySelector('.upload-placeholder').style.display = 'none';
+        };
+        
+        reader.readAsDataURL(file);
+    }
+    
+    // Handle form submission
+    cakeDetailsForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Check if image is uploaded
+        if (previewContainer.innerHTML === '') {
+            alert('Please upload an image of your cake design');
+            return;
+        }
+        
+        // Get form values
+        const cakeSize = document.getElementById('cakeSize').value;
+        const cakeFlavor = document.getElementById('cakeFlavor').value;
+        const fillingType = document.getElementById('fillingType').value;
+        const frostingType = document.getElementById('frostingType').value;
+        const specialInstructions = document.getElementById('specialInstructions').value;
+        
+        // Here you would typically send this data to your server
+        // For now, we'll just show a success message
+        alert('Your custom cake order has been submitted! We will contact you shortly to confirm the details.');
+        
+        // Close the modal
+        closeModalFunc();
+        
+        // Reset form
+        cakeDetailsForm.reset();
+        previewContainer.innerHTML = '';
+        uploadArea.querySelector('.upload-placeholder').style.display = 'flex';
     });
     
     // Add CSS for selected option
