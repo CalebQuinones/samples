@@ -277,6 +277,7 @@ padding: 20px;
 margin: 20px 50px;
 text-align: center;
 border: none; /* Removed the blue border */
+/* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
 }
 
 .custom-cake-banner h3 {
