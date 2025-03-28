@@ -579,81 +579,93 @@ iframe {
     margin-right: 0.5rem;
   }
 
-  .burdir{
-    border: 1px solid #E44486;
-    margin-top: 30px;
-    margin-bottom: 30px;
-  }
+ /* Footer */
 footer {
     background-color: #FFD7E9;
     color: #FFF;
     padding: 40px 20px;
     position: relative;
-    top: 50px;
+    margin-top: 0px;
+    
+  }
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%; /* Adjust this value to control line length */
+    height: 5px;
+    background-color: #E44486;
 }
-
-.footer-content {
+  
+  .footer-content {
+    padding-top: 50px;
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 40px;
     color: #0A142F;
-}
-
-.footer-logo img {
-    width: 200px;
-    height: 200px;
+  }
+  
+  .footer-logo img {
+    width: 350px;
+    height: 350px;
     margin-bottom: 10px;
-}
-
-.footer-contact p {
+    position: relative;
+    right: 50px;
+  }
+  
+  .footer-contact p {
     margin: 5px 0;
-}
-
-.footer-social {
+  }
+  
+  .footer-social {
     display: flex;
     gap: 20px;
-}
-
-.footer-social a {
+  }
+  
+  .footer-social a {
     color: rgb(0, 0, 0);
     font-size: 24px;
-    transition: opacity 0.3s;
-}
-
-.footer-content text{
+    transition: color 0.3s, transfomr 0.3s;
+  }
+  
+  .footer-content text{
     color: #0A142F;
-}
-
-.footer-social a:hover {
-    opacity: 0.8;
-}
-
-.footer-links {
+  }
+  
+  .footer-social a:hover {
+    color: #E44486;
+    transform: scale(1.1);
+  }
+  
+  
+  .footer-links {
     display: flex;
     flex-direction: column;
     gap: 10px;
     color: #0A142F;
-}
-
-.footer-links a {
+  }
+  
+  .footer-links a {
     color: #0A142F;
     text-decoration: none;
     transition: opacity 0.3s;
-}
-
-.footer-links a:hover {
+  }
+  
+  .footer-links a:hover {
     opacity: 0.8;
-}
-
-.footer-copyright {
+  }
+  
+  .footer-copyright {
     text-align: center;
     margin-top: 40px;
     padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     color: #0A142F;
-}
+  }
 @media screen and (max-width: 480px) {
     .container {
         width: 100%;

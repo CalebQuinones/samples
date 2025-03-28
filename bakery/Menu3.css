@@ -1427,6 +1427,8 @@ nav.container {
 width: 100%;
 overflow-x: hidden;
 padding-top: 100px;
+padding-bottom: 60px;
+
 }
 
 
@@ -1725,6 +1727,16 @@ background-color: #FFD7E9;
 color: #FFF;
 padding: 40px 20px;
 }
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%; /* Adjust this value to control line length */
+  height: 5px;
+  background-color: #E44486;
+}
 
 .footer-content {
 max-width: 1200px;
@@ -1733,6 +1745,8 @@ display: grid;
 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 gap: 40px;
 color: #0A142F;
+padding-top: 50px;
+
 }
 
 .footer-logo img {
