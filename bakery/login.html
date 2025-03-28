@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log in to Your Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .custom-input {
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .custom-input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 5px rgba(255,105,180,0.5);
+        }
+        .Logo{
+            position: relative;
+            left: 160px;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-5xl flex shadow-lg rounded-xl overflow-hidden">
+        <div class="w-1/2 bg-white p-12 flex flex-col justify-center">
+            <div class="text-center mb-8">
+                <img src="Logo.png" class="Logo" class="mx-auto mb-4 rounded-full">
+                <h2 class="text-2xl font-bold text-gray-800">Log in your Account</h2>
+                <p class="text-gray-500 mt-2">Today is a new day. It's your day. You shape it. Log in to get started.</p>
+            </div>
+            
+            <form class="space-y-4">
+                <div>
+                    <input 
+                        type="email" 
+                        placeholder="Example@email.com" 
+                        class="w-full p-3 rounded-lg custom-input text-gray-700"
+                    >
+                </div>
+                <div>
+                    <input 
+                        type="password" 
+                        placeholder="At least 8 characters" 
+                        class="w-full p-3 rounded-lg custom-input text-gray-700"
+                    >
+                </div>
+                <div class="text-right">
+                    <a href="#" class="text-pink-500 hover:underline">Forgot Password?</a>
+                </div>
+                <button 
+                    class="w-full bg-pink-400 text-white py-3 rounded-lg hover:bg-pink-500 transition-colors"
+                >
+                    Sign in
+                </button>
+                
+                <div class="text-center text-gray-500 my-4">Or</div>
+                
+                <div class="space-y-3">
+                    <button 
+                        class="w-full flex items-center justify-center border border-gray-300 py-3 rounded-lg hover:bg-gray-50"
+                    >
+                        <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                            <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                            <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.32-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                            <path fill="#FBBC05" d="M11.68 28.18c-1.11-3.3-1.11-6.88 0-10.18V12.3H4.34A20.04 20.04 0 0 0 2 24c0 3.23.77 6.27 2.34 9.03l7.34-5.85z"/>
+                            <path fill="#EA4335" d="M24 9.75c3.23 0 6.13 1.15 8.41 3.35l6.31-6.31C34.91 3.29 29.62 1 24 1 15.4 1 7.96 5.93 4.34 14.97l7.34 5.85c1.74-5.2 6.59-9.07 12.32-9.07z"/>
+                        </svg>
+                        Sign in with Google
+                    </button>
+                    <button 
+                    class="w-full flex items-center justify-center border border-gray-300 py-3 rounded-lg hover:bg-gray-50"
+                >
+                    <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#3F60A0" d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20S35.046 4 24 4z"/>
+                        <path fill="#FFFFFF" d="M26.707 29.301h5.176l.813-5.258h-5.989v-2.874c0-2.184.714-4.121 2.757-4.121h3.283V12.46c-.532-.073-1.834-.232-4.186-.232-4.455 0-7.061 2.345-7.061 7.683v3.131h-4.565v5.258h4.565v14.311h5.601V29.301z"/>
+                    </svg>
+                    Sign in with Facebook
+                </button>
+                </div>
+                
+                <div class="text-center mt-4 text-gray-600">
+                    Don't have an account? <a href="#" class="text-pink-500 hover:underline">Sign up</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="w-1/2">
+            <img 
+                src="image 3.png" 
+                alt="Birthday celebration" 
+                class="w-full h-full object-cover"
+            >
+        </div>
+    </div>
+</body>
+</html>
