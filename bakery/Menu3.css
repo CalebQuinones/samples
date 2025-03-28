@@ -271,6 +271,7 @@ filter: drop-shadow(2px 2px 2px #525252);
 }
 }
 .custom-cake-banner {
+
   position: relative;
   border-radius: 15px;
   margin: 20px 50px;
@@ -297,6 +298,15 @@ filter: drop-shadow(2px 2px 2px #525252);
   100% {
       background-position: 0% 50%;
   }
+
+background-color: #ff8bb4; /* Updated to match the bright pink color in the image */
+border-radius: 15px;
+padding: 20px;
+margin: 20px 50px;
+text-align: center;
+border: none; /* Removed the blue border */
+/* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+
 }
 
 .custom-cake-banner h3 {
