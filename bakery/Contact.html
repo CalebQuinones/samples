@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Contact.css">
 
 </head>
@@ -39,24 +39,156 @@
                 </ul>
             </div>
             <div class="cart-profile">
-              <div class="cart-icon">
+              <div class="cart-icon" id="cartIcon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  <span class="cart-count"></span>
+                  <span class="cart-count">0</span>
               </div>
-              <div class="profile-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-              </div>
+              <a href="account.html"><div class="profile-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                 </div>
+              </a>
           </div>
         </nav>
     </header>
+    <!-- Cart Popup -->
+<div class="cart-popup" id="cartPopup">
+    <div class="cart-popup-content">
+        <div class="cart-popup-header">
+            <h3>Your Cart</h3>
+            <button class="close-cart" id="closeCart">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 6L18 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        <div class="cart-popup-items" id="cartPopupItems">
+            <!-- Cart items will be dynamically inserted here -->
+        </div>
+        <div class="cart-popup-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">Php 0</span>
+            </div>
+            <button class="shop-more-btn" id="shopMoreBtn">Shop more</button>
+            <button class="checkout-btn" id="checkoutBtn">Go to Checkout</button>
+        </div>
+    </div>
+</div>
+  <!-- Checkout Modal -->
+<div class="checkout-modal" id="checkoutModal">
+    <div class="checkout-content">
+        <div class="checkout-header">
+            <h2>Checkout</h2>
+            <button class="close-checkout" id="closeCheckout">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 6L18 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
 
+        <div class="checkout-body">
+            <div class="checkout-left">
+                <div class="back-to-cart">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 19L5 12L12 5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Back to cart</span>
+                </div>
+
+                <div class="checkout-section">
+                    <h3>Review your purchases</h3>
+                    <div class="cart-items-container">
+                        <div class="cart-items" id="orderItemsList">
+                            <!-- Cart items will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-section">
+                    <h3>Delivery Options</h3>
+                    <div class="delivery-options">
+                        <div class="delivery-option">
+                            <input type="radio" id="standardDelivery" name="deliveryOption" value="standard" checked>
+                            <label for="standardDelivery">
+                                <div class="option-title">Php 50 - Standard delivery</div>
+                                <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
+                            </label>
+                        </div>
+                        <div class="delivery-option">
+                            <input type="radio" id="pickupOption" name="deliveryOption" value="pickup">
+                            <label for="pickupOption">
+                                <div class="option-title">No cost - Pick-up</div>
+                                <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-right">
+                <div class="payment-details">
+                    <h3>Payment Details</h3>
+                    <p class="payment-subtitle">Complete your order by providing your payment details</p>
+
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="Enter your email here..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fullname">Fullname</label>
+                            <input type="text" id="fullname" placeholder="Enter your fullname here..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Delivery Address</label>
+                            <input type="text" id="address" placeholder="Enter your address..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deliveryDate">Delivery date/Pick-up date</label>
+                            <input type="date" id="deliveryDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Payment</label>
+                            <div class="payment-options">
+                                <div class="payment-option">
+                                    <input type="radio" id="cardPayment" name="paymentMethod" value="card" checked>
+                                    <label for="cardPayment">Card</label>
+                                </div>
+                                <div class="payment-option">
+                                    <input type="radio" id="gcashPayment" name="paymentMethod" value="gcash">
+                                    <label for="gcashPayment">
+                                        <img src="https://www.gcash.com/wp-content/uploads/2019/04/gcash-logo.png" alt="GCash" class="payment-icon">
+                                    </label>
+                                </div>
+                                <div class="view-all-options">
+                                    <span>View all options</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="confirm-button">CONFIRM</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Overlay -->
+<div class="modal-overlay" id="modalOverlay"></div>
     <section>
            <img src="meltdown1.png" class="melt">
            <div class="contact">
@@ -136,7 +268,7 @@
                 <div class="contact-item-icon">✉️</div>
                 <div class="contact-item-content">
                     <div class="contact-item-title">EMAIL</div>
-                    <div>triplejbakery@gmail.com</div>
+                    <div><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="493d3b2039252c232b28222c3b30092e24282025672a2624">[email&#160;protected]</a></div>
                 </div>
             </div>
             <div class="contact-item">
@@ -161,9 +293,15 @@
                 <a href="MenuSection.html"><img src="logo.png"></a>
             </div>
             <div class="footer-contact">
+
               <p>001 Road 10 Joseph Sitt Bagumbayan, Taguig City</p>
               <p>Call us: +63 918 746 4342</p>
               <p>Email: bascalmaylene@gmail.com</p>
+
+                <p>001 Road 10 Joseph Sitt Bagumbayan, Taguig City</p>
+                <p>Call us: +63 918 746 4342</p>
+                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8fedeefceceee3e2eef6e3eae1eacfe8e2eee6e3a1ece0e2">[email&#160;protected]</a></p>
+
             </div>
             <div class="footer-social">
                 <a href="#"><i class="fab fa-facebook"></i></a>
@@ -182,8 +320,9 @@
             <p>&copy; 2024 Triple J's Bakery. All rights reserved.</p>
         </div>
     </footer>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    <script src="cart-persistence.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    document.addEventListener('DOMContentLoaded', function() {
         const navToggle = document.querySelector('.nav-toggle');
         const navLinks = document.querySelector('.nav-links');
     
@@ -203,9 +342,6 @@
             }
         });
     });
-    
-    
-    </script>
-    
+</script>
 </body>
 </html>

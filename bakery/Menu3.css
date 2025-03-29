@@ -272,6 +272,34 @@ filter: drop-shadow(2px 2px 2px #525252);
 }
 }
 .custom-cake-banner {
+
+  position: relative;
+  border-radius: 15px;
+  margin: 20px 50px;
+  padding: 3px; /* This creates space for the thin border */
+  border: 2px solid 90deg, #ff00cc, #9933ff, #3366ff, #00ccff, #ff00cc;
+  background-size: 400% 400%;
+  animation: borderRotate 3s linear infinite;
+}
+
+.banner-content {
+  background-color: #ff8bb4;
+  border-radius: 12px; /* Slightly smaller than parent to show the border */
+  padding: 20px;
+  text-align: center;
+}
+
+@keyframes borderRotate {
+  0% {
+      background-position: 0% 50%;
+  }
+  50% {
+      background-position: 100% 50%;
+  }
+  100% {
+      background-position: 0% 50%;
+  }
+
 background-color: #ff8bb4; /* Updated to match the bright pink color in the image */
 border-radius: 15px;
 padding: 20px;
@@ -279,32 +307,33 @@ margin: 20px 50px;
 text-align: center;
 border: none; /* Removed the blue border */
 /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+
 }
 
 .custom-cake-banner h3 {
-color: #525252; /* Darker text color */
-margin-bottom: 15px;
-font-family: "madimi one";
-font-size: 40px;
-text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Added text shadow for the effect shown */
+  color: #525252;
+  margin-bottom: 15px;
+  font-family: "madimi one";
+  font-size: 40px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .custom-order-btn {
-background-color: white;
-color: #555;
-border: none;
-border-radius: 50px;
-padding: 8px 25px;
-font-size: 14px;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.3s;
-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added subtle shadow to the button */
+  background-color: white;
+  color: #555;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .custom-order-btn:hover {
-background-color: #f8f8f8;
-transform: scale(1.05);
+  background-color: #f8f8f8;
+  transform: scale(1.05);
 }
 
 :root {
@@ -385,12 +414,6 @@ transform: scale(1.05);
 .modal-overlay.active {
   opacity: 1;
 }
-
-/* Remove blur-background class */
-.blur-background {
-  /* This class is now empty - we're not using blur anymore */
-}
-
 /* Custom Cake Modal - Add some depth with shadow */
 .custom-cake-modal {
   position: fixed;
@@ -499,6 +522,328 @@ transform: scale(1.05);
   margin-bottom: 20px;
   cursor: pointer;
 }
+/* Cart Popup Styles */
+.cart-popup {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 380px;
+  height: 100vh;
+  background-color: #fff;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 1100;
+  transition: right 0.3s ease;
+  display: none;
+}
+
+.cart-popup.active {
+  right: 0;
+}
+
+.cart-popup-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #fff5f9;
+}
+
+.cart-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  background-color: white;
+}
+
+.cart-popup-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.close-cart {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.cart-popup-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.empty-cart-message {
+  text-align: center;
+  color: #999;
+  margin-top: 50px;
+}
+
+.cart-popup-item {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.cart-item-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-right: 12px;
+  background-color: #f5f5f5;
+}
+
+.cart-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item-details {
+  flex: 1;
+}
+
+.cart-item-details h4 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.cart-item-details p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.cart-item-quantity {
+  display: flex;
+  align-items: center;
+  margin: 0 15px;
+}
+
+.cart-quantity-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cart-quantity-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.cart-quantity {
+  margin: 0 8px;
+  font-size: 14px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.cart-item-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #e84b8a;
+}
+
+.cart-popup-footer {
+  padding: 15px;
+  border-top: 1px solid #eee;
+  background-color: white;
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.shop-more-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: white;
+  color: #e84b8a;
+  border: 1px solid #e84b8a;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: background-color 0.2s;
+}
+
+.shop-more-btn:hover {
+  background-color: #fff5f9;
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #e84b8a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkout-btn:hover {
+  background-color: #d63f7a;
+}
+
+/* Custom scrollbar for cart items */
+.cart-popup-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cart-popup-items::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.cart-popup-items::-webkit-scrollbar-thumb {
+  background: #e84b8a;
+  border-radius: 10px;
+}
+
+.cart-popup-items::-webkit-scrollbar-thumb:hover {
+  background: #d63f7a;
+}
+
+/* Animation for cart items */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive styles for cart popup */
+@media screen and (max-width: 480px) {
+  .cart-popup {
+    width: 100%;
+    right: -100%;
+  }
+}
+
+/* Cart items container styles */
+.cart-items-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 5px;
+  background-color: #fff;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart-item {
+  display: flex;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px;
+  transition: background-color 0.2s ease;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.cart-item:hover {
+  background-color: #f9f9f9;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  margin-right: 15px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.item-details p {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Custom scrollbar for the cart items container */
+.cart-items-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cart-items-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.cart-items-container::-webkit-scrollbar-thumb {
+  background: #e84b8a;
+  border-radius: 10px;
+}
+
+.cart-items-container::-webkit-scrollbar-thumb:hover {
+  background: #d63f7a;
+}
+
+/* Make cart count visible */
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e84b8a;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
 
 .back-to-cart svg {
   margin-right: 5px;
@@ -613,6 +958,112 @@ transform: scale(1.05);
   color: #666;
   margin-bottom: 20px;
 }
+/* Add these styles for the scrollable cart items container */
+.cart-items-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 5px;
+  background-color: #fff;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart-item {
+  display: flex;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px;
+  transition: background-color 0.2s ease;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.cart-item:hover {
+  background-color: #f9f9f9;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  margin-right: 15px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.item-details p {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Custom scrollbar for the cart items container */
+.cart-items-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cart-items-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.cart-items-container::-webkit-scrollbar-thumb {
+  background: #e84b8a;
+  border-radius: 10px;
+}
+
+.cart-items-container::-webkit-scrollbar-thumb:hover {
+  background: #d63f7a;
+}
+
+/* Animation for new cart items */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Make cart count visible */
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e84b8a;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
 
 .form-group {
   margin-bottom: 15px;
@@ -1570,6 +2021,8 @@ background-position: center;
 transition: transform 0.3s ease;
 margin: 0 auto;
 margin-bottom: 10px;
+position: relative;
+left: -10px;
 }
 
 /* New styles for star ratings */
@@ -1597,12 +2050,13 @@ color: #FFD700;
 .quantity-control {
 display: flex;
 align-items: center;
-margin: 10px 0;
+margin: 10px 0px;
 border: 1px solid #e0e0e0;
 border-radius: 4px;
 overflow: hidden;
-width: 100px;
+width: 80px;
 margin-left: 12px;
+
 }
 
 .quantity-btn {
@@ -1615,6 +2069,7 @@ cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
+
 }
 
 .quantity-btn:hover {
