@@ -2018,6 +2018,8 @@ background-position: center;
 transition: transform 0.3s ease;
 margin: 0 auto;
 margin-bottom: 10px;
+position: relative;
+left: -10px;
 }
 
 /* New styles for star ratings */
@@ -2045,12 +2047,13 @@ color: #FFD700;
 .quantity-control {
 display: flex;
 align-items: center;
-margin: 10px 0;
+margin: 10px 0px;
 border: 1px solid #e0e0e0;
 border-radius: 4px;
 overflow: hidden;
-width: 100px;
+width: 80px;
 margin-left: 12px;
+
 }
 
 .quantity-btn {
@@ -2063,6 +2066,7 @@ cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
+
 }
 
 .quantity-btn:hover {

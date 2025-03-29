@@ -114,120 +114,135 @@
         </div>
     </section>
 
-    <!-- Account Section -->
+    <!-- Account Section - Updated to match new design -->
     <section class="account-section">
         <div class="account-container">
             <!-- Profile Photo -->
             <div class="profile-photo"></div>
             
-            <!-- Account Tabs -->
-            <div class="account-tabs">
-                <div class="tab" data-tab="personal">Personal Information</div>
-                <div class="tab active" data-tab="orders">My Orders</div>
-                <div class="tab" data-tab="address">Manage Address</div>
-                <div class="tab" data-tab="payment">Payment Method</div>
-                <div class="tab" data-tab="logout">Log Out</div>
-            </div>
-            
-            <!-- Tab Content -->
-            <div class="tab-content hidden" id="personal-content">
-                <div class="input-row">
-                    <input type="text" placeholder="First name">
-                    <input type="text" placeholder="Last Name">
+            <!-- Account Layout -->
+            <div class="account-layout">
+                <!-- Account Tabs -->
+                <div class="account-tabs">
+                    <div class="tab active" data-tab="personal">Personal Information</div>
+                    <div class="tab" data-tab="orders">My Orders</div>
+                    <div class="tab" data-tab="address">Manage Address</div>
+                    <div class="tab" data-tab="payment">Payment Method</div>
+                    <div class="tab" data-tab="logout">Log Out</div>
                 </div>
                 
-                <div class="input-row">
-                    <input type="email" placeholder="Email">
-                </div>
-                
-                <div class="input-row">
-                    <input type="tel" placeholder="Phone">
-                </div>
-                
-                <div class="input-row">
-                    <input type="date" placeholder="Birthday">
-                </div>
-                
-                <button class="update-button">Update Changes</button>
-            </div>
-            
-            <div class="tab-content" id="orders-content">
-                <div class="orders-header">
-                    <h3>Orders (2)</h3>
-                </div>
-                
-                <div class="order-details">
-                    <div class="order-header">
-                        <div class="order-id">
-                            <span class="label">ID:</span>
-                            <span class="value">#ABC9342</span>
+                <!-- Tab Content Container -->
+                <div class="tab-content-container">
+                    <!-- Personal Information Tab -->
+                    <div class="tab-content active" id="personal-content">
+                        <div class="input-row">
+                            <input type="text" placeholder="First name">
                         </div>
-                        <div class="order-date">
-                            <span class="label">Date:</span>
-                            <span class="value">19th Jul 2023</span>
+                        
+                        <div class="input-row">
+                            <input type="text" placeholder="Last Name">
                         </div>
-                        <div class="order-status">
-                            <span class="status-badge">Delivered</span>
+                        
+                        <div class="input-row">
+                            <input type="email" placeholder="Email">
                         </div>
+                        
+                        <div class="input-row">
+                            <input type="tel" placeholder="Phone">
+                        </div>
+                        
+                        <div class="input-row">
+                            <input type="date" placeholder="Birthday">
+                        </div>
+                        
+                        <button class="update-button">Update Changes</button>
                     </div>
                     
-                    <div class="order-items-container">
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="strawberry-cake.jpg" alt="Strawberry Short Cake">
+                    <!-- Orders Tab -->
+                    <div class="tab-content" id="orders-content">
+                        <div class="orders-header">Orders (2)</div>
+                        
+                        <table class="order-table">
+                            <thead>
+                                <tr>
+                                    <th class="order-table-header">Order ID</th>
+                                    <th class="order-table-header">Total Price</th>
+                                    <th class="order-table-header">Delivery Status</th>
+                                    <th class="order-table-header">Ordered Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="order-item-cell">#ABC9342</td>
+                                    <td class="order-item-cell">Php 1,500.00</td>
+                                    <td class="order-item-cell">Onsite</td>
+                                    <td class="order-item-cell">19 July 2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="order-items">
+                            <div class="order-item">
+                                <div class="order-item-cell">
+                                    <div class="item-image"></div>
+                                </div>
+                                <div class="order-item-cell">
+                                    <h4>Strawberry Short Cake</h4>
+                                    <p>Php 350.00</p>
+                                </div>
                             </div>
-                            <div class="item-details">
-                                <h4>Strawberry Short Cake</h4>
-                                <p>Php 350.00</p>
+                            
+                            <div class="order-item">
+                                <div class="order-item-cell">
+                                    <div class="item-image"></div>
+                                </div>
+                                <div class="order-item-cell">
+                                    <h4>1 Pack Chocolate Cookies</h4>
+                                    <p>Php 120.00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="order-item">
+                                <div class="order-item-cell">
+                                    <div class="item-image"></div>
+                                </div>
+                                <div class="order-item-cell">
+                                    <h4>1 Pack Chocolate Cookies</h4>
+                                    <p>Php 120.00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="order-item">
+                                <div class="order-item-cell">
+                                    <div class="item-image"></div>
+                                </div>
+                                <div class="order-item-cell">
+                                    <h4>Strawberry Short Cake</h4>
+                                    <p>Php 350.00</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="chocolate-cookies.jpg" alt="Triple Chocolate Cookies">
-                            </div>
-                            <div class="item-details">
-                                <h4>Triple Chocolate Cookies</h4>
-                                <p>Php 120.00</p>
-                            </div>
-                        </div>
-                        
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="chocolate-cookies.jpg" alt="Triple Chocolate Cookies">
-                            </div>
-                            <div class="item-details">
-                                <h4>Triple Chocolate Cookies</h4>
-                                <p>Php 120.00</p>
-                            </div>
-                        </div>
-                        
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="strawberry-cake.jpg" alt="Strawberry Short Cake">
-                            </div>
-                            <div class="item-details">
-                                <h4>Strawberry Short Cake</h4>
-                                <p>Php 350.00</p>
-                            </div>
-                        </div>
+                        <div class="order-status">Your Order Status</div>
+                        <button class="track-order-button">Track Order</button>
+                    </div>
+                    
+                    <!-- Address Tab -->
+                    <div class="tab-content" id="address-content">
+                        <p class="empty-message">No addresses saved.</p>
+                    </div>
+                    
+                    <!-- Payment Tab -->
+                    <div class="tab-content" id="payment-content">
+                        <p class="empty-message">No payment methods saved.</p>
+                    </div>
+                    
+                    <!-- Logout Tab -->
+                    <div class="tab-content" id="logout-content">
+                        <p class="confirm-message">Are you sure you want to log out?</p>
+                        <button class="logout-button">Confirm Logout</button>
                     </div>
                 </div>
-                
-                <button class="track-order-button">Track Order</button>
-            </div>
-            
-            <div class="tab-content hidden" id="address-content">
-                <p class="empty-message">No addresses saved.</p>
-            </div>
-            
-            <div class="tab-content hidden" id="payment-content">
-                <p class="empty-message">No payment methods saved.</p>
-            </div>
-            
-            <div class="tab-content hidden" id="logout-content">
-                <p class="confirm-message">Are you sure you want to log out?</p>
-                <button class="logout-button">Confirm Logout</button>
             </div>
         </div>
     </section>
@@ -267,22 +282,24 @@
             // Navigation toggle
             const navToggle = document.querySelector('.nav-toggle');
             const navLinks = document.querySelector('.nav-links');
-        
-            navToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('active');
-                
-                // Toggle hamburger to X
-                this.classList.toggle('active');
-            });
-        
-            // Close menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const isClickInsideNav = navLinks.contains(event.target) || navToggle.contains(event.target);
-                if (!isClickInsideNav && navLinks.classList.contains('active')) {
-                    navLinks.classList.remove('active');
-                    navToggle.classList.remove('active');
-                }
-            });
+    
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    
+                    // Toggle hamburger to X
+                    this.classList.toggle('active');
+                });
+            
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    const isClickInsideNav = navLinks.contains(event.target) || navToggle.contains(event.target);
+                    if (!isClickInsideNav && navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        navToggle.classList.remove('active');
+                    }
+                });
+            }
 
             // Account tabs functionality
             const tabs = document.querySelectorAll('.tab');
@@ -297,15 +314,15 @@
                     this.classList.add('active');
                     
                     // Hide all tab contents
-                    tabContents.forEach(content => content.classList.add('hidden'));
+                    tabContents.forEach(content => content.classList.remove('active'));
                     
                     // Show the corresponding tab content
                     const tabName = this.getAttribute('data-tab');
-                    document.getElementById(`${tabName}-content`).classList.remove('hidden');
+                    document.getElementById(`${tabName}-content`).classList.add('active');
                 });
             });
 
-            // Cart functionality (keeping your existing code)
+            // Cart functionality
             const cartIcon = document.getElementById('cartIcon');
             const cartPopup = document.getElementById('cartPopup');
             const closeCart = document.getElementById('closeCart');
@@ -325,8 +342,6 @@
                     }, 300);
                 });
             }
-            
-            // Rest of your cart functionality...
         });
     </script>
 <script>
@@ -654,9 +669,8 @@ function addToCart(item) {
     // Update the display
     updateCartCount();
 }
-
-
 </script>
     
 </body>
 </html>
+
