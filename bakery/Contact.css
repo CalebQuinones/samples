@@ -715,7 +715,7 @@ body {
 }
 
 .top-banner {
-    background-color: #FFBBD7;
+    background-color: #F0679F;
     color: #333;
     text-align: center;
     position: fixed;
@@ -728,7 +728,8 @@ body {
     font-style: normal;
     font-weight: 800;
     line-height: normal;
-    width: 1550px
+    width: 1550px;
+    height: 15vh;
 
 }
 header {
