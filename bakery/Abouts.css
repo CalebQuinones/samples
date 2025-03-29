@@ -292,11 +292,11 @@ button {
 }
 /* Footer */
 footer {
-    background-color: #FFD7E9;
+    background-color: #FFE6F0;
     color: #FFF;
     padding: 40px 20px;
     position: relative;
-    margin-top: 0px;
+    margin-top: 90px;
   }
   footer::before {
     content: '';

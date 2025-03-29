@@ -1427,7 +1427,8 @@ nav.container {
 width: 100%;
 overflow-x: hidden;
 padding-top: 100px;
-padding-bottom: 60px;
+padding-bottom: 100px;
+
 
 }
 
@@ -1726,16 +1727,19 @@ footer {
 background-color: #FFD7E9;
 color: #FFF;
 padding: 40px 20px;
+padding-top: 60px;
+
 }
 footer::before {
   content: '';
   position: absolute;
-  top: 0;
+  top: 1;
   left: 50%;
   transform: translateX(-50%);
   width: 80%; /* Adjust this value to control line length */
   height: 5px;
   background-color: #E44486;
+  
 }
 
 .footer-content {

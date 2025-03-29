@@ -1200,11 +1200,12 @@ footer {
   padding: 40px 20px;
   position: relative;
   margin-top: -260px;
+  padding-top: 80px;
 }
 footer::before {
   content: '';
   position: absolute;
-  top: 0;
+  top: 1;
   left: 50%;
   transform: translateX(-50%);
   width: 80%; /* Adjust this value to control line length */
