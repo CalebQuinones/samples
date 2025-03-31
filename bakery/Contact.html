@@ -191,6 +191,7 @@
 <div class="modal-overlay" id="modalOverlay"></div>
     <section>
            <img src="meltdown1.png" class="melt">
+           <div clas="buong-content">
            <div class="contact">
              <h2>Contact Us</h2>
            </div>
@@ -225,6 +226,7 @@
                 </form>
             </div>
         </div>
+        <div class = "kingina">
         <div class="business-hours-card">
             <div class="business-hours-title">
                 <span class="clock-icon">🕒</span>
@@ -248,6 +250,7 @@
           </svg>Find Us!</h1>
         <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15452.11962132778!2d121.0519816!3d14.4829723!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cf0c38d4663f%3A0x316dfb3b2003f0ce!2sTriple%20J%20and%20Rose&#39;s%20Bakery!5e0!3m2!1sen!2sph!4v1733152230083!5m2!1sen!2sph" 
     width="650" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
         
 
 
@@ -320,6 +323,7 @@
             <p>&copy; 2024 Triple J's Bakery. All rights reserved.</p>
         </div>
     </footer>
+</div>
     <script src="cart-persistence.js"></script>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -343,5 +347,72 @@
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+  const meltElement = document.querySelector('.melt');
+  
+  if (meltElement) {
+    // Initial position (slightly up)
+    meltElement.style.transform = 'translateY(-30px)';
+    
+    // Maximum scroll position where the effect should complete
+    const maxScrollPosition = 200; // Adjust this value as needed
+    
+    window.addEventListener('scroll', function() {
+      // Get current scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Calculate how far to move the element (from -30px to 0px)
+      if (scrollPosition <= maxScrollPosition) {
+        // Calculate percentage of scroll progress
+        const scrollPercentage = scrollPosition / maxScrollPosition;
+        
+        // Calculate new Y position (from -30px to 0px)
+        const newYPosition = -30 + (scrollPercentage * 30);
+        
+        // Apply the transform
+        meltElement.style.transform = `translateY(${newYPosition}px)`;
+      } else {
+        // Keep it at final position once scroll exceeds max
+        meltElement.style.transform = 'translateY(0)';
+      }
+    });
+  }
+});
+</script>
+<!-- Add this before your closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const meltElement = document.querySelector('.melt');
+      
+      if (meltElement) {
+        // Initial position (slightly up)
+        meltElement.style.transform = 'translateY(-30px)';
+        
+        // Maximum scroll position where the effect should complete
+        const maxScrollPosition = 200; // Adjust this value as needed
+        
+        window.addEventListener('scroll', function() {
+          // Get current scroll position
+          const scrollPosition = window.scrollY;
+          
+          // Calculate how far to move the element (from -30px to 0px)
+          if (scrollPosition <= maxScrollPosition) {
+            // Calculate percentage of scroll progress
+            const scrollPercentage = scrollPosition / maxScrollPosition;
+            
+            // Calculate new Y position (from -30px to 0px)
+            const newYPosition = -30 + (scrollPercentage * 30);
+            
+            // Apply the transform
+            meltElement.style.transform = `translateY(${newYPosition}px)`;
+          } else {
+            // Keep it at final position once scroll exceeds max
+            meltElement.style.transform = 'translateY(0)';
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
