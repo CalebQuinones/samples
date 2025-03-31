@@ -854,25 +854,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
       })
   
-      // Add a test button for debugging
-      const testButton = document.createElement("button")
-      testButton.textContent = "Test Product Popup"
-      testButton.style.position = "fixed"
-      testButton.style.bottom = "20px"
-      testButton.style.right = "20px"
-      testButton.style.zIndex = "999"
-      testButton.style.padding = "10px 20px"
-      testButton.style.backgroundColor = "#E44486"
-      testButton.style.color = "white"
-      testButton.style.border = "none"
-      testButton.style.borderRadius = "5px"
-      testButton.style.cursor = "pointer"
-  
-      testButton.addEventListener("click", () => {
-        openProductModal(1)
-      })
-  
-      document.body.appendChild(testButton)
+      
     }
   })
   
