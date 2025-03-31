@@ -1713,6 +1713,7 @@ background-color: #FF69B4;
     text-align: center;
     position: relative;
     bottom: 260px;
+    padding-bottom: 50px;
   }
   
   .section-title {
@@ -1850,9 +1851,20 @@ footer {
   padding: 40px 20px;
   position: relative;
   margin-top: -260px;
+  padding-top: 80px;
 }
-
+footer::before {
+  content: '';
+  position: absolute;
+  top: 1;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%; /* Adjust this value to control line length */
+  height: 5px;
+  background-color: #E44486;
+}
 .footer-content {
+  padding-top: 50px;
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
