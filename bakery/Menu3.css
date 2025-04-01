@@ -1898,6 +1898,8 @@ background-color: #FFD7E9;
   min-width: 120px;
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
+  left: 220px;
 }
 
 .category-card:hover {
