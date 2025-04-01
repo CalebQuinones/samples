@@ -152,6 +152,7 @@
     </div>
     <img src="meltdown1.png" class="melt">
     </section>
+    <div class="buong-content">
     <h1 class="ulo">OUR STORY</h1>
     <section class="history">
             <img src="mama.jpg" class="mama">
@@ -316,6 +317,7 @@
                     <p>&copy; 2024 Triple J's Bakery. All rights reserved.</p>
                 </div>
             </footer>
+        </div>   
             <script src="cart-persistence.js"></script>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -334,6 +336,38 @@
                 workShowcase.scrollLeft += scrollAmount;
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+  const meltElement = document.querySelector('.melt');
+  
+  if (meltElement) {
+    // Initial position (slightly up)
+    meltElement.style.transform = 'translateY(-30px)';
+    
+    // Maximum scroll position where the effect should complete
+    const maxScrollPosition = 200; // Adjust this value as needed
+    
+    window.addEventListener('scroll', function() {
+      // Get current scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Calculate how far to move the element (from -30px to 0px)
+      if (scrollPosition <= maxScrollPosition) {
+        // Calculate percentage of scroll progress
+        const scrollPercentage = scrollPosition / maxScrollPosition;
+        
+        // Calculate new Y position (from -30px to 0px)
+        const newYPosition = -30 + (scrollPercentage * 30);
+        
+        // Apply the transform
+        meltElement.style.transform = `translateY(${newYPosition}px)`;
+      } else {
+        // Keep it at final position once scroll exceeds max
+        meltElement.style.transform = 'translateY(0)';
+      }
+    });
+  }
+});
     </script>
     
     
@@ -427,5 +461,92 @@ window.addEventListener('load', () => {
     });
 });
 </script>
+<!-- Add this before your closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const meltElement = document.querySelector('.melt');
+      
+      if (meltElement) {
+        // Initial position (slightly up)
+        meltElement.style.transform = 'translateY(-30px)';
+        
+        // Maximum scroll position where the effect should complete
+        const maxScrollPosition = 200; // Adjust this value as needed
+        
+        window.addEventListener('scroll', function() {
+          // Get current scroll position
+          const scrollPosition = window.scrollY;
+          
+          // Calculate how far to move the element (from -30px to 0px)
+          if (scrollPosition <= maxScrollPosition) {
+            // Calculate percentage of scroll progress
+            const scrollPercentage = scrollPosition / maxScrollPosition;
+            
+            // Calculate new Y position (from -30px to 0px)
+            const newYPosition = -30 + (scrollPercentage * 30);
+            
+            // Apply the transform
+            meltElement.style.transform = `translateY(${newYPosition}px)`;
+          } else {
+            // Keep it at final position once scroll exceeds max
+            meltElement.style.transform = 'translateY(0)';
+          }
+        });
+      }
+    });
+  </script>
+  <script>
+    // Intersection Observer to detect when elements enter the viewport
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements to animate - EXCLUDING hero section and meltdown
+  const animatedElements = [
+    { selector: '.history .mama, .history .papa', animation: 'fade-in-side', delay: 0.1 },
+    { selector: '.history .ptext', animation: 'fade-up', delay: 0.2 },
+    { selector: '.history1 .pinsan', animation: 'fade-in-side', delay: 0.1 },
+    { selector: '.history1 .htext2 p', animation: 'fade-up', delay: 0.2 },
+    { selector: '.review-card', animation: 'fade-in-scale', delay: 0.15 },
+    { selector: '.likod h1, .likod p', animation: 'fade-up', delay: 0.1 },
+    { selector: '.btn', animation: 'fade-up', delay: 0.2 }
+  ];
+
+  // Create animation classes for each element
+  animatedElements.forEach(item => {
+    const elements = document.querySelectorAll(item.selector);
+    elements.forEach((element, index) => {
+      // Add initial state class
+      element.classList.add('animate-on-scroll');
+      element.classList.add(item.animation);
+      
+      // Add staggered delay for groups of elements
+      if (elements.length > 1) {
+        element.style.transitionDelay = `${item.delay * (index + 1)}s`;
+      } else {
+        element.style.transitionDelay = `${item.delay}s`;
+      }
+    });
+  });
+
+  // Create the Intersection Observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      // Add the visible class when element enters viewport
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Unobserve after animation is triggered
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    root: null, // viewport
+    threshold: 0.1, // trigger when 10% of the element is visible
+    rootMargin: '0px 0px -50px 0px' // trigger slightly before element enters viewport
+  });
+
+  // Observe all elements with animate-on-scroll class
+  document.querySelectorAll('.animate-on-scroll').forEach(element => {
+    observer.observe(element);
+  });
+});
+  </script>
 </body>
 </html>

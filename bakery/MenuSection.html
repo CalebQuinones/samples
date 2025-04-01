@@ -1052,6 +1052,7 @@ function displayProducts(productsToShow) {
         </div>
     `).join('');
     
+    
     // ADDED EVENT LISTENERS FOR QUANTITY BUTTONS
     const plusButtons = document.querySelectorAll('.plus');
     const minusButtons = document.querySelectorAll('.minus');
@@ -1076,7 +1077,86 @@ function displayProducts(productsToShow) {
         });
     });
 }
+// Add this function to your menu page JavaScript, right after the displayProducts function
+function attachProductPopupListeners() {
+    // Get all product cards
+    const productCards = document.querySelectorAll('.product-card');
+    
+    // Add click event to each product card to open the modal
+    productCards.forEach((card) => {
+        card.addEventListener('click', function(e) {
+            // Don't trigger if clicking on buttons inside the card
+            if (e.target.closest('.quantity-btn') || e.target.closest('.add-to-order')) {
+                return;
+            }
 
+            const productId = parseInt(this.getAttribute('data-id'));
+            console.log("Product card clicked, ID:", productId);
+            
+            // Call the openProductModal function from product-popup-direct.js
+            if (typeof window.openProductModal === 'function') {
+                window.openProductModal(productId);
+            } else {
+                console.error("openProductModal function not found!");
+            }
+        });
+    });
+}
+
+// Modify your displayProducts function to call attachProductPopupListeners at the end
+function displayProducts(productsToShow) {
+    productGrid.innerHTML = productsToShow.map(product => `
+        <div class="product-card" data-category="${product.category}" data-id="${product.id}">
+            <div class="product-image" style="background-image: url(${product.image})"></div>
+            <div class="product-details">
+                <h3 class="product-name">${product.name}</h3>
+                <!-- STAR RATING ADDED HERE -->
+                <div class="product-rating">
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star">★</span>
+                </div>
+                <p class="product-price">Php ${product.price.toLocaleString()}</p>
+                <!-- QUANTITY CONTROL ADDED HERE -->
+                <div class="quantity-control">
+                    <button class="quantity-btn minus">-</button>
+                    <span class="quantity">1</span>
+                    <button class="quantity-btn plus">+</button>
+                </div>
+                <button class="add-to-order">Add to order</button>
+            </div>
+        </div>
+    `).join('');
+    
+    // ADDED EVENT LISTENERS FOR QUANTITY BUTTONS
+    const plusButtons = document.querySelectorAll('.plus');
+    const minusButtons = document.querySelectorAll('.minus');
+    
+    plusButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event bubbling
+            const quantityElement = this.parentElement.querySelector('.quantity');
+            let quantity = parseInt(quantityElement.textContent);
+            quantityElement.textContent = quantity + 1;
+        });
+    });
+    
+    minusButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event bubbling
+            const quantityElement = this.parentElement.querySelector('.quantity');
+            let quantity = parseInt(quantityElement.textContent);
+            if (quantity > 1) {
+                quantityElement.textContent = quantity - 1;
+            }
+        });
+    });
+    
+    // Attach product popup listeners to the newly created product cards
+    attachProductPopupListeners();
+}
 // Function to filter products
 function filterProducts(searchTerm = '', categoryFilter = '', availabilityFilter = '', priceFilter = '') {
     let filteredProducts = products.filter(product => {
@@ -1264,6 +1344,29 @@ function updateCartUI() {
     updateCheckoutItems();
 }
 
+// Back to top functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const backToTopButton = document.querySelector('.back-to-top');
+  
+  if (backToTopButton) {
+    // Show button when scrolled down
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 300) {
+        backToTopButton.classList.add('visible');
+      } else {
+        backToTopButton.classList.remove('visible');
+      }
+    });
+    
+    // Scroll to top when clicked
+    backToTopButton.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+});
 // Function to update checkout items
 function updateCheckoutItems() {
     const orderItemsList = document.getElementById('orderItemsList');
@@ -1393,6 +1496,111 @@ document.addEventListener('click', function(e) {
 displayProducts(products);
 updateCartUI();
       </script>
+
+
+<button class="back-to-top" aria-label="Back to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>   
+<!-- Add this before your closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const meltElement = document.querySelector('.melt');
       
+      if (meltElement) {
+        // Initial position (slightly up)
+        meltElement.style.transform = 'translateY(-30px)';
+        
+        // Maximum scroll position where the effect should complete
+        const maxScrollPosition = 200; // Adjust this value as needed
+        
+        window.addEventListener('scroll', function() {
+          // Get current scroll position
+          const scrollPosition = window.scrollY;
+          
+          // Calculate how far to move the element (from -30px to 0px)
+          if (scrollPosition <= maxScrollPosition) {
+            // Calculate percentage of scroll progress
+            const scrollPercentage = scrollPosition / maxScrollPosition;
+            
+            // Calculate new Y position (from -30px to 0px)
+            const newYPosition = -30 + (scrollPercentage * 30);
+            
+            // Apply the transform
+            meltElement.style.transform = `translateY(${newYPosition}px)`;
+          } else {
+            // Keep it at final position once scroll exceeds max
+            meltElement.style.transform = 'translateY(0)';
+          }
+        });
+      }
+    });
+  </script>    
+  <script>
+    // Intersection Observer to detect when elements enter the viewport
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements to animate - EXCLUDING hero section and meltdown
+  const animatedElements = [
+    { selector: '.Menu h2', animation: 'fade-up', delay: 0.1 },
+    { selector: '.category-card', animation: 'fade-in-scale', delay: 0.3 },
+    { selector: '.search-section', animation: 'fade-up', delay: 0.1 },
+    { selector: '.custom-cake-banner', animation: 'fade-in', delay: 0.2 },
+    { selector: '.product-card', animation: 'fade-up', delay: 0},
+    { selector: '.back-to-top', animation: 'fade-in', delay: 0.1 }
+  ];
+
+  // Create animation classes for each element
+  animatedElements.forEach(item => {
+    const elements = document.querySelectorAll(item.selector);
+    elements.forEach((element, index) => {
+      // Add initial state class
+      element.classList.add('animate-on-scroll');
+      element.classList.add(item.animation);
+      
+      // Add staggered delay for groups of elements
+      if (elements.length > 1) {
+        element.style.transitionDelay = `${item.delay * (index + 1)}s`;
+      } else {
+        element.style.transitionDelay = `${item.delay}s`;
+      }
+    });
+  });
+
+  // Create the Intersection Observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      // Add the visible class when element enters viewport
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Unobserve after animation is triggered
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    root: null, // viewport
+    threshold: 0.1, // trigger when 10% of the element is visible
+    rootMargin: '0px 0px -50px 0px' // trigger slightly before element enters viewport
+  });
+
+  // Observe all elements with animate-on-scroll class
+  document.querySelectorAll('.animate-on-scroll').forEach(element => {
+    observer.observe(element);
+  });
+
+  // Special handling for product cards that are added dynamically
+  // This will be called after products are displayed
+  window.animateNewProducts = function() {
+    const productCards = document.querySelectorAll('.product-card:not(.animate-on-scroll)');
+    
+    productCards.forEach((card, index) => {
+      card.classList.add('animate-on-scroll');
+      card.classList.add('fade-up');
+      card.style.transitionDelay = `${0.1 * (index % 4 + 1)}s`; // Stagger by row (assuming 4 cards per row)
+      observer.observe(card);
+    });
+  };
+});
+  </script>
 </body>
 </html>

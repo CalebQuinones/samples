@@ -248,92 +248,17 @@ margin-top: -179px;
 z-index: 1;
 filter: drop-shadow(2px 2px 2px #525252);
 }
-.melt{
+.melt {
   position: relative;
-  top:20px;
+  top: 20px;
   width: 1550px;
   max-width: 100%;
   left: 1px;
   height: 700px;
   z-index: -8;
-  animation: tulo 3s ease-in-out forwards infinite;
   margin-bottom: -160px;
   margin-top: -30px;
-}
-@keyframes tulo {
-0%{
-  transform: translateY(-30px);
-}
-50%{
-   transform: translateY(-30px);
-}
-100%{
-   transform: translateY(-3px);
-}
-}
-.custom-cake-banner {
-
-  position: relative;
-  border-radius: 15px;
-  margin: 20px 50px;
-  padding: 3px; /* This creates space for the thin border */
-  border: 2px solid 90deg, #ff00cc, #9933ff, #3366ff, #00ccff, #ff00cc;
-  background-size: 400% 400%;
-  animation: borderRotate 3s linear infinite;
-}
-
-.banner-content {
-  background-color: #ff8bb4;
-  border-radius: 12px; /* Slightly smaller than parent to show the border */
-  padding: 20px;
-  text-align: center;
-}
-
-@keyframes borderRotate {
-  0% {
-      background-position: 0% 50%;
-  }
-  50% {
-      background-position: 100% 50%;
-  }
-  100% {
-      background-position: 0% 50%;
-  }
-
-background-color: #ff8bb4; /* Updated to match the bright pink color in the image */
-border-radius: 15px;
-padding: 20px;
-margin: 20px 50px;
-text-align: center;
-border: none; /* Removed the blue border */
-/* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
-
-}
-
-.custom-cake-banner h3 {
-  color: #525252;
-  margin-bottom: 15px;
-  font-family: "madimi one";
-  font-size: 40px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.custom-order-btn {
-  background-color: white;
-  color: #555;
-  border: none;
-  border-radius: 50px;
-  padding: 8px 25px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.custom-order-btn:hover {
-  background-color: #f8f8f8;
-  transform: scale(1.05);
+  transition: transform 0.3s ease-out; /* Add smooth transition */
 }
 
 :root {
@@ -361,40 +286,104 @@ background-color: var(--secondary);
 overflow-x: hidden;
 }
 
-/* Custom Cake Banner */
+/* Custom Cake Banner - Updated with subtle glowing border effect */
 .custom-cake-banner {
-background-color: #ff8bb4;
-border-radius: 15px;
-padding: 20px;
-margin: 20px 50px;
-text-align: center;
-border: none;
+  position: relative;
+  background-color: #ff8bb4; /* Bright pink background */
+  border-radius: 15px;
+  padding: 30px 20px;
+  margin: 20px 50px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Subtle glowing border effect that follows the color scheme */
+.custom-cake-banner::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  border-radius: 17px; /* Slightly larger than the banner */
+  background: linear-gradient(90deg, #E84B8A, #FFD7E9, #E84B8A, #FFBBD7, #E84B8A);
+  background-size: 300% 300%;
+  animation: subtleBorderGlow 8s ease infinite; /* Much slower animation */
+  opacity: 0.8; /* More subtle effect */
+}
+
+/* Slower, more subtle animation for the border glow */
+@keyframes subtleBorderGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Text shadow effect for the heading */
 .custom-cake-banner h3 {
-color: #525252;
-margin-bottom: 15px;
-font-family: "madimi one", sans-serif;
-font-size: 40px;
-text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  color: #333;
+  margin-bottom: 20px;
+  font-family: "Madimi One", sans-serif;
+  font-size: 40px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Styled button to match the image */
 .custom-order-btn {
-background-color: white;
-color: #555;
-border: none;
-border-radius: 50px;
-padding: 8px 25px;
-font-size: 14px;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.3s;
-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  color: #555;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
 }
 
 .custom-order-btn:hover {
-background-color: #f8f8f8;
-transform: scale(1.05);
+  background-color: #f8f8f8;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .custom-cake-banner {
+    margin: 20px 20px;
+    padding: 20px 15px;
+  }
+  
+  .custom-cake-banner h3 {
+    font-size: 30px;
+  }
+  
+  .custom-order-btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .custom-cake-banner {
+    margin: 15px 10px;
+    padding: 15px 10px;
+  }
+  
+  .custom-cake-banner h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
 }
 
 /* Modal Overlay */
@@ -1698,7 +1687,7 @@ nav.container {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
-  margin-left: 0;
+  margin-left: -60px;
 }
 
 .categories::-webkit-scrollbar {
@@ -1891,9 +1880,11 @@ padding-bottom: 100px;
   padding-bottom: 16px;
   margin-bottom: 32px;
   margin-top: 0px;
-  margin-left: 250px;
+  margin-left: 50px;
   cursor: pointer;
 }
+
+
 #color{
 background-color: #FFD7E9;
 }
@@ -2011,6 +2002,14 @@ padding: 5px;
 margin-left: 15px;
 margin-right: 15px;
 }
+.product-card {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.product-card:hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
 
 .product-image {
 width: 100%;
@@ -2087,6 +2086,9 @@ width: 100%;
 padding: 0 10px;
 text-align: center;
 }
+.product-description {
+  line-height: 1.6;
+}
 
 .product-name {
 margin: 5px 0;
@@ -2116,7 +2118,31 @@ width: 100%;
 .add-to-order:hover {
 background-color: #45a049;
 }
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  cursor: pointer;
+  border: none;
+  z-index: 99;
+}
 
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
 /* Responsive adjustments */
 @media (max-width: 1024px) {
 .product-grid {
@@ -2565,4 +2591,45 @@ nav {
     height: 200px;
     margin-bottom: -100px;
 }
+
+}
+/* Base styles for animated elements */
+.animate-on-scroll {
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  will-change: opacity, transform;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translate(0, 0) scale(1) !important;
+}
+
+/* Fade up animation */
+.fade-up {
+  transform: translateY(40px);
+}
+
+/* Fade in scale animation */
+.fade-in-scale {
+  transform: scale(0.92);
+}
+
+/* Fade in animation */
+.fade-in {
+  opacity: 0;
+}
+
+/* Staggered animations for category cards */
+.category-card:nth-child(1) { transition-delay: 0.1s; }
+.category-card:nth-child(2) { transition-delay: 0.2s; }
+.category-card:nth-child(3) { transition-delay: 0.3s; }
+.category-card:nth-child(4) { transition-delay: 0.4s; }
+.category-card:nth-child(5) { transition-delay: 0.5s; }
+.category-card:nth-child(6) { transition-delay: 0.6s; }
+.category-card:nth-child(7) { transition-delay: 0.7s; }
+
+/* Ensure product cards animate nicely in a grid */
+.product-card {
+  transition-duration: 0.6s;
 }
