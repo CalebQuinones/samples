@@ -14,6 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <title class="ito may bago">About</title>
     <link rel="stylesheet" href="Abouts.css">
+    <link rel="stylesheet" href="order-confirmation.css">
+    <script src="cart-confirmation.js"></script>
 </head>
 <body>
     <div class="top-banner">
@@ -166,6 +168,31 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<!-- Order Confirmation Modal -->
+<div class="order-confirmation-modal" id="orderConfirmationModal">
+    <div class="order-confirmation-content">
+        <div class="confirmation-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="#E84B8A" />
+                <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h2>Order Confirmed!</h2>
+        <p>Thank you for your order. We've received your payment and are preparing your items.</p>
+        <div class="order-details">
+            <div class="order-id">
+                <span>Order ID:</span>
+                <span id="confirmationOrderId">TJR-12345</span>
+            </div>
+            <div class="order-date">
+                <span>Date:</span>
+                <span id="confirmationOrderDate">April 1, 2025</span>
+            </div>
+        </div>
+        <p class="confirmation-message">A confirmation email has been sent to your email address.</p>
+        <button class="check-status-btn" id="checkStatusBtn">Check Order Status</button>
     </div>
 </div>
 
