@@ -1,3 +1,99 @@
+<?php
+include 'loginchecker.php';
+include 'config.php';
+
+redirectToLogin();
+
+function updateValue($conn, $query, $param_type, $param_value) {
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($param_type, ...$param_value);
+    $stmt->execute();
+    $stmt->close();
+}
+
+
+$user_email = $_SESSION['user_email']; 
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update'])) {
+
+    $Fname = $_POST['Fname'];
+    $Lname = $_POST['Lname'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $birthday = $_POST['birthday'];
+    $address = $_POST['address'];
+    $payment = $_POST['payment'];
+    $profpic = $_POST['profpic'];
+
+    $updateFields = [];
+    $paramTypes = "";
+    $paramValues = [];
+
+  
+    if (!empty($Fname)) {
+        $updateFields[] = "Fname = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $Fname;
+    }
+    if (!empty($Lname)) {
+        $updateFields[] = "Lname = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $Lname;
+    }
+    if (!empty($email)) {
+        $updateFields[] = "email = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $email;
+    }
+    if (!empty($phone)) {
+        $updateFields[] = "phone = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $phone;
+    }
+    if (!empty($birthday)) {
+        $updateFields[] = "birthday = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $birthday;
+    }
+    if (!empty($address)) {
+        $updateFields[] = "address = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $address;
+    }
+    if (!empty($payment)) {
+        $updateFields[] = "payment = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $payment;
+    }
+    if (!empty($profpic)) {
+        $updateFields[] = "profpic = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $profpic;
+    }
+
+    if (count($updateFields) > 0) {
+        $updateQuery = "UPDATE login SET " . implode(", ", $updateFields) . " WHERE email = ?";
+        $paramTypes .= "s";
+        $paramValues[] = $user_email;
+
+        updateValue($conn, $updateQuery, $paramTypes, $paramValues);
+
+        $popupMessage = "Profile updated successfully!";
+    } else {
+        $popupMessage = "No changes were made to your profile.";
+    }
+}
+    if (isset($popupMessage)) {
+        ?>
+        <script type="text/javascript">
+            alert("<?php echo addslashes($popupMessage); ?>");
+            window.location.href = "account.php";
+        </script>
+        <?php
+        exit();
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +109,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="account.css">
+    <link rel="stylesheet" href="updateaccount.css">
     <link rel="stylesheet" href="order-confirmation.css">
     <script src="cart-confirmation.js"></script>
 </head>
@@ -35,7 +131,7 @@
                     <li><a href="TriplesJ_sandroseBakery.html" class="active">Home</a></li>
                     <li><a href="MenuSection.html">Menu</a></li>
                     <li><a href="Abouts.html">About</a></li>
-                    <li><a href="Contact.html">Contact</a></li>
+                    <li><a href="Contact.php">Contact</a></li>
                 </ul>
             </div>
             <div class="cart-profile">
@@ -150,51 +246,57 @@
     <button id="logout-btn" class="sidebar-button">Log Out</button>
 </div>
 
+
             <!-- Main Content -->
+            <form action=" " method="POST" enctype="multipart/form-data">
             <div class="main-content">
                 <!-- Personal Info Tab -->
                 <div id="personal-info-tab" class="tab-content active">
                     <div class="profile-picture-container">
-                        <div class="profile-picture">
-                            <span class="sr-only">Profile picture</span>
-                        </div>
+                        <label for="profile-picture-input">
+                            <div class="profile-picture">
+                                <span class="sr-only">Profile picture</span>
+                                <img id="profile-picture-preview" src="" alt="" style="display: none; width: 100%; height: 100%; border-radius: 9999px; object-fit: cover;">
+                            </div>
+                        </label>
+                            <input type="file" id="profile-picture-input" name="profpic" accept="image/*" style="display: none;">
                     </div>
                     
                     <div class="form-container">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="first-name">First name</label>
-                                <input id="first-name" type="text" class="input">
+                                <input id="first-name" name="Fname" type="text" class="input">
                             </div>
                             <div class="form-group">
                                 <label for="last-name">Last Name</label>
-                                <input id="last-name" type="text" class="input">
+                                <input id="last-name" name="Lname" type="text" class="input">
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input id="email" type="email" class="input">
+                            <input id="email" name="email" type="email" class="input">
                         </div>
                         
                         <div class="form-group">
                             <label for="phone">Phone</label>
-                            <input id="phone" type="tel" class="input">
+                            <input id="phone" name="phone" type="tel" class="input">
                         </div>
                         
                         <div class="form-group">
                             <label for="birthday">Birthday</label>
-                            <input id="birthday" type="date" class="input">
+                            <input id="birthday" name="birthday" type="date" class="input">
                         </div>
 
                         <div class="form-group">
                             <label for="address">Address</label>
-                            <textarea id="address" class="input textarea" rows="3" placeholder="Enter your address"></textarea>
+                            <textarea id="address" name="address" class="input textarea" rows="3" placeholder="Enter your address"></textarea>
                         </div>
                         
                         <div class="form-group">
                             <label for="payment-method">Payment Method</label>
-                            <select id="payment-method" class="input select">
+                            <select id="payment-method" name="payment" class="input select">
                                 <option value="" disabled selected>Select payment method</option>
                                 <option value="credit-card">Credit Card</option>
                                 <option value="debit-card">Debit Card</option>
@@ -205,7 +307,7 @@
                         </div>
                         
                         <div class="button-container">
-                            <button class="primary-button">Update Changes</button>
+                            <button name="update" class="primary-button">Update Changes</button>
                         </div>
                     </div>
                 </div>
@@ -279,6 +381,7 @@
                 </div>
             </div>
         </div>
+        </form>
     </div>
 
     <!-- Logout Confirmation Modal -->
@@ -288,10 +391,12 @@
             <p>Are you sure you want to log out?</p>
             <div class="modal-actions">
                 <button id="cancel-logout" class="outline-button">Cancel</button>
-                <button id="confirm-logout" class="primary-button">Confirm</button>
+                <a href='logout.php'><button id="confirm-logout" name="logout" class="primary-button">Confirm</button></a>
             </div>
         </div>
     </div>
+
+
 
     <script>
         // Tab switching functionality
@@ -372,6 +477,31 @@
     </footer>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+        const profilePictureInput = document.getElementById('profile-picture-input');
+        const profilePicturePreview = document.getElementById('profile-picture-preview');
+
+        document.querySelector('.profile-picture').addEventListener('click', () => {
+            profilePictureInput.click();
+        });
+
+        profilePictureInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+            
+                    profilePicturePreview.src = e.target.result;
+                    profilePicturePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+        
+                profilePicturePreview.src = '';
+                profilePicturePreview.style.display = 'none';
+            }
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Navigation toggle

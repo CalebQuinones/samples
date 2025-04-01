@@ -1,3 +1,36 @@
+<?php
+include 'config.php';
+
+
+if (isset($_POST['submit'])) {
+
+    $Fname = $_POST['Fname'];
+    $Lname = $_POST['Lname'];
+    $email = $_POST['email'];
+    $phone = $_POST['pnum'];
+    $message = $_POST['msg'];
+
+
+    $stmt = $conn->prepare("INSERT INTO inquiry (Fname, Lname, email, Pnum, msg) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $Fname, $Lname, $email, $phone, $message);
+
+
+    if ($stmt->execute()) {
+        // Display popup message
+        echo "<script type='text/javascript'>
+                alert('Thank you for your message, $Fname! We will get back to you shortly.');
+                window.location.href = 'contact.php';
+              </script>";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,7 +70,7 @@
                     <li><a href="TriplesJ_sandroseBakery.html" class="active">Home</a></li>
                     <li><a href="MenuSection.html">Menu</a></li>
                     <li><a href="Abouts.html">About</a></li>
-                    <li><a href="Contact.html">Contact</a></li>
+                    <li><a href="Contact.php">Contact</a></li>
                 </ul>
             </div>
             <div class="cart-profile">
@@ -49,7 +82,7 @@
                   </svg>
                   <span class="cart-count">0</span>
               </div>
-              <a href="account.html"><div class="profile-icon">
+              <a href="account.php"><div class="profile-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -223,36 +256,36 @@
              <h2>Contact Us</h2>
            </div>
     
-           
-            <div class="form-panel">
-                <form>
-                    <h1>We'd Love To Hear From You!</h1>
-                    <p>Need assistance? Please complete our brief inquiry form to contact us. We will respond promptly.</p> <br>
-                    <br>
 
-                    <div class="form-row">
-                        <div class="form-group"><p>First Name</p>
-                            <input type="text" placeholder="Enter first name" required>
-                        </div>
-                        <div class="form-group"><p>Last Name</p>
-                            <input type="text" placeholder="Enter last name" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><p>Address</p>
-                            <input type="email" placeholder="Enter your email address" required>
-                        </div>
-                        <div class="form-group"><p>Number</p>
-                            <input type="tel" placeholder="+63" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <textarea placeholder="Enter your message here" required></textarea>
-                    </div>
-                    <button type="submit" class="submit">Submit</button>
-                </form>
+           <div class="form-panel">
+        <form action="" method="post">
+        <h1>We'd Love To Hear From You!</h1>
+        <p>Need assistance? Please complete our brief inquiry form to contact us. We will respond promptly.</p> <br>
+        <br>
+
+        <div class="form-row">
+            <div class="form-group"><p>First Name</p>
+                <input type="text" name="Fname" placeholder="Enter first name" required>
+            </div>
+            <div class="form-group"><p>Last Name</p>
+                <input type="text" name="Lname" placeholder="Enter last name" required>
             </div>
         </div>
+        <div class="form-row">
+            <div class="form-group"><p>Email Address</p>
+                <input type="email" name="email" placeholder="Enter your email address" required>
+            </div>
+            <div class="form-group"><p>Number</p>
+                <input type="tel" name="pnum" placeholder="+63" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <textarea name="msg" placeholder="Enter your message here" required></textarea>
+        </div>
+        <button type="submit" name="submit" class="submit">Submit</button>
+        </form>
+        </div>
+
         <div class = "kingina">
         <div class="business-hours-card">
             <div class="business-hours-title">

@@ -423,15 +423,8 @@
     margin-bottom: 1rem;
 }
 
-.form-group p{
-    display: flex;
-    font-size: medium;
-    font-weight: 350;
-    flex-direction: column;
-}
-
 label {
-    font-size: bold;
+    font-size: 0.875rem;
     font-weight: 500;
 }
 
@@ -442,7 +435,6 @@ label {
     border-radius: 2rem;
     font-size: 1rem;
 }
-
 
 .button-container {
     display: flex;
