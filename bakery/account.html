@@ -738,6 +738,74 @@ function addToCart(item) {
     updateCartCount();
 }
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+  const meltElement = document.querySelector('.melt');
+  
+  if (meltElement) {
+    // Initial position (slightly up)
+    meltElement.style.transform = 'translateY(-30px)';
+    
+    // Maximum scroll position where the effect should complete
+    const maxScrollPosition = 200; // Adjust this value as needed
+    
+    window.addEventListener('scroll', function() {
+      // Get current scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Calculate how far to move the element (from -30px to 0px)
+      if (scrollPosition <= maxScrollPosition) {
+        // Calculate percentage of scroll progress
+        const scrollPercentage = scrollPosition / maxScrollPosition;
+        
+        // Calculate new Y position (from -30px to 0px)
+        const newYPosition = -30 + (scrollPercentage * 30);
+        
+        // Apply the transform
+        meltElement.style.transform = `translateY(${newYPosition}px)`;
+      } else {
+        // Keep it at final position once scroll exceeds max
+        meltElement.style.transform = 'translateY(0)';
+      }
+    });
+  }
+});
+
+</script>
+<!-- Add this before your closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const meltElement = document.querySelector('.melt');
+      
+      if (meltElement) {
+        // Initial position (slightly up)
+        meltElement.style.transform = 'translateY(-30px)';
+        
+        // Maximum scroll position where the effect should complete
+        const maxScrollPosition = 200; // Adjust this value as needed
+        
+        window.addEventListener('scroll', function() {
+          // Get current scroll position
+          const scrollPosition = window.scrollY;
+          
+          // Calculate how far to move the element (from -30px to 0px)
+          if (scrollPosition <= maxScrollPosition) {
+            // Calculate percentage of scroll progress
+            const scrollPercentage = scrollPosition / maxScrollPosition;
+            
+            // Calculate new Y position (from -30px to 0px)
+            const newYPosition = -30 + (scrollPercentage * 30);
+            
+            // Apply the transform
+            meltElement.style.transform = `translateY(${newYPosition}px)`;
+          } else {
+            // Keep it at final position once scroll exceeds max
+            meltElement.style.transform = 'translateY(0)';
+          }
+        });
+      }
+    });
+  </script>
     
 </body>
 </html>
