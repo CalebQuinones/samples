@@ -1,3 +1,74 @@
+<?php
+session_start();
+include 'config.php';
+
+// Signup
+if (isset($_POST['signup'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $rpassword = $_POST['rpassword'];
+    $Fname = $_POST['Fname'];
+    $Lname = $_POST['Lname'];
+
+    // Check if exists
+    $select = "SELECT * FROM login WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $select);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (mysqli_num_rows($result) > 0) {
+        echo "<script>alert('User already exists!');</script>";
+    } else {
+        // Check if passwords match
+        if ($password === $rpassword) {
+            // Hash password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Insert into database
+            $insert = "INSERT INTO login (Fname, Lname, email, password) VALUES (?, ?, ?, ?)";
+            $stmt = mysqli_prepare($conn, $insert);
+            mysqli_stmt_bind_param($stmt, "ssss", $Fname, $Lname, $email, $hashed_password);
+
+            if (mysqli_stmt_execute($stmt)) {
+                echo "<script>alert('Registration successful!'); window.location.href='login.php';</script>";
+            } else {
+                echo "<script>alert('Registration failed. Please try again.');</script>";
+            }
+        } else {
+            echo "<script>alert('Passwords do not match!');</script>";
+        }
+    }
+}
+
+// Signin
+if (isset($_POST['signin'])) {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+
+    $select = "SELECT * FROM login WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $select);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        if (password_verify($password, $row['password'])) {
+            $_SESSION['user_email'] = $email; // Store in session
+            echo "<script>alert('Login successful!'); window.location.href='account.php';</script>";
+            exit();
+        } else {
+            echo "<script>alert('Incorrect password!');</script>";
+        }
+    } else {
+        echo "<script>alert('User not found!');</script>";
+    }
+}
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,7 +205,7 @@
         .logo {
             width: 70px;
             height: 70px;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
         h2 {
@@ -148,7 +219,7 @@
         p {
             font-size: 14px;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             text-align: center;
         }
 
@@ -159,7 +230,7 @@
         }
 
         .input-field {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .input-field label {
@@ -346,6 +417,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container" id="container">
         <div class="form-container sign-up-container">
@@ -354,24 +426,28 @@
                 <h2>Create an Account</h2>
                 <p>Let's Get Baked! Sign up to get started.</p>
                 
-                <form id="signup-form" class="form">
+                <form action=" " method= "post" id="signup-form" class="form">
                     <div class="input-field">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" placeholder="Enter Name" required>
+                        <label for="name">First Name</label>
+                        <input type="text" name="Fname" id="name" placeholder="Enter First Name" required>
+                    </div>
+                    <div class="input-field">
+                        <label for="name">Last Name</label>
+                        <input type="text" name="Lname" id="name" placeholder="Enter Last Name" required>
                     </div>
                     <div class="input-field">
                         <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="Example@email.com" required>
+                        <input type="email" name= "email" id="email" placeholder="Example@email.com" required>
                     </div>
                     <div class="input-field">
                         <label for="password">Create Password</label>
-                        <input type="password" id="password" placeholder="At least 8 characters" required>
+                        <input type="password" name="password" id="password" placeholder="At least 8 characters" required>
                     </div>
                     <div class="input-field">
                         <label for="confirm-password">Re-enter Password</label>
-                        <input type="password" id="confirm-password" placeholder="At least 8 characters" required>
+                        <input type="password" name="rpassword" id="confirm-password" placeholder="At least 8 characters" required>
                     </div>
-                    <button type="submit" class="btn">Sign up</button>
+                    <button type="submit" name="signup" class="btn">Sign up</button>
                     
                     <div class="social-text">Or</div>
                     
@@ -408,19 +484,19 @@
                 <h2>Log in to Your Account</h2>
                 <p>Today is a new day. It's your day. You shape it. Log in to get started.</p>
                 
-                <form id="signin-form" class="form">
+                <form action=" " method="post" id="signin-form" class="form">
                     <div class="input-field">
                         <label for="login-email">Email</label>
-                        <input type="email" id="login-email" placeholder="Example@email.com" required>
+                        <input type="email" name="email" id="login-email" placeholder="Example@email.com" required>
                     </div>
                     <div class="input-field">
                         <label for="login-password">Password</label>
-                        <input type="password" id="login-password" placeholder="At least 8 characters" required>
+                        <input type="password" name="password" id="login-password" placeholder="At least 8 characters" required>
                     </div>
                     <div class="forgot-password">
                         <a href="#">Forgot Password?</a>
                     </div>
-                    <button type="submit" class="btn">Sign in</button>
+                    <button type="submit" name="signin" class="btn">Sign in</button>
                     
                     <div class="social-text">Or</div>
                     
@@ -461,19 +537,6 @@
 
     <script>
         const container = document.getElementById('container');
-        const signUpBtn = document.getElementById('signUpBtn');
-        const signInBtn = document.getElementById('signInBtn');
-        
-        // Form submission prevention (for demo purposes)
-        document.getElementById('signin-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Sign in form submitted');
-        });
-        
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Sign up form submitted');
-        });
         
         // Toggle between sign in and sign up
         signUpBtn.addEventListener('click', () => {
