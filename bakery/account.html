@@ -17,7 +17,6 @@
 </head>
 <body>
     <div class="top-banner">
-        10% off for your second order!
     </div>
     <header>
         <nav class="container">
@@ -115,137 +114,206 @@
     </section>
 
     <!-- Account Section - Updated to match new design -->
-    <section class="account-section">
-        <div class="account-container">
-            <!-- Profile Photo -->
-            <div class="profile-photo"></div>
-            
-            <!-- Account Layout -->
-            <div class="account-layout">
-                <!-- Account Tabs -->
-                <div class="account-tabs">
-                    <div class="tab active" data-tab="personal">Personal Information</div>
-                    <div class="tab" data-tab="orders">My Orders</div>
-                    <div class="tab" data-tab="address">Manage Address</div>
-                    <div class="tab" data-tab="payment">Payment Method</div>
-                    <div class="tab" data-tab="logout">Log Out</div>
-                </div>
-                
-                <!-- Tab Content Container -->
-                <div class="tab-content-container">
-                    <!-- Personal Information Tab -->
-                    <div class="tab-content active" id="personal-content">
-                        <div class="input-row">
-                            <input type="text" placeholder="First name">
+    <div class="conti">
+        <div class="account-grid">
+            <!-- Replace the current sidebar HTML with this -->
+<div class="sidebar">
+    <button id="personal-info-btn" class="sidebar-button active">Personal Information</button>
+    <button id="orders-btn" class="sidebar-button">My Orders</button>
+    <button id="logout-btn" class="sidebar-button">Log Out</button>
+</div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Personal Info Tab -->
+                <div id="personal-info-tab" class="tab-content active">
+                    <div class="profile-picture-container">
+                        <div class="profile-picture">
+                            <span class="sr-only">Profile picture</span>
                         </div>
-                        
-                        <div class="input-row">
-                            <input type="text" placeholder="Last Name">
-                        </div>
-                        
-                        <div class="input-row">
-                            <input type="email" placeholder="Email">
-                        </div>
-                        
-                        <div class="input-row">
-                            <input type="tel" placeholder="Phone">
-                        </div>
-                        
-                        <div class="input-row">
-                            <input type="date" placeholder="Birthday">
-                        </div>
-                        
-                        <button class="update-button">Update Changes</button>
                     </div>
                     
-                    <!-- Orders Tab -->
-                    <div class="tab-content" id="orders-content">
-                        <div class="orders-header">Orders (2)</div>
+                    <div class="form-container">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first-name">First name</label>
+                                <input id="first-name" type="text" class="input">
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Last Name</label>
+                                <input id="last-name" type="text" class="input">
+                            </div>
+                        </div>
                         
-                        <table class="order-table">
-                            <thead>
-                                <tr>
-                                    <th class="order-table-header">Order ID</th>
-                                    <th class="order-table-header">Total Price</th>
-                                    <th class="order-table-header">Delivery Status</th>
-                                    <th class="order-table-header">Ordered Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="order-item-cell">#ABC9342</td>
-                                    <td class="order-item-cell">Php 1,500.00</td>
-                                    <td class="order-item-cell">Onsite</td>
-                                    <td class="order-item-cell">19 July 2023</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input id="email" type="email" class="input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input id="phone" type="tel" class="input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="birthday">Birthday</label>
+                            <input id="birthday" type="date" class="input">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" class="input textarea" rows="3" placeholder="Enter your address"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="payment-method">Payment Method</label>
+                            <select id="payment-method" class="input select">
+                                <option value="" disabled selected>Select payment method</option>
+                                <option value="credit-card">Credit Card</option>
+                                <option value="debit-card">Debit Card</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="bank-transfer">Bank Transfer</option>
+                                <option value="cash">Cash on Delivery</option>
+                            </select>
+                        </div>
+                        
+                        <div class="button-container">
+                            <button class="primary-button">Update Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div id="orders-tab" class="tab-content">
+                    <div class="orders-header">
+                        <h2>Orders (2)</h2>
+                    </div>
+                    
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-header-item">
+                                <div class="order-header-label">Order ID</div>
+                                <div class="order-header-value">#ADJW349J</div>
+                            </div>
+                            <div class="order-header-item">
+                                <div class="order-header-label">Total Payment</div>
+                                <div class="order-header-value">Php 1,300.00</div>
+                            </div>
+                            <div class="order-header-item">
+                                <div class="order-header-label">Payment Method</div>
+                                <div class="order-header-value">Cash</div>
+                            </div>
+                            <div class="order-header-item">
+                                <div class="order-header-label">Estimated Delivery</div>
+                                <div class="order-header-value">30 July 2025</div>
+                            </div>
+                        </div>
                         
                         <div class="order-items">
                             <div class="order-item">
-                                <div class="order-item-cell">
-                                    <div class="item-image"></div>
+                                <img src="https://via.placeholder.com/60" alt="Strawberry Short Cake" class="order-item-image">
+                                <div class="order-item-details">
+                                    <div class="order-item-name">Strawberry Short Cake</div>
+                                    <div class="order-item-meta">Php 700.00 | 1 Qty</div>
                                 </div>
-                                <div class="order-item-cell">
-                                    <h4>Strawberry Short Cake</h4>
-                                    <p>Php 350.00</p>
+                            </div>
+                            <div class="order-item">
+                                <img src="https://via.placeholder.com/60" alt="1 Pack Chocolate Cookies" class="order-item-image">
+                                <div class="order-item-details">
+                                    <div class="order-item-name">1 Pack Chocolate Cookies</div>
+                                    <div class="order-item-meta">Php 300 | 1 Qty</div>
+                                </div>
+                            </div>
+                            <div class="order-item">
+                                <img src="https://via.placeholder.com/60" alt="1 Pack Chocolate Cookies" class="order-item-image">
+                                <div class="order-item-details">
+                                    <div class="order-item-name">1 Pack Chocolate Cookies</div>
+                                    <div class="order-item-meta">Php 300 | 1 Qty</div>
+                                </div>
+                            </div>
+                            <div class="order-item">
+                                <img src="https://via.placeholder.com/60" alt="Strawberry Short Cake" class="order-item-image">
+                                <div class="order-item-details">
+                                    <div class="order-item-name">Strawberry Short Cake</div>
+                                    <div class="order-item-meta">Php 700.00 | 1 Qty</div>
                                 </div>
                             </div>
                             
-                            <div class="order-item">
-                                <div class="order-item-cell">
-                                    <div class="item-image"></div>
-                                </div>
-                                <div class="order-item-cell">
-                                    <h4>1 Pack Chocolate Cookies</h4>
-                                    <p>Php 120.00</p>
-                                </div>
+                            <div class="order-status">
+                                <span class="status-badge">Delivered</span>
+                                <span class="status-text">Your Order Status</span>
                             </div>
                             
-                            <div class="order-item">
-                                <div class="order-item-cell">
-                                    <div class="item-image"></div>
-                                </div>
-                                <div class="order-item-cell">
-                                    <h4>1 Pack Chocolate Cookies</h4>
-                                    <p>Php 120.00</p>
-                                </div>
-                            </div>
-                            
-                            <div class="order-item">
-                                <div class="order-item-cell">
-                                    <div class="item-image"></div>
-                                </div>
-                                <div class="order-item-cell">
-                                    <h4>Strawberry Short Cake</h4>
-                                    <p>Php 350.00</p>
-                                </div>
+                            <div class="order-actions">
+                                <button class="primary-button">Track Order</button>
                             </div>
                         </div>
-                        
-                        <div class="order-status">Your Order Status</div>
-                        <button class="track-order-button">Track Order</button>
-                    </div>
-                    
-                    <!-- Address Tab -->
-                    <div class="tab-content" id="address-content">
-                        <p class="empty-message">No addresses saved.</p>
-                    </div>
-                    
-                    <!-- Payment Tab -->
-                    <div class="tab-content" id="payment-content">
-                        <p class="empty-message">No payment methods saved.</p>
-                    </div>
-                    
-                    <!-- Logout Tab -->
-                    <div class="tab-content" id="logout-content">
-                        <p class="confirm-message">Are you sure you want to log out?</p>
-                        <button class="logout-button">Confirm Logout</button>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-actions">
+                <button id="cancel-logout" class="outline-button">Cancel</button>
+                <button id="confirm-logout" class="primary-button">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const personalInfoBtn = document.getElementById('personal-info-btn');
+        const ordersBtn = document.getElementById('orders-btn');
+        const personalInfoTab = document.getElementById('personal-info-tab');
+        const ordersTab = document.getElementById('orders-tab');
+
+        personalInfoBtn.addEventListener('click', () => {
+            personalInfoBtn.classList.add('active');
+            ordersBtn.classList.remove('active');
+            personalInfoTab.classList.add('active');
+            ordersTab.classList.remove('active');
+        });
+
+        ordersBtn.addEventListener('click', () => {
+            ordersBtn.classList.add('active');
+            personalInfoBtn.classList.remove('active');
+            ordersTab.classList.add('active');
+            personalInfoTab.classList.remove('active');
+        });
+
+        // Logout confirmation functionality
+        const logoutBtn = document.getElementById('logout-btn');
+        const logoutModal = document.getElementById('logout-modal');
+        const cancelLogoutBtn = document.getElementById('cancel-logout');
+        const confirmLogoutBtn = document.getElementById('confirm-logout');
+
+        logoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', () => {
+            // Here you would typically redirect to logout endpoint
+            alert('Logged out successfully!');
+            logoutModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
+    </script>
 
     <footer>
         <div class="burdir"></div>
@@ -670,6 +738,74 @@ function addToCart(item) {
     updateCartCount();
 }
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+  const meltElement = document.querySelector('.melt');
+  
+  if (meltElement) {
+    // Initial position (slightly up)
+    meltElement.style.transform = 'translateY(-30px)';
+    
+    // Maximum scroll position where the effect should complete
+    const maxScrollPosition = 200; // Adjust this value as needed
+    
+    window.addEventListener('scroll', function() {
+      // Get current scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Calculate how far to move the element (from -30px to 0px)
+      if (scrollPosition <= maxScrollPosition) {
+        // Calculate percentage of scroll progress
+        const scrollPercentage = scrollPosition / maxScrollPosition;
+        
+        // Calculate new Y position (from -30px to 0px)
+        const newYPosition = -30 + (scrollPercentage * 30);
+        
+        // Apply the transform
+        meltElement.style.transform = `translateY(${newYPosition}px)`;
+      } else {
+        // Keep it at final position once scroll exceeds max
+        meltElement.style.transform = 'translateY(0)';
+      }
+    });
+  }
+});
+
+</script>
+<!-- Add this before your closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const meltElement = document.querySelector('.melt');
+      
+      if (meltElement) {
+        // Initial position (slightly up)
+        meltElement.style.transform = 'translateY(-30px)';
+        
+        // Maximum scroll position where the effect should complete
+        const maxScrollPosition = 200; // Adjust this value as needed
+        
+        window.addEventListener('scroll', function() {
+          // Get current scroll position
+          const scrollPosition = window.scrollY;
+          
+          // Calculate how far to move the element (from -30px to 0px)
+          if (scrollPosition <= maxScrollPosition) {
+            // Calculate percentage of scroll progress
+            const scrollPercentage = scrollPosition / maxScrollPosition;
+            
+            // Calculate new Y position (from -30px to 0px)
+            const newYPosition = -30 + (scrollPercentage * 30);
+            
+            // Apply the transform
+            meltElement.style.transform = `translateY(${newYPosition}px)`;
+          } else {
+            // Keep it at final position once scroll exceeds max
+            meltElement.style.transform = 'translateY(0)';
+          }
+        });
+      }
+    });
+  </script>
     
 </body>
 </html>

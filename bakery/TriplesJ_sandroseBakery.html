@@ -217,7 +217,7 @@
           </div>
         </div>
     </section>
-    <div class="melts">
+    <div class>
         <img src="meltdown2.png" class="melt"></div>
     </div>
 
@@ -539,6 +539,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial call to set the first image
     changeCake(0);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const meltElement = document.querySelector('.melt');
+  
+  if (meltElement) {
+    // Initial position (slightly up)
+    meltElement.style.transform = 'translateY(-30px)';
+    
+    // Maximum scroll position where the effect should complete
+    const maxScrollPosition = 200; // Adjust this value as needed
+    
+    window.addEventListener('scroll', function() {
+      // Get current scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Calculate how far to move the element (from -30px to 0px)
+      if (scrollPosition <= maxScrollPosition) {
+        // Calculate percentage of scroll progress
+        const scrollPercentage = scrollPosition / maxScrollPosition;
+        
+        // Calculate new Y position (from -30px to 0px)
+        const newYPosition = -30 + (scrollPercentage * 30);
+        
+        // Apply the transform
+        meltElement.style.transform = `translateY(${newYPosition}px)`;
+      } else {
+        // Keep it at final position once scroll exceeds max
+        meltElement.style.transform = 'translateY(0)';
+      }
+    });
+  }
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1687,5 +1719,93 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <!-- Modal Overlay -->
 <div class="modal-overlay" id="modalOverlay"></div>
+<!-- Add this before your closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const meltElement = document.querySelector('.melt');
+      
+      if (meltElement) {
+        // Initial position (slightly up)
+        meltElement.style.transform = 'translateY(-30px)';
+        
+        // Maximum scroll position where the effect should complete
+        const maxScrollPosition = 200; // Adjust this value as needed
+        
+        window.addEventListener('scroll', function() {
+          // Get current scroll position
+          const scrollPosition = window.scrollY;
+          
+          // Calculate how far to move the element (from -30px to 0px)
+          if (scrollPosition <= maxScrollPosition) {
+            // Calculate percentage of scroll progress
+            const scrollPercentage = scrollPosition / maxScrollPosition;
+            
+            // Calculate new Y position (from -30px to 0px)
+            const newYPosition = -30 + (scrollPercentage * 30);
+            
+            // Apply the transform
+            meltElement.style.transform = `translateY(${newYPosition}px)`;
+          } else {
+            // Keep it at final position once scroll exceeds max
+            meltElement.style.transform = 'translateY(0)';
+          }
+        });
+      }
+    });
+  </script>
+  <script>
+    // Intersection Observer to detect when elements enter the viewport
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements to animate - EXCLUDING hero section and meltdown
+  const animatedElements = [
+    { selector: '.feature-card', animation: 'fade-up', delay: 0.1 },
+    { selector: '.catalog-item', animation: 'fade-in-scale', delay: 0.15 },
+    { selector: '.celebration-card', animation: 'fade-in-scale', delay: 0.15 },
+    { selector: '.container1 > div', animation: 'fade-in-side', delay: 0.2 },
+    { selector: '.gallery-item', animation: 'fade-up', delay: 0.1 }
+    // Removed hero-text, hero-image, and melt elements
+  ];
+
+  // Create animation classes for each element
+  animatedElements.forEach(item => {
+    const elements = document.querySelectorAll(item.selector);
+    elements.forEach((element, index) => {
+      // Add initial state class
+      element.classList.add('animate-on-scroll');
+      element.classList.add(item.animation);
+      
+      // Add staggered delay for groups of elements
+      if (elements.length > 1) {
+        element.style.transitionDelay = `${item.delay * (index + 1)}s`;
+      } else {
+        element.style.transitionDelay = `${item.delay}s`;
+      }
+    });
+  });
+
+  // Create the Intersection Observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      // Add the visible class when element enters viewport
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Unobserve after animation is triggered
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    root: null, // viewport
+    threshold: 0.1, // trigger when 10% of the element is visible
+    rootMargin: '0px 0px -50px 0px' // trigger slightly before element enters viewport
+  });
+
+  // Observe all elements with animate-on-scroll class
+  document.querySelectorAll('.animate-on-scroll').forEach(element => {
+    observer.observe(element);
+  });
+
+  // Removed special handling for hero section
+});
+  </script>
 </body>
 </html>

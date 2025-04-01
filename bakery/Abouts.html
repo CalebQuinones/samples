@@ -38,7 +38,7 @@
                 </ul>
             </div>
             <div class="cart-profile">
-              <div class="cart-icon">
+              <div class="cart-icon" id="cartIcon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -56,18 +56,7 @@
           </div>
         </nav>
     </header>
-    <!-- Cart Icon in Navigation -->
-<div class="cart-profile">
-    <div class="cart-icon" id="cartIcon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="cart-count">0</span>
-    </div>
-</div>
-
+    
 <!-- Cart Popup -->
 <div class="cart-popup" id="cartPopup">
     <div class="cart-popup-content">
@@ -126,6 +115,55 @@
                     </div>
                 </div>
                 <!-- Rest of checkout modal content -->
+                <div class="checkout-right">
+                    <div class="payment-details">
+                        <h3>Payment Details</h3>
+                        <p class="payment-subtitle">Complete your order by providing your payment details</p>
+
+                        <form id="paymentForm">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" placeholder="Enter your email here..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fullname">Fullname</label>
+                                <input type="text" id="fullname" placeholder="Enter your fullname here..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address">Delivery Address</label>
+                                <input type="text" id="address" placeholder="Enter your address..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="deliveryDate">Delivery date/Pick-up date</label>
+                                <input type="date" id="deliveryDate" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment</label>
+                                <div class="payment-options">
+                                    <div class="payment-option">
+                                        <input type="radio" id="cardPayment" name="paymentMethod" value="card" checked>
+                                        <label for="cardPayment">Card</label>
+                                    </div>
+                                    <div class="payment-option">
+                                        <input type="radio" id="gcashPayment" name="paymentMethod" value="gcash">
+                                        <label for="gcashPayment">
+                                            <img src="https://www.gcash.com/wp-content/uploads/2019/04/gcash-logo.png" alt="GCash" class="payment-icon">
+                                        </label>
+                                    </div>
+                                    <div class="view-all-options">
+                                        <span>View all options</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="confirm-button">CONFIRM</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -152,6 +190,7 @@
     </div>
     <img src="meltdown1.png" class="melt">
     </section>
+    <div class="buong-content">
     <h1 class="ulo">OUR STORY</h1>
     <section class="history">
             <img src="mama.jpg" class="mama">
@@ -316,6 +355,7 @@
                     <p>&copy; 2024 Triple J's Bakery. All rights reserved.</p>
                 </div>
             </footer>
+        </div>   
             <script src="cart-persistence.js"></script>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -334,6 +374,38 @@
                 workShowcase.scrollLeft += scrollAmount;
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+  const meltElement = document.querySelector('.melt');
+  
+  if (meltElement) {
+    // Initial position (slightly up)
+    meltElement.style.transform = 'translateY(-30px)';
+    
+    // Maximum scroll position where the effect should complete
+    const maxScrollPosition = 200; // Adjust this value as needed
+    
+    window.addEventListener('scroll', function() {
+      // Get current scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Calculate how far to move the element (from -30px to 0px)
+      if (scrollPosition <= maxScrollPosition) {
+        // Calculate percentage of scroll progress
+        const scrollPercentage = scrollPosition / maxScrollPosition;
+        
+        // Calculate new Y position (from -30px to 0px)
+        const newYPosition = -30 + (scrollPercentage * 30);
+        
+        // Apply the transform
+        meltElement.style.transform = `translateY(${newYPosition}px)`;
+      } else {
+        // Keep it at final position once scroll exceeds max
+        meltElement.style.transform = 'translateY(0)';
+      }
+    });
+  }
+});
     </script>
     
     
@@ -427,5 +499,92 @@ window.addEventListener('load', () => {
     });
 });
 </script>
+<!-- Add this before your closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const meltElement = document.querySelector('.melt');
+      
+      if (meltElement) {
+        // Initial position (slightly up)
+        meltElement.style.transform = 'translateY(-30px)';
+        
+        // Maximum scroll position where the effect should complete
+        const maxScrollPosition = 200; // Adjust this value as needed
+        
+        window.addEventListener('scroll', function() {
+          // Get current scroll position
+          const scrollPosition = window.scrollY;
+          
+          // Calculate how far to move the element (from -30px to 0px)
+          if (scrollPosition <= maxScrollPosition) {
+            // Calculate percentage of scroll progress
+            const scrollPercentage = scrollPosition / maxScrollPosition;
+            
+            // Calculate new Y position (from -30px to 0px)
+            const newYPosition = -30 + (scrollPercentage * 30);
+            
+            // Apply the transform
+            meltElement.style.transform = `translateY(${newYPosition}px)`;
+          } else {
+            // Keep it at final position once scroll exceeds max
+            meltElement.style.transform = 'translateY(0)';
+          }
+        });
+      }
+    });
+  </script>
+  <script>
+    // Intersection Observer to detect when elements enter the viewport
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements to animate - EXCLUDING hero section and meltdown
+  const animatedElements = [
+    { selector: '.history .mama, .history .papa', animation: 'fade-in-side', delay: 0.1 },
+    { selector: '.history .ptext', animation: 'fade-up', delay: 0.2 },
+    { selector: '.history1 .pinsan', animation: 'fade-in-side', delay: 0.1 },
+    { selector: '.history1 .htext2 p', animation: 'fade-up', delay: 0.2 },
+    { selector: '.review-card', animation: 'fade-in-scale', delay: 0.15 },
+    { selector: '.likod h1, .likod p', animation: 'fade-up', delay: 0.1 },
+    { selector: '.btn', animation: 'fade-up', delay: 0.2 }
+  ];
+
+  // Create animation classes for each element
+  animatedElements.forEach(item => {
+    const elements = document.querySelectorAll(item.selector);
+    elements.forEach((element, index) => {
+      // Add initial state class
+      element.classList.add('animate-on-scroll');
+      element.classList.add(item.animation);
+      
+      // Add staggered delay for groups of elements
+      if (elements.length > 1) {
+        element.style.transitionDelay = `${item.delay * (index + 1)}s`;
+      } else {
+        element.style.transitionDelay = `${item.delay}s`;
+      }
+    });
+  });
+
+  // Create the Intersection Observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      // Add the visible class when element enters viewport
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Unobserve after animation is triggered
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    root: null, // viewport
+    threshold: 0.1, // trigger when 10% of the element is visible
+    rootMargin: '0px 0px -50px 0px' // trigger slightly before element enters viewport
+  });
+
+  // Observe all elements with animate-on-scroll class
+  document.querySelectorAll('.animate-on-scroll').forEach(element => {
+    observer.observe(element);
+  });
+});
+  </script>
 </body>
 </html>
