@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Details - Bakery Admin Dashboard</title>
+  <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="Logo.png" alt="Triple J & Rose's Bakery" width="50" height="50">
+        <div>
+          <h1>Triple J & Rose's</h1>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="dashbrd.html">
+              <i class="fas fa-home"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="orders.html" class="active">
+              <i class="fas fa-shopping-bag"></i>
+              Orders
+            </a>
+          </li>
+          <li>
+            <a href="products.html">
+              <i class="fas fa-birthday-cake"></i>
+              Products
+            </a>
+          </li>
+          <li>
+            <a href="accounts.html">
+              <i class="fas fa-users"></i>
+              Accounts
+            </a>
+          </li>
+          <li>
+            <a href="inquiries.html">
+              <i class="fas fa-comment-dots"></i>
+              Inquiries
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="order-details-header">
+        <div class="order-details-header-content">
+          <div class="order-details-title">
+            <a href="orders.html"><i class="fas fa-arrow-left"></i></a>
+            <h1>Order #ORD-002</h1>
+          </div>
+          <div>
+            <button class="edit-button edit-button-edit" id="editButton">
+              <i class="fas fa-edit"></i>
+              Edit Order
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div class="order-details-content">
+        <div class="order-grid">
+          <!-- Left Column -->
+          <div>
+            <!-- Order Information -->
+            <div class="order-card">
+              <div class="order-card-header">
+                <h2 class="order-card-title">Order Information</h2>
+                <button class="update-status-button" id="updateStatusButton" style="display: none;">
+                  Update Status
+                </button>
+              </div>
+              <div class="order-card-content">
+                <div class="order-info-grid">
+                  <div>
+                    <p class="order-info-label">Order ID</p>
+                    <p class="order-info-value">#ORD-002</p>
+                  </div>
+                  <div>
+                    <p class="order-info-label">Order Date</p>
+                    <p class="order-info-value">April 2, 2025</p>
+                  </div>
+                  <div>
+                    <p class="order-info-label">Status</p>
+                    <div id="statusContainer">
+                      <span class="status-badge status-in-progress">In Progress</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="order-info-label">Payment Method</p>
+                    <p class="order-info-value">Bank Transfer</p>
+                  </div>
+                  <div>
+                    <p class="order-info-label">Delivery Date</p>
+                    <p class="order-info-value">April 9, 2025</p>
+                  </div>
+                  <div>
+                    <p class="order-info-label">Delivery Method</p>
+                    <p class="order-info-value">Standard Delivery</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Cake Details -->
+            <div class="order-card">
+              <div class="order-card-header">
+                <h2 class="order-card-title">Custom Cake Details</h2>
+              </div>
+              <div class="order-card-content">
+                <div class="cake-details-grid">
+                  <div>
+                    <div class="cake-details-section">
+                      <p class="cake-details-label">Cake Size</p>
+                      <p class="cake-details-value">3-tier (6", 8", 10")</p>
+                    </div>
+                    <div class="cake-details-section">
+                      <p class="cake-details-label">Cake Flavor</p>
+                      <p class="cake-details-value">Vanilla</p>
+                    </div>
+                    <div class="cake-details-section">
+                      <p class="cake-details-label">Filling</p>
+                      <p class="cake-details-value">Strawberry Jam</p>
+                    </div>
+                    <div class="cake-details-section">
+                      <p class="cake-details-label">Frosting Type</p>
+                      <p class="cake-details-value">Buttercream</p>
+                    </div>
+                    <div class="cake-details-section">
+                      <p class="cake-details-label">Special Instructions</p>
+                      <p class="cake-details-value">Please make the cake in white and gold colors. We would like some floral decorations on each tier if possible. The cake is for our 25th wedding anniversary.</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="cake-details-label">Inspiration Image</p>
+                    <div class="cake-image-container">
+                      <img src="placeholder.svg" alt="Cake Inspiration" class="cake-image">
+                    </div>
+                    <p class="cake-image-caption">Customer-provided inspiration image</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="order-card">
+              <div class="order-card-header">
+                <h2 class="order-card-title">Order Items</h2>
+              </div>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Price</th>
+                      <th>Quantity</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div style="display: flex; align-items: center;">
+                          <div style="width: 40px; height: 40px; border-radius: 6px; background-color: var(--pink-100); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                            <i class="fas fa-birthday-cake" style="color: var(--pink-600);"></i>
+                          </div>
+                          <div>
+                            <div style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900);">Wedding Cake (3-tier)</div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">White vanilla with buttercream frosting</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>$349.99</td>
+                      <td>1</td>
+                      <td>$349.99</td>
+                    </tr>
+                  </tbody>
+                  <tfoot style="background-color: var(--pink-50);">
+                    <tr>
+                      <td colspan="2"></td>
+                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Subtotal</td>
+                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">$349.99</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2"></td>
+                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Tax</td>
+                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">$0.00</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2"></td>
+                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Delivery Fee</td>
+                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">$0.00</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2"></td>
+                      <td style="font-size: 0.875rem; font-weight: 700; color: var(--gray-900);">Total</td>
+                      <td style="font-size: 0.875rem; font-weight: 700; color: var(--gray-900);">$349.99</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div>
+            <!-- Customer Information -->
+            <div class="order-card">
+              <div class="order-card-header">
+                <h2 class="order-card-title">Customer Information</h2>
+              </div>
+              <div class="order-card-content">
+                <div class="customer-header">
+                  <div class="customer-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <p class="customer-name">Michael Brown</p>
+                    <p class="customer-since">Customer since Jan 2023</p>
+                  </div>
+                </div>
+                <div class="customer-info">
+                  <div class="customer-info-item">
+                    <i class="fas fa-phone customer-info-icon"></i>
+                    <span class="customer-info-text">+1 (555) 123-4567</span>
+                  </div>
+                  <div class="customer-info-item">
+                    <i class="fas fa-envelope customer-info-icon"></i>
+                    <span class="customer-info-text">michael.brown@example.com</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="order-card">
+              <div class="order-card-header">
+                <h2 class="order-card-title">Shipping Address</h2>
+              </div>
+              <div class="order-card-content">
+                <div class="customer-info-item">
+                  <i class="fas fa-map-marker-alt customer-info-icon"></i>
+                  <div>
+                    <p class="customer-name">Michael Brown</p>
+                    <p class="customer-info-text">123 Wedding Lane</p>
+                    <p class="customer-info-text">Apt 4B</p>
+                    <p class="customer-info-text">San Francisco, CA 94107</p>
+                    <p class="customer-info-text">United States</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="order-card">
+              <div class="order-card-header">
+                <h2 class="order-card-title">Payment Information</h2>
+              </div>
+              <div class="order-card-content">
+                <div class="customer-info-item">
+                  <i class="fas fa-credit-card customer-info-icon"></i>
+                  <div>
+                    <p class="customer-name">Bank Transfer</p>
+                    <p class="customer-info-text">Transaction ID: TRX-98765432</p>
+                    <p class="customer-info-text">Date: April 3, 2025</p>
+                    <p class="customer-info-text">Status: Completed</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery Information -->
+            <div class="order-card">
+              <div class="order-card-header">
+                <h2 class="order-card-title">Delivery Information</h2>
+              </div>
+              <div class="order-card-content">
+                <div class="customer-info-item">
+                  <i class="fas fa-truck customer-info-icon"></i>
+                  <div>
+                    <p class="customer-name">Standard Delivery</p>
+                    <p class="customer-info-text">Carrier: Bakery Delivery Service</p>
+                  </div>
+                </div>
+                <div class="customer-info-item" style="margin-top: 1rem;">
+                  <i class="fas fa-calendar-alt customer-info-icon"></i>
+                  <div>
+                    <p class="customer-name">Delivery Date</p>
+                    <p class="customer-info-text">April 9, 2025</p>
+                    <p class="customer-info-text">Time: 10:00 AM - 2:00 PM</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Status Update Modal -->
+  <div class="modal-overlay" id="statusModal" style="display: none;">
+    <div class="modal-container">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Update Order Status</h3>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" class="form-select">
+              <option>Pending</option>
+              <option selected>In Progress</option>
+              <option>Ready for Pickup</option>
+              <option>Out for Delivery</option>
+              <option>Completed</option>
+              <option>Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message" class="form-label">Message to Customer (Optional)</label>
+            <textarea id="message" class="form-textarea" placeholder="Add a message to notify the customer about this status update..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-button modal-button-primary" id="updateStatusConfirm">Update Status</button>
+        <button class="modal-button modal-button-secondary" id="cancelStatusUpdate">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="order-details.js"></script>
+</body>
+</html>
