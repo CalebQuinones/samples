@@ -673,12 +673,7 @@ header {
     top: 26px;
 }
 
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-}
+
 
 .logo {
     display: flex;
@@ -701,6 +696,12 @@ nav {
     font-weight: 400;
     line-height: normal;
     margin-left: -70px;
+}
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
 }
 
 .nav-toggle {
