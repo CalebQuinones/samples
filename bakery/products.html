@@ -70,6 +70,7 @@
           </div>
         </div>
       </header>
+      
 
       <div class="page-content">
         <!-- Bulk Actions  -->
@@ -236,6 +237,50 @@
       </div>
     </div>
   </div>
+  <!-- Product Edit Modal -->
+<div class="modal-overlay" id="editProductModal" style="display: none;">
+  <div class="modal-container">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+        <h3 class="modal-title">Product Details</h3>
+        <div id="productInitials" style="width: 48px; height: 48px; border-radius: 50%; background-color: var(--pink-100); color: var(--pink-600); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 500;">PD</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="edit-product-name" class="form-label">Product Name</label>
+        <input type="text" id="edit-product-name" class="form-textarea" style="min-height: auto;">
+      </div>
+      
+      <div class="form-group">
+        <label for="edit-product-category" class="form-label">Category</label>
+        <select id="edit-product-category" class="form-select">
+          <option>Cakes</option>
+          <option>Cupcakes</option>
+          <option>Breads</option>
+          <option>Pastries</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="edit-product-price" class="form-label">Price</label>
+        <input type="text" id="edit-product-price" class="form-textarea" style="min-height: auto;">
+      </div>
+      
+      <div class="form-group">
+        <label for="edit-product-status" class="form-label">Status</label>
+        <select id="edit-product-status" class="form-select">
+          <option>In Stock</option>
+          <option>Low Stock</option>
+          <option>Out of Stock</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-button modal-button-primary" id="saveEditProduct">Save Changes</button>
+      <button class="modal-button modal-button-secondary" id="cancelEditProduct">Cancel</button>
+    </div>
+  </div>
+</div>
 
   <script src="products.js"></script>
 </body>

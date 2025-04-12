@@ -193,6 +193,7 @@ body {
   gap: 1rem;
 }
 
+/* Notification Styles */
 .notifications {
   position: relative;
 }
@@ -202,6 +203,12 @@ body {
   border: none;
   color: var(--gray-500);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 2rem;
+  height: 2rem;
 }
 
 .notifications-button:hover {
@@ -235,6 +242,7 @@ body {
   border: 1px solid var(--pink-200);
   z-index: 50;
   display: none;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .notifications-dropdown.show {
@@ -261,28 +269,59 @@ body {
   padding: 0.75rem;
   border-bottom: 1px solid var(--pink-100);
   transition: background-color 0.2s;
+  position: relative;
 }
 
 .notification-item:hover {
   background-color: var(--pink-50);
 }
 
+.notification-item.read {
+  opacity: 0.7;
+}
+
+.notification-item.read::before {
+  display: none;
+}
+
+.notification-item:not(.read)::before {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--pink-500);
+}
+
 .notification-title {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--gray-800);
+  padding-left: 0.75rem;
 }
 
 .notification-message {
   font-size: 0.75rem;
   color: var(--gray-600);
   margin-top: 0.25rem;
+  padding-left: 0.75rem;
 }
 
 .notification-time {
   font-size: 0.75rem;
   color: var(--gray-400);
   margin-top: 0.25rem;
+  padding-left: 0.75rem;
+}
+
+.notification-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--gray-500);
+  font-style: italic;
 }
 
 .notifications-footer {
@@ -297,11 +336,98 @@ body {
   background: none;
   border: none;
   cursor: pointer;
+  padding: 0.5rem;
 }
 
 .notifications-footer button:hover {
   color: var(--pink-800);
 }
+
+/* Side Popup Notification */
+.notification-side-popup {
+  position: fixed;
+  top: 5rem;
+  right: 1rem;
+  width: 20rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--pink-500);
+  z-index: 100;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-side-popup-header {
+  padding: 0.75rem 1rem;
+  background-color: var(--pink-50);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--pink-100);
+}
+
+.notification-side-popup-header h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pink-600);
+  margin: 0;
+}
+
+.notification-close-btn {
+  background: none;
+  border: none;
+  color: var(--gray-500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+}
+
+.notification-close-btn:hover {
+  color: var(--pink-600);
+}
+
+.notification-side-popup-body {
+  padding: 0.75rem 1rem;
+}
+
+.notification-side-popup-body p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--gray-700);
+}
+
+.notification-side-popup-body .notification-time {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-top: 0.5rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 
 .user-profile {
   display: flex;
@@ -923,10 +1049,11 @@ tbody tr:hover {
 
 .search-icon {
   position: absolute;
-  left: 0.90rem;
+  left: 14.30rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--gray-400);
+  z-index: 30;
 }
 
 .search-input {
@@ -935,6 +1062,8 @@ tbody tr:hover {
   border: 1px solid var(--pink-200);
   border-radius: 0.5rem;
   outline: none;
+  position: relative;
+  left: 0px;
 }
 
 .search-input:focus {
@@ -1129,7 +1258,53 @@ tbody tr:hover {
   cursor: pointer;
   transition: background-color 0.2s;
 }
+/* Edit Product Modal Styles */
+#productInitials {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--pink-100);
+  color: var(--pink-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
 
+#editProductModal .modal-container {
+  max-width: 500px;
+}
+
+#editProductModal .modal-content {
+  padding: 1.5rem;
+}
+
+#editProductModal .modal-footer {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* Status badge colors */
+.status-badge.status-in-stock {
+  background-color: var(--green-100);
+  color: var(--green-800);
+}
+
+.status-badge.status-low-stock {
+  background-color: var(--yellow-100);
+  color: var(--yellow-800);
+}
+
+.status-badge.status-out-of-stock {
+  background-color: var(--red-100);
+  color: var(--red-800);
+}
 .edit-button svg {
   width: 1rem;
   height: 1rem;
