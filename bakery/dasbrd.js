@@ -7,33 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 function setupNotificationSystem() {
-  // Sample notification data
-  const initialNotifications = [
-    {
-      id: 1,
-      title: "New Order",
-      message: "Sarah Johnson placed a new order for a Birthday Cake",
-      time: "10 minutes ago",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Order Status Update",
-      message: "Order #ORD-002 has been updated to 'In Progress'",
-      time: "1 hour ago",
-      read: false,
-    },
-    {
-      id: 3,
-      title: "New Inquiry",
-      message: "Jennifer Smith sent an inquiry about a Wedding Cake",
-      time: "2 hours ago",
-      read: false,
-    },
-  ]
-
-  let notifications = [...initialNotifications]
-  let nextNotificationId = 4
+  let notifications = []
+  let nextNotificationId = 1
+  let lastFetchTime = Date.now()
 
   // DOM elements
   const notificationsButton = document.getElementById("notificationsButton")
@@ -62,6 +38,11 @@ function setupNotificationSystem() {
     notificationsButton.addEventListener("click", (event) => {
       event.stopPropagation()
       notificationsDropdown.classList.toggle("show")
+
+      // When opening the dropdown, mark notifications as seen on the server
+      if (notificationsDropdown.classList.contains("show")) {
+        markNotificationsAsSeen()
+      }
     })
 
     // Close the dropdown when clicking outside
@@ -77,13 +58,114 @@ function setupNotificationSystem() {
   // Mark all as read
   if (markAllAsReadButton) {
     markAllAsReadButton.addEventListener("click", () => {
+      markAllAsRead()
+    })
+  }
+
+  // Fetch notifications from database
+  async function fetchNotifications() {
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch(`/api/notifications?since=${lastFetchTime}`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.notifications && data.notifications.length > 0) {
+        // Process new notifications
+        data.notifications.forEach((newNotif) => {
+          // Check if notification already exists
+          const exists = notifications.some((existingNotif) => existingNotif.id === newNotif.id)
+          if (!exists) {
+            notifications.unshift(newNotif)
+            // Show popup for new notification
+            showSidePopup(newNotif)
+          }
+        })
+
+        // Update UI
+        updateNotificationsList()
+        updateNotificationBadge()
+      }
+
+      // Update last fetch time
+      lastFetchTime = Date.now()
+    } catch (error) {
+      console.error("Error fetching notifications:", error)
+    }
+  }
+
+  // Mark notifications as seen (viewed but not necessarily read)
+  async function markNotificationsAsSeen() {
+    try {
+      // Replace with your actual API endpoint
+      await fetch("/api/notifications/seen", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+    } catch (error) {
+      console.error("Error marking notifications as seen:", error)
+    }
+  }
+
+  // Mark a notification as read
+  async function markAsRead(id) {
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch("/api/notifications/read", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+
+      // Update local state
+      const index = notifications.findIndex((n) => n.id === id)
+      if (index !== -1) {
+        notifications[index].read = true
+        updateNotificationsList()
+        updateNotificationBadge()
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error)
+    }
+  }
+
+  // Mark all notifications as read
+  async function markAllAsRead() {
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch("/api/notifications/read-all", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+
+      // Update local state
       notifications = notifications.map((notification) => ({
         ...notification,
         read: true,
       }))
       updateNotificationsList()
       updateNotificationBadge()
-    })
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error)
+    }
   }
 
   // Update notifications list in dropdown
@@ -112,12 +194,7 @@ function setupNotificationSystem() {
 
       // Add click event to mark as read when clicked
       notificationItem.addEventListener("click", () => {
-        const index = notifications.findIndex((n) => n.id === notification.id)
-        if (index !== -1) {
-          notifications[index].read = true
-          updateNotificationsList()
-          updateNotificationBadge()
-        }
+        markAsRead(notification.id)
       })
 
       notificationsList.appendChild(notificationItem)
@@ -174,44 +251,63 @@ function setupNotificationSystem() {
     }, 5000)
   }
 
-  // Add a new notification
-  function addNotification(title, message) {
-    const newNotification = {
-      id: nextNotificationId++,
-      title,
-      message,
-      time: "Just now",
-      read: false,
+  // Add a new notification (client-side function that also sends to server)
+  async function addNotification(title, message) {
+    try {
+      // Send notification to server
+      const response = await fetch("/api/notifications/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, message }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+
+      // Get the created notification from response
+      const newNotification = await response.json()
+
+      // Add to local state
+      notifications.unshift(newNotification)
+      updateNotificationsList()
+      updateNotificationBadge()
+      showSidePopup(newNotification)
+
+      return newNotification
+    } catch (error) {
+      console.error("Error adding notification:", error)
+
+      // Fallback to local-only notification if server request fails
+      const fallbackNotification = {
+        id: nextNotificationId++,
+        title,
+        message,
+        time: "Just now",
+        read: false,
+      }
+
+      notifications.unshift(fallbackNotification)
+      updateNotificationsList()
+      updateNotificationBadge()
+      showSidePopup(fallbackNotification)
+
+      return fallbackNotification
     }
-
-    notifications.unshift(newNotification)
-    updateNotificationsList()
-    updateNotificationBadge()
-    showSidePopup(newNotification)
-
-    return newNotification
   }
 
-  // Initialize
-  updateNotificationsList()
-  updateNotificationBadge()
+  // Initialize - fetch notifications from server
+  fetchNotifications()
 
-  // Simulate new notifications coming in
-  setTimeout(() => {
-    addNotification("New Order", "Michael Brown placed a new order for a Wedding Cake")
-  }, 10000)
-
-  setTimeout(() => {
-    addNotification("Low Stock Alert", "Chocolate frosting is running low on stock")
-  }, 25000)
-
-  setTimeout(() => {
-    addNotification("Order Completed", "Order #ORD-001 has been marked as completed")
-  }, 40000)
+  // Set up polling to check for new notifications every 30 seconds
+  setInterval(fetchNotifications, 30000)
 
   // Make functions available globally
   window.bakeryNotifications = {
     addNotification,
+    fetchNotifications,
   }
 }
 
@@ -444,38 +540,68 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 })
 
-// Function to simulate real-time events
-function simulateRealTimeEvents() {
-  // Array of possible events
-  const events = [
-    { title: "New Order", message: "Alex Thompson placed a new order for a Chocolate Cake" },
-    { title: "Order Status Update", message: "Order #ORD-007 has been updated to 'Completed'" },
-    { title: "Low Stock Alert", message: "Vanilla extract is running low on stock" },
-    { title: "New Inquiry", message: "Daniel Lee sent an inquiry about custom cupcakes" },
-    { title: "Payment Received", message: "Payment received for Order #ORD-009" },
-    { title: "Delivery Scheduled", message: "Delivery for Order #ORD-005 scheduled for tomorrow" },
-  ]
+// Function to initialize database connection check
+function initDatabaseConnectionCheck() {
+  // Check database connection on page load
+  checkDatabaseConnection()
 
-  // Generate a random event every 30-60 seconds
-  function scheduleRandomEvent() {
-    const randomTime = Math.floor(Math.random() * 30000) + 30000 // 30-60 seconds
-    setTimeout(() => {
-      // Pick a random event
-      const randomEvent = events[Math.floor(Math.random() * events.length)]
-
-      // Trigger notification
-      if (window.bakeryNotifications) {
-        window.bakeryNotifications.addNotification(randomEvent.title, randomEvent.message)
-      }
-
-      // Schedule next event
-      scheduleRandomEvent()
-    }, randomTime)
-  }
-
-  // Start the simulation
-  scheduleRandomEvent()
+  // Check connection every 2 minutes
+  setInterval(checkDatabaseConnection, 120000)
 }
 
-// Start simulating real-time events after a short delay
-setTimeout(simulateRealTimeEvents, 15000)
+// Function to check database connection
+async function checkDatabaseConnection() {
+  try {
+    // Replace with your actual API endpoint
+    const response = await fetch("/api/database/status")
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.connected) {
+      console.log("Database connection: OK")
+
+      // If we were previously disconnected, show reconnection notification
+      if (window.wasDisconnected) {
+        if (window.bakeryNotifications) {
+          window.bakeryNotifications.addNotification(
+            "Database Connected",
+            "Connection to the database has been restored. Your data is now up-to-date.",
+          )
+        }
+        window.wasDisconnected = false
+
+        // Refresh notifications to get any we missed while disconnected
+        if (window.bakeryNotifications) {
+          window.bakeryNotifications.fetchNotifications()
+        }
+      }
+    } else {
+      console.error("Database connection: Failed")
+      window.wasDisconnected = true
+
+      if (window.bakeryNotifications) {
+        window.bakeryNotifications.addNotification(
+          "Database Disconnected",
+          "Connection to the database has been lost. Some features may be unavailable.",
+        )
+      }
+    }
+  } catch (error) {
+    console.error("Error checking database connection:", error)
+    window.wasDisconnected = true
+
+    if (window.bakeryNotifications) {
+      window.bakeryNotifications.addNotification(
+        "Database Error",
+        "Unable to connect to the database. Please check your connection.",
+      )
+    }
+  }
+}
+
+// Start database connection check
+document.addEventListener("DOMContentLoaded", initDatabaseConnectionCheck)
