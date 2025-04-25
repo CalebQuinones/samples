@@ -408,7 +408,7 @@ function setupCalendar() {
           ordersForDay.forEach((order) => {
             const event = document.createElement("a")
             event.className = `calendar-event status-${order.status.toLowerCase().replace(" ", "-")}`
-            event.href = `order-details.html?id=${order.id}`
+            event.href = `order-details.php?id=${order.id}`
 
             const eventTitle = document.createElement("div")
             eventTitle.className = "calendar-event-title"

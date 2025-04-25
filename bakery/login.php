@@ -46,26 +46,32 @@ if (isset($_POST['signin'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    $select = "SELECT * FROM login WHERE email = ?";
-    $stmt = mysqli_prepare($conn, $select);
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        if (password_verify($password, $row['password'])) {
-            $_SESSION['user_email'] = $email; // Store in session
-            echo "<script>alert('Login successful!'); window.location.href='account.php';</script>";
-            exit();
-        } else {
-            echo "<script>alert('Incorrect password!');</script>";
-        }
+    // Admin checker
+    if ($email === 'admin.bakery@gmail.com' && $password === 'adminuser123') {
+        $_SESSION['admin_email'] = $email; // Store admin email in session
+        echo "<script>alert('Admin login successful!'); window.location.href='dashbrd.php';</script>";
+        exit();
     } else {
-        echo "<script>alert('User not found!');</script>";
+        $select = "SELECT * FROM login WHERE email = ?";
+        $stmt = mysqli_prepare($conn, $select);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            if (password_verify($password, $row['password'])) {
+                $_SESSION['user_email'] = $email; // Store user email in session
+                echo "<script>alert('Login successful!'); window.location.href='TriplesJ_sandroseBakery.php';</script>";
+                exit();
+            } else {
+                echo "<script>alert('Incorrect password!');</script>";
+            }
+        } else {
+            echo "<script>alert('User not found!');</script>";
+        }
     }
 }
-
 
 ?>
 
@@ -441,11 +447,11 @@ if (isset($_POST['signin'])) {
                     </div>
                     <div class="input-field">
                         <label for="password">Create Password</label>
-                        <input type="password" name="password" id="password" placeholder="At least 8 characters" required>
+                        <input type="password" name="password" id="password" placeholder="At least 8 characters" required minlength="8" required>
                     </div>
                     <div class="input-field">
                         <label for="confirm-password">Re-enter Password</label>
-                        <input type="password" name="rpassword" id="confirm-password" placeholder="At least 8 characters" required>
+                        <input type="password" name="rpassword" id="confirm-password" placeholder="At least 8 characters" required minlength="8" required>
                     </div>
                     <button type="submit" name="signup" class="btn">Sign up</button>
                     

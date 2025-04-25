@@ -4,94 +4,174 @@ include 'config.php';
 
 redirectToLogin();
 
-function updateValue($conn, $query, $param_type, $param_value) {
+function updateValue($conn, $query, $param_type, $param_value)
+{
     $stmt = $conn->prepare($query);
-    $stmt->bind_param($param_type, ...$param_value);
-    $stmt->execute();
-    $stmt->close();
+    if ($stmt) {
+        // Corrected: Pass $param_value directly, not as spread
+        $stmt->bind_param($param_type, ...$param_value);
+        $stmt->execute();
+        $stmt->close();
+        return true; // Indicate success
+    } else {
+        return false; // Indicate failure
+    }
+}
+
+// Start session if it's not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
 
 
-$user_email = $_SESSION['user_email']; 
+$user_email = $_SESSION['user_email'];
+$user_id = null; // Initialize user_id
+
+// Fetch the user_id from the login table based on the email
+$getIdQuery = "SELECT user_id FROM login WHERE email = ?";
+$getIdStmt = $conn->prepare($getIdQuery);
+if ($getIdStmt) {
+    $getIdStmt->bind_param("s", $user_email);
+    $getIdStmt->execute();
+    $getIdStmt->bind_result($user_id);
+    $getIdStmt->fetch();
+    $getIdStmt->close();
+}
+
+if (!$user_id) {
+    $popupMessage = "Error: User not found.";
+    ?>
+    <script type="text/javascript">
+        alert("<?php echo addslashes($popupMessage); ?>");
+        window.location.href = "account.php"; // Or wherever you want to redirect
+    </script>
+    <?php
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update'])) {
 
     $Fname = $_POST['Fname'];
     $Lname = $_POST['Lname'];
-    $email = $_POST['email'];
     $phone = $_POST['phone'];
     $birthday = $_POST['birthday'];
     $address = $_POST['address'];
     $payment = $_POST['payment'];
-    $profpic = $_POST['profpic'];
 
-    $updateFields = [];
-    $paramTypes = "";
-    $paramValues = [];
+    $loginUpdateFields = [];
+    $loginParamTypes = "";
+    $loginParamValues = [];
 
-  
+    $customerInfoUpdateFields = [];
+    $customerInfoParamTypes = "";
+    $customerInfoParamValues = [];
+
     if (!empty($Fname)) {
-        $updateFields[] = "Fname = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $Fname;
+        $loginUpdateFields[] = "Fname = ?";
+        $loginParamTypes .= "s";
+        $loginParamValues[] = $Fname;
     }
     if (!empty($Lname)) {
-        $updateFields[] = "Lname = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $Lname;
+        $loginUpdateFields[] = "Lname = ?";
+        $loginParamTypes .= "s";
+        $loginParamValues[] = $Lname;
     }
-    if (!empty($email)) {
-        $updateFields[] = "email = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $email;
-    }
+
     if (!empty($phone)) {
-        $updateFields[] = "phone = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $phone;
+        $customerInfoUpdateFields[] = "phone = ?";
+        $customerInfoParamTypes .= "s";
+        $customerInfoParamValues[] = $phone;
     }
     if (!empty($birthday)) {
-        $updateFields[] = "birthday = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $birthday;
+        $customerInfoUpdateFields[] = "birthday = ?";
+        $customerInfoParamTypes .= "s";
+        $customerInfoParamValues[] = $birthday;
     }
     if (!empty($address)) {
-        $updateFields[] = "address = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $address;
+        $customerInfoUpdateFields[] = "address = ?";
+        $customerInfoParamTypes .= "s";
+        $customerInfoParamValues[] = $address;
     }
     if (!empty($payment)) {
-        $updateFields[] = "payment = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $payment;
-    }
-    if (!empty($profpic)) {
-        $updateFields[] = "profpic = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $profpic;
+        $customerInfoUpdateFields[] = "payment = ?";
+        $customerInfoParamTypes .= "s";
+        $customerInfoParamValues[] = $payment;
     }
 
-    if (count($updateFields) > 0) {
-        $updateQuery = "UPDATE login SET " . implode(", ", $updateFields) . " WHERE email = ?";
-        $paramTypes .= "s";
-        $paramValues[] = $user_email;
+    $updateSuccess = true;
+    $messages = [];
 
-        updateValue($conn, $updateQuery, $paramTypes, $paramValues);
+    // Update login table if there are changes
+    if (count($loginUpdateFields) > 0) {
+        $loginUpdateQuery = "UPDATE login SET " . implode(", ", $loginUpdateFields) . " WHERE user_id = ?";
+        $loginParamTypes .= "i"; // Assuming user_id is an integer
+        $loginParamValues[] = $user_id;
+        if (!updateValue($conn, $loginUpdateQuery, $loginParamTypes, $loginParamValues)) { // Corrected
+            $updateSuccess = false;
+            $messages[] = "Failed to update login information.";
+        }
+    }
 
+    // Update customerinfo table if there are changes
+    if (count($customerInfoUpdateFields) > 0) {
+        // Check if a record exists for the user in customerinfo
+        $checkQuery = "SELECT COUNT(*) FROM customerinfo WHERE user_id = ?";
+        $checkStmt = $conn->prepare($checkQuery);
+        $checkStmt->bind_param("i", $user_id); // Assuming user_id is an integer
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
+
+        if ($count > 0) {
+            $customerInfoUpdateQuery = "UPDATE customerinfo SET " . implode(", ", $customerInfoUpdateFields) . " WHERE user_id = ?";
+            $customerInfoParamTypes .= "i"; // Assuming user_id is an integer
+            $customerInfoParamValues[] = $user_id;
+            if (!updateValue($conn, $customerInfoUpdateQuery, $customerInfoParamTypes, $customerInfoParamValues)) { // Corrected
+                $updateSuccess = false;
+                $messages[] = "Failed to update profile information.";
+            }
+        } else {
+            // If no record exists, insert a new one
+            $insertFields = implode(", ", array_merge(['user_id'], array_map(function($field){ return str_replace(' = ?', '', $field); }, $customerInfoUpdateFields)));
+            $placeholders = implode(", ", array_fill(0, count($customerInfoUpdateFields) + 1, '?'));
+            $insertQuery = "INSERT INTO customerinfo ($insertFields) VALUES ($placeholders)";
+            $insertParamTypes =  "i" . $customerInfoParamTypes;
+            $insertParamValues = array_merge([$user_id], $customerInfoParamValues);
+
+            $stmt = $conn->prepare($insertQuery);
+            if ($stmt) {
+                $stmt->bind_param($insertParamTypes, ...$insertParamValues);
+                if (!$stmt->execute()) {
+                    $updateSuccess = false;
+                    $messages[] = "Failed to create profile information.";
+                }
+                $stmt->close();
+            } else {
+                $updateSuccess = false;
+                $messages[] = "Failed to prepare insert statement for profile information.";
+            }
+        }
+    }
+
+    if ($updateSuccess) {
         $popupMessage = "Profile updated successfully!";
+    } elseif (!empty($messages)) {
+        $popupMessage = implode("<br>", $messages);
     } else {
         $popupMessage = "No changes were made to your profile.";
     }
 }
-    if (isset($popupMessage)) {
-        ?>
-        <script type="text/javascript">
-            alert("<?php echo addslashes($popupMessage); ?>");
-            window.location.href = "account.php";
-        </script>
-        <?php
-        exit();
-    }
+
+if (isset($popupMessage)) {
+    ?>
+    <script type="text/javascript">
+        alert("<?php echo addslashes($popupMessage); ?>");
+        window.location.href = "account.php";
+    </script>
+    <?php
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -259,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update'])) {
                                 <img id="profile-picture-preview" src="" alt="" style="display: none; width: 100%; height: 100%; border-radius: 9999px; object-fit: cover;">
                             </div>
                         </label>
-                            <input type="file" id="profile-picture-input" name="profpic" accept="image/*" style="display: none;">
+
                     </div>
                     
                     <div class="form-container">
@@ -273,12 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update'])) {
                                 <input id="last-name" name="Lname" type="text" class="input">
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input id="email" name="email" type="email" class="input">
-                        </div>
-                        
+                    
                         <div class="form-group">
                             <label for="phone">Phone</label>
                             <input id="phone" name="phone" type="tel" class="input">

@@ -21,31 +21,31 @@
       <nav class="sidebar-nav">
         <ul>
           <li>
-            <a href="dashbrd.html">
+            <a href="dashbrd.php">
               <i class="fas fa-home"></i>
               Dashboard
             </a>
           </li>
           <li>
-            <a href="orders.html" class="active">
+            <a href="orders.php" class="active">
               <i class="fas fa-shopping-bag"></i>
               Orders
             </a>
           </li>
           <li>
-            <a href="products.html">
+            <a href="products.php">
               <i class="fas fa-birthday-cake"></i>
               Products
             </a>
           </li>
           <li>
-            <a href="accounts.html">
+            <a href="accounts.php">
               <i class="fas fa-users"></i>
               Accounts
             </a>
           </li>
           <li>
-            <a href="inquiries.html">
+            <a href="inquiries.php">
               <i class="fas fa-comment-dots"></i>
               Inquiries
             </a>
@@ -59,7 +59,7 @@
       <header class="order-details-header">
         <div class="order-details-header-content">
           <div class="order-details-title">
-            <a href="orders.html"><i class="fas fa-arrow-left"></i></a>
+            <a href="orders.php"><i class="fas fa-arrow-left"></i></a>
             <h1>Order #ORD-002</h1>
           </div>
           <div>

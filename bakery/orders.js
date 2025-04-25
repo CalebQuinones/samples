@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Actions cell
         const actionsCell = document.createElement("td")
         const editLink = document.createElement("a")
-        editLink.href = `order-details.html?id=${order.id}`
+        editLink.href = `order-details.php?id=${order.id}`
         editLink.className = "text-pink-600 hover:text-pink-900 flex items-center"
         editLink.innerHTML = '<i class="fas fa-edit mr-1"></i> Edit'
         actionsCell.appendChild(editLink)
@@ -518,7 +518,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <input type="checkbox" class="order-checkbox" data-order-id="${order.id}">
           </td>
           <td>
-            <a href="order-details.html?id=${order.id}" class="order-id">${order.id}</a>
+            <a href="order-details.php?id=${order.id}" class="order-id">${order.id}</a>
           </td>
           <td>${order.customer}</td>
           <td>${order.product}</td>
@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${order.total}</td>
           <td>
             <div class="actions">
-              <a href="order-details.html?id=${order.id}" title="View Details">
+              <a href="order-details.php?id=${order.id}" title="View Details">
                 <i class="fas fa-edit"></i>
               </a>
           
@@ -698,7 +698,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <input type="checkbox" class="order-checkbox" data-order-id="${order.id}">
           </td>
           <td>
-            <a href="order-details.html?id=${order.id}" class="order-id">${order.id}</a>
+            <a href="order-details.php?id=${order.id}" class="order-id">${order.id}</a>
           </td>
           <td>${order.customer}</td>
           <td>${order.product}</td>
@@ -709,7 +709,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${order.total}</td>
           <td>
             <div class="actions">
-              <a href="order-details.html?id=${order.id}" title="View Details">
+              <a href="order-details.php?id=${order.id}" title="View Details">
                 <i class="fas fa-eye"></i>
               </a>
               <button title="Edit Order" class="edit-button" data-order-id="${order.id}">
