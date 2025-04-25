@@ -67,9 +67,9 @@ if (isset($_POST['submit'])) {
             </label>
             <div class="nav-links">
                 <ul>
-                    <li><a href="TriplesJ_sandroseBakery.html" class="active">Home</a></li>
-                    <li><a href="MenuSection.html">Menu</a></li>
-                    <li><a href="Abouts.html">About</a></li>
+                    <li><a href="TriplesJ_sandroseBakery.php" class="active">Home</a></li>
+                    <li><a href="MenuSection.php">Menu</a></li>
+                    <li><a href="Abouts.php">About</a></li>
                     <li><a href="Contact.php">Contact</a></li>
                 </ul>
             </div>
@@ -271,9 +271,6 @@ if (isset($_POST['submit'])) {
                 <input type="text" name="Lname" placeholder="Enter last name" required>
             </div>
         </div>
-<<<<<<< HEAD:bakery/Contact.html
-        <div class="kingina">
-=======
         <div class="form-row">
             <div class="form-group"><p>Email Address</p>
                 <input type="email" name="email" placeholder="Enter your email address" required>
@@ -290,7 +287,6 @@ if (isset($_POST['submit'])) {
         </div>
 
         <div class = "kingina">
->>>>>>> 858edb0e0250edcc54721ac4c71b81098dd57e3d:bakery/Contact.php
         <div class="business-hours-card">
             <div class="business-hours-title">
                 <span class="clock-icon">🕒</span>
@@ -357,7 +353,7 @@ if (isset($_POST['submit'])) {
     <footer>
         <div class="footer-content">
             <div class="footer-logo">
-                <a href="MenuSection.html"><img src="logo.png"></a>
+                <a href="MenuSection.php"><img src="logo.png"></a>
             </div>
             <div class="footer-contact">
 
@@ -376,8 +372,8 @@ if (isset($_POST['submit'])) {
                 <a href="#"><i class="fab fa-pinterest"></i></a>
             </div>
             <div class="footer-links">
-                <a href="Abouts.html">About Us</a>
-                <a href="Contact.html">Contact Us</a>
+                <a href="Abouts.php">About Us</a>
+                <a href="Contact.php">Contact Us</a>
                 <a href="#help">Help</a>
                 <a href="#privacy">Privacy Policy</a>
                 <a href="">Sitemap</a>

@@ -6,17 +6,72 @@ include 'config.php';
 redirectToLogin();
 
 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 $user_email = $_SESSION['user_email'];
+$user_id = null; // Initialize user_id
+
+// Fetch the user_id from the login table based on the email
+$getIdQuery = "SELECT user_id FROM login WHERE email = ?";
+$getIdStmt = $conn->prepare($getIdQuery);
+if ($getIdStmt) {
+    $getIdStmt->bind_param("s", $user_email);
+    $getIdStmt->execute();
+    $getIdStmt->bind_result($user_id);
+    $getIdStmt->fetch();
+    $getIdStmt->close();
+}
+
+if (!$user_id) {
+    $popupMessage = "Error: User not found.";
+    ?>
+    <script type="text/javascript">
+        alert("<?php echo addslashes($popupMessage); ?>");
+        window.location.href = "account.php"; // Or wherever you want to redirect
+    </script>
+    <?php
+    exit();
+}
 
 
-$query = "SELECT Fname, Lname, email, phone, birthday, address, payment, profpic FROM login WHERE email = ?";
+
+$Fname = "";
+$Lname = "";
+$email = "";
+// Fetch data from login table
+$query = "SELECT Fname, Lname, email FROM login WHERE email = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("s", $user_email);
-$stmt->execute();
-$stmt->store_result();
-$stmt->bind_result($Fname, $Lname, $email, $phone, $birthday, $address, $payment, $profpic);
-$stmt->fetch();
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("s", $user_email);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) { //check if there are any results
+        $stmt->bind_result($Fname, $Lname, $email);
+        $stmt->fetch();
+    }
+    $stmt->close();
+}
+
+$phone = "";
+$birthday = "";
+$address = "";
+$payment = "";
+$profpic = "";
+// Fetch data from customerinfo table
+$query = "SELECT phone, birthday, address, payment, profpic FROM customerinfo WHERE user_id = ?";
+$stmt = $conn->prepare($query);
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->store_result();
+     if ($stmt->num_rows > 0) {  //check if there are any results
+        $stmt->bind_result($phone, $birthday, $address, $payment, $profpic);
+        $stmt->fetch();
+    }
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,9 +108,9 @@ $stmt->close();
             </label>
             <div class="nav-links">
                 <ul>
-                    <li><a href="TriplesJ_sandroseBakery.html" class="active">Home</a></li>
-                    <li><a href="MenuSection.html">Menu</a></li>
-                    <li><a href="Abouts.html">About</a></li>
+                    <li><a href="TriplesJ_sandroseBakery.php" class="active">Home</a></li>
+                    <li><a href="MenuSection.php">Menu</a></li>
+                    <li><a href="Abouts.php">About</a></li>
                     <li><a href="Contact.php">Contact</a></li>
                 </ul>
             </div>
@@ -181,7 +236,7 @@ $stmt->close();
                             <div class="profile-picture">
                                 <span class="sr-only">Profile picture</span>
                                 <img id="profile-picture-preview" src="" alt="" style="display: none; width: 100%; height: 100%; border-radius: 9999px; object-fit: cover;">
-                                <img src="<?php echo $profpic; ?>" alt="Profile Picture" class="profile-picture-img" style="width: 100%; height: 100%; border-radius: 9999px; object-fit: cover;">
+                                <img src=" " alt="Profile Picture" class="profile-picture-img" style="width: 100%; height: 100%; border-radius: 9999px; object-fit: cover;">
                             </div>
                         </label>
                     </div>
@@ -220,7 +275,7 @@ $stmt->close();
                         
                         <div class="form-group">
                             <label for="payment-method">Payment Method</label>
-                            <p id="payment-method"><?php echo $payment; ?></p>
+                            <p id="payment-method"><?php echo ucwords("$payment"); ?></p>
                         </div>
                         
                         <div class="button-container">

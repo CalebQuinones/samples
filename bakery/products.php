@@ -21,31 +21,31 @@
       <nav class="sidebar-nav">
         <ul>
           <li>
-            <a href="dashbrd.html">
+            <a href="dashbrd.php">
               <i class="fas fa-home"></i>
               <span>Dashboard</span>
             </a>
           </li>
           <li>
-            <a href="orders.html">
+            <a href="orders.php">
               <i class="fas fa-shopping-bag"></i>
               <span>Orders</span>
             </a>
           </li>
           <li>
-            <a href="products.html" class="active">
+            <a href="products.php" class="active">
               <i class="fas fa-birthday-cake"></i>
               <span>Products</span>
             </a>
           </li>
           <li>
-            <a href="accounts.html">
+            <a href="accounts.php">
               <i class="fas fa-users"></i>
               <span>Accounts</span>
             </a>
           </li>
           <li>
-            <a href="inquiries.html">
+            <a href="inquiries.php">
               <i class="fas fa-comment-dots"></i>
               <span>Inquiries</span>
             </a>

@@ -33,9 +33,9 @@
             </label>
             <div class="nav-links">
                 <ul>
-                    <li><a href="TriplesJ_sandroseBakery.html" class="active">Home</a></li>
-                    <li><a href="MenuSection.html">Menu</a></li>
-                    <li><a href="Abouts.html">About</a></li>
+                    <li><a href="TriplesJ_sandroseBakery.php" class="active">Home</a></li>
+                    <li><a href="MenuSection.php">Menu</a></li>
+                    <li><a href="Abouts.php">About</a></li>
                     <li><a href="Contact.php">Contact</a></li>
                 </ul>
             </div>
@@ -352,7 +352,7 @@
             <footer>
                 <div class="footer-content">
                     <div class="footer-logo">
-                        <a href="MenuSection.html"><img src="logo.png"></a>
+                        <a href="MenuSection.php"><img src="logo.png"></a>
                     </div>
                     <div class="footer-contact">
 
@@ -371,8 +371,8 @@
                         <a href="#"><i class="fab fa-pinterest"></i></a>
                     </div>
                     <div class="footer-links">
-                        <a href="Abouts.html">About Us</a>
-                        <a href="Contact.html">Contact Us</a>
+                        <a href="Abouts.php">About Us</a>
+                        <a href="Contact.php">Contact Us</a>
                         <a href="#help">Help</a>
                         <a href="#privacy">Privacy Policy</a>
                         <a href="">Sitemap</a>

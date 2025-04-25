@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orders - Bakery Admin Dashboard</title>
+  <title>Inquiries - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -21,33 +21,33 @@
       <nav class="sidebar-nav">
         <ul>
           <li>
-            <a href="dashbrd.html">
+            <a href="dashbrd.php">
               <i class="fas fa-home"></i>
-              Dashboard
+              <span>Dashboard</span>
             </a>
           </li>
           <li>
-            <a href="orders.html" class="active">
+            <a href="orders.php">
               <i class="fas fa-shopping-bag"></i>
-              Orders
+              <span>Orders</span>
             </a>
           </li>
           <li>
-            <a href="products.html">
+            <a href="products.php">
               <i class="fas fa-birthday-cake"></i>
-              Products
+              <span>Products</span>
             </a>
           </li>
           <li>
-            <a href="accounts.html">
+            <a href="accounts.php">
               <i class="fas fa-users"></i>
-              Accounts
+              <span>Accounts</span>
             </a>
           </li>
           <li>
-            <a href="inquiries.html">
+            <a href="inquiries.php" class="active">
               <i class="fas fa-comment-dots"></i>
-              Inquiries
+              <span>Inquiries</span>
             </a>
           </li>
         </ul>
@@ -59,27 +59,28 @@
       <header class="page-header">
         <div class="page-header-content">
           <div class="page-title">
-            <h1>Orders</h1>
+            <h1>Inquiries</h1>
           </div>
         </div>
       </header>
 
       <div class="page-content">
+        <!-- Bulk Actions (hidden by default) -->
         <div class="bulk-actions" id="bulkActions" style="display: none;">
           <div class="bulk-actions-count">
-            <span id="selectedCount">0</span> orders selected
+            <span id="selectedCount">0</span> inquiries selected
           </div>
           <div class="bulk-actions-buttons">
             <button class="bulk-button bulk-button-complete">
               <i class="fas fa-check"></i>
-              Mark as Completed
+              Mark as Resolved
             </button>
             <button class="bulk-button bulk-button-print">
-              Print Labels
+              Mark as In Progress
             </button>
             <button class="bulk-button bulk-button-cancel">
               <i class="fas fa-times"></i>
-              Cancel Orders
+              Delete
             </button>
             <button class="bulk-button bulk-button-clear" id="clearSelection">
               Clear Selection
@@ -91,22 +92,14 @@
         <div class="filters">
           <div class="search-container">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search orders..." id="searchInput">
+            <input type="text" class="search-input" placeholder="Search inquiries..." id="searchInput">
           </div>
           <div class="filter-buttons">
             <select class="filter-select" id="statusFilter">
-              <option>All Statuses</option>
-              <option>Completed</option>
+              <option>All Status</option>
+              <option>New</option>
               <option>In Progress</option>
-              <option>Pending</option>
-              <option>Cancelled</option>
-            </select>
-            <select class="filter-select" id="productFilter">
-              <option>All Products</option>
-              <option>Cakes</option>
-              <option>Cupcakes</option>
-              <option>Breads</option>
-              <option>Custom Orders</option>
+              <option>Resolved</option>
             </select>
             <select class="filter-select" id="dateFilter">
               <option>Last 30 Days</option>
@@ -114,16 +107,11 @@
               <option>Today</option>
               <option>This Month</option>
               <option>Last Month</option>
-              <option>Custom Range</option>
             </select>
-            <button class="filter-button">
-              <i class="fas fa-filter"></i>
-              More Filters
-            </button>
           </div>
         </div>
 
-        <!-- Orders Table -->
+        <!-- Inquiries Table -->
         <div class="order-card">
           <div class="table-container">
             <table>
@@ -132,19 +120,15 @@
                   <th>
                     <input type="checkbox" id="selectAll">
                   </th>
-                  <th>Order ID</th>
+                  <th>Subject</th>
                   <th>Customer</th>
-                  <th>Product</th>
-                  <th>Order Date</th>
-                  <th>Delivery Date</th>
+                  <th>Date</th>
                   <th>Status</th>
-                  <th>Payment</th>
-                  <th>Total</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="ordersTableBody">
-                <!-- Orders will be populated sa JavaScript -->
+              <tbody id="inquiriesTableBody">
+                <!-- Inquiries will be populated by JavaScript -->
               </tbody>
             </table>
           </div>
@@ -161,7 +145,7 @@
             </div>
             <div class="pagination-desktop">
               <div class="pagination-info">
-                Showing <span id="startIndex">1</span> to <span id="endIndex">8</span> of <span id="totalItems">12</span> results
+                Showing <span id="startIndex">1</span> to <span id="endIndex">5</span> of <span id="totalItems">8</span> results
               </div>
               <div class="pagination-nav" id="paginationNav">
                 <button class="pagination-button pagination-button-prev" id="prevPage" disabled>
@@ -179,6 +163,59 @@
     </main>
   </div>
 
-  <script src="orders.js"></script>
+  <!-- View Inquiry Modal -->
+  <div class="modal-overlay" id="inquiryModal" style="display: none;">
+    <div class="modal-container">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="inquirySubject">Wedding Cake Inquiry</h3>
+          <span class="status-badge status-new" id="inquiryStatusBadge">New</span>
+        </div>
+        <div class="modal-body">
+          <div class="bg-gray-50 p-3 rounded-lg">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <div id="inquiryCustomer" style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900);">Jennifer Smith</div>
+              <div id="inquiryDate" style="font-size: 0.75rem; color: var(--gray-500);">Apr 9, 2025</div>
+            </div>
+            <p id="inquiryMessage" style="font-size: 0.875rem; color: var(--gray-700); white-space: pre-line;">I'm interested in ordering a 3-tier wedding cake for my upcoming wedding on June 15th. Do you offer tastings? I'd like to discuss design options and flavors. My fiancé and I are thinking of a semi-naked cake with fresh flowers. Please let me know what information you need from me to get started.</p>
+          </div>
+
+          <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; font-size: 0.875rem; color: var(--gray-600);">
+              <i class="fas fa-envelope" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
+              <span id="inquiryEmail">jennifer.smith@example.com</span>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 0.875rem; color: var(--gray-600);">
+              <i class="fas fa-phone" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
+              <span id="inquiryPhone">+1 (555) 123-4567</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem;">
+            <label for="reply" style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
+              Reply
+            </label>
+            <textarea
+              id="replyText"
+              rows="4"
+              class="form-textarea"
+              placeholder="Type your reply here..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-button modal-button-primary" id="sendReply">
+          <i class="fas fa-reply mr-2"></i>
+          Send Reply
+        </button>
+        <button class="modal-button modal-button-secondary" id="closeInquiry">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="inquiries.js"></script>
 </body>
 </html>

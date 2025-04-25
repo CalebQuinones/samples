@@ -1,13 +1,18 @@
 <?php
+// Database configuration
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_NAME', 'bakery_db');
 
-    $servername = "localhost";
-    $username = "root"; 
-    $password = "";
-    $dbname = "bakerydb";
-    
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+// Attempt to connect to MySQL database
+$conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
+// Check connection
+if($conn === false){
+    die("ERROR: Could not connect. " . mysqli_connect_error());
+}
+
+// Set charset to utf8mb4
+mysqli_set_charset($conn, "utf8mb4");
 ?>
