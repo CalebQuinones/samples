@@ -1,3 +1,21 @@
+<?php
+// Start the session
+session_start();
+
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "bakerydb";
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -434,28 +452,38 @@
             
     </section>
         <div class="product-grid">
-            <div class="product-card">
-                <div class="product-image"></div>
-                <div class="product-details">
-                    <h3 class="product-name">Product Name</h3>
-                    <!-- STAR RATING ADDED HERE -->
-                    <div class="product-rating">
-                        <span class="star filled">★</span>
-                        <span class="star filled">★</span>
-                        <span class="star filled">★</span>
-                        <span class="star filled">★</span>
-                        <span class="star">★</span>
-                    </div>
-                    <p class="product-price">Php 1,200</p>
-                    <!-- QUANTITY CONTROL ADDED HERE -->
-                    <div class="quantity-control">
-                        <button class="quantity-btn minus">-</button>
-                        <span class="quantity">1</span>
-                        <button class="quantity-btn plus">+</button>
-                    </div>
-                    <button class="add-to-order">Add to order</button>
-                </div>
-            </div>
+            <?php
+            // Get products from database
+            $sql = "SELECT * FROM products ORDER BY created_at DESC";
+            $result = mysqli_query($conn, $sql);
+
+            if ($result && mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo '<div class="product-card">';
+                    echo '<div class="product-image" style="background-image: url(\'' . $row['image'] . '\')"></div>';
+                    echo '<div class="product-details">';
+                    echo '<h3 class="product-name">' . $row['name'] . '</h3>';
+                    echo '<div class="product-rating">';
+                    echo '<span class="star filled">★</span>';
+                    echo '<span class="star filled">★</span>';
+                    echo '<span class="star filled">★</span>';
+                    echo '<span class="star filled">★</span>';
+                    echo '<span class="star">★</span>';
+                    echo '</div>';
+                    echo '<p class="product-price">Php ' . number_format($row['price'], 2) . '</p>';
+                    echo '<div class="quantity-control">';
+                    echo '<button class="quantity-btn minus">-</button>';
+                    echo '<span class="quantity">1</span>';
+                    echo '<button class="quantity-btn plus">+</button>';
+                    echo '</div>';
+                    echo '<button class="add-to-order">Add to order</button>';
+                    echo '</div>';
+                    echo '</div>';
+                }
+            } else {
+                echo '<p>No products found</p>';
+            }
+            ?>
         </div>
     </section>
     <footer>

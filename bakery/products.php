@@ -1,3 +1,18 @@
+<?php
+session_start();
+require_once 'config.php';
+
+// Check if user is logged in and is admin
+if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
+    header("location: login.php");
+    exit;
+}
+
+// Fetch all products
+$sql = "SELECT * FROM products ORDER BY created_at DESC";
+$result = mysqli_query($conn, $sql);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,17 +116,18 @@
           </div>
           <div class="filter-buttons">
             <select class="filter-select" id="categoryFilter">
-              <option>All Categories</option>
-              <option>Cakes</option>
-              <option>Cupcakes</option>
-              <option>Breads</option>
-              <option>Pastries</option>
+              <option value="">All Categories</option>
+              <option value="Wedding Cakes">Wedding Cakes</option>
+              <option value="Birthday Cakes">Birthday Cakes</option>
+              <option value="Shower Cakes">Shower Cakes</option>
+              <option value="Cupcakes">Cupcakes</option>
+              <option value="Celebration">Celebration</option>
+              <option value="Breads">Breads</option>
             </select>
-            <select class="filter-select" id="statusFilter">
-              <option>All Status</option>
-              <option>In Stock</option>
-              <option>Low Stock</option>
-              <option>Out of Stock</option>
+            <select class="filter-select" id="availabilityFilter">
+              <option value="">All Status</option>
+              <option value="In Stock">In Stock</option>
+              <option value="Out of Stock">Out of Stock</option>
             </select>
             <select class="filter-select" id="sortBy">
               <option>Sort By: Newest</option>
@@ -133,15 +149,53 @@
                   <th>
                     <input type="checkbox" id="selectAll">
                   </th>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>PRODUCT ID</th>
+                  <th>IMAGE</th>
+                  <th>NAME</th>
+                  <th>CATEGORY</th>
+                  <th>PRICE</th>
+                  <th>AVAILABILITY</th>
+                  <th>ACTIONS</th>
                 </tr>
               </thead>
               <tbody id="productsTableBody">
-                <!-- Products will be populated by JavaScript -->
+                <?php 
+                if ($result && mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $productId = $row['product_id'];
+                        $name = $row['name'];
+                        $category = $row['category'];
+                        $price = number_format($row['price'], 2);
+                        $image = $row['image'];
+                        $availability = $row['availability'];
+                        
+                        // Get availability badge class
+                        $availabilityClass = $availability === 'In Stock' ? 'status-completed' : 'status-cancelled';
+                        
+                        echo "<tr data-product-id='$productId'>";
+                        echo "<td><input type='checkbox' class='product-checkbox' value='$productId'></td>";
+                        echo "<td class='product-id'>PRD-" . str_pad($productId, 3, '0', STR_PAD_LEFT) . "</td>";
+                        echo "<td class='product-image'><img src='$image' alt='$name' width='50'></td>";
+                        echo "<td>$name</td>";
+                        echo "<td>$category</td>";
+                        echo "<td>₱$price</td>";
+                        echo "<td><span class='status-badge $availabilityClass'>$availability</span></td>";
+                        echo "<td>
+                                <div class='action-buttons'>
+                                    <button class='action-button edit-button' title='Edit Product' data-product-id='$productId'>
+                                        <i class='fas fa-pen'></i>
+                                    </button>
+                                    <button class='action-button delete-button' title='Delete Product' data-product-id='$productId'>
+                                        <i class='fas fa-trash'></i>
+                                    </button>
+                                </div>
+                            </td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='8' class='no-products'>No products found</td></tr>";
+                }
+                ?>
               </tbody>
             </table>
           </div>

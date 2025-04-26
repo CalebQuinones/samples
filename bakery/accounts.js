@@ -100,6 +100,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveChanges = document.getElementById("saveChanges");
     const closeAccount = document.getElementById("closeAccount");
     const resetPasswordBtn = document.getElementById("resetPasswordBtn");
+    const accountEditModal = document.getElementById('accountEditModal');
+    const accountEditForm = document.getElementById('accountEditForm');
+    const closeEditModal = document.getElementById('closeEditModal');
+    const cancelEdit = document.getElementById('cancelEdit');
+  
+    // Customer Details Modal
+    const customerDetailsModal = document.getElementById('customerDetailsModal');
+    const closeCustomerDetails = document.getElementById('closeCustomerDetails');
+    const closeCustomerDetailsBtn = document.getElementById('closeCustomerDetailsBtn');
   
     // Pagination state
     let currentPage = 1;
@@ -220,6 +229,20 @@ document.addEventListener("DOMContentLoaded", () => {
       if (event.target === viewAccountModal) {
         viewAccountModal.style.display = "none";
       }
+    });
+  
+    // Add event listeners for edit and delete buttons using event delegation
+    accountsTableBody.addEventListener('click', function(e) {
+        const target = e.target.closest('.action-button');
+        if (!target) return;
+
+        const userId = target.dataset.userId;
+        
+        if (target.classList.contains('edit-button')) {
+            showEditModal(userId);
+        } else if (target.classList.contains('delete-button')) {
+            confirmDeleteAccount(userId);
+        }
     });
   
     // Functions
@@ -350,18 +373,15 @@ document.addEventListener("DOMContentLoaded", () => {
         editButton.className = "edit-button";
         editButton.innerHTML = '<i class="fas fa-edit"></i>';
         editButton.title = "Edit Account";
-        editButton.addEventListener("click", () => viewAccount(account));
+        editButton.dataset.userId = account.id;
+        editButton.addEventListener("click", () => showEditModal(account.id));
         
         const deleteButton = document.createElement("button");
         deleteButton.className = "delete-button";
         deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
         deleteButton.title = "Delete Account";
-        deleteButton.addEventListener("click", () => {
-          if (confirm(`Are you sure you want to delete ${account.name}'s account?`)) {
-            alert(`Account for ${account.name} has been deleted.`);
-            // Here you would normally delete the account
-          }
-        });
+        deleteButton.dataset.userId = account.id;
+        deleteButton.addEventListener("click", () => confirmDeleteAccount(account.id));
         
         actionsDiv.appendChild(editButton);
         actionsDiv.appendChild(deleteButton);
@@ -406,5 +426,130 @@ document.addEventListener("DOMContentLoaded", () => {
       // Show the modal
       viewAccountModal.style.display = "flex";
     }
+  
+    function showEditModal(userId) {
+        fetch(`get_account.php?id=${userId}`)
+            .then(response => response.json())
+            .then(account => {
+                document.getElementById('editUserId').value = account.user_id;
+                document.getElementById('editFirstName').value = account.Fname;
+                document.getElementById('editLastName').value = account.Lname;
+                document.getElementById('editEmail').value = account.email;
+                document.getElementById('editPhone').value = account.phone || '';
+                document.getElementById('editAddress').value = account.address || '';
+                document.getElementById('editStatus').value = account.status;
+                
+                accountEditModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(error => console.error('Error:', error));
+    }
+  
+    function closeModal() {
+        accountEditModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        accountEditForm.reset();
+    }
+  
+    function handleAccountEdit(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('user_id', document.getElementById('editUserId').value);
+        formData.append('first_name', document.getElementById('editFirstName').value);
+        formData.append('last_name', document.getElementById('editLastName').value);
+        formData.append('email', document.getElementById('editEmail').value);
+        formData.append('phone', document.getElementById('editPhone').value);
+        formData.append('address', document.getElementById('editAddress').value);
+        formData.append('status', document.getElementById('editStatus').value);
+
+        fetch('update_account.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeModal();
+                location.reload();
+            } else {
+                alert(data.message || 'Error updating account');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  
+    function confirmDeleteAccount(userId) {
+        if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
+            fetch('delete_account.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error deleting account');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+  
+    // Function to fetch and display customer details
+    async function showCustomerDetails(userId) {
+        try {
+            const response = await fetch(`get_customer_details.php?user_id=${userId}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('customerPhone').textContent = data.phone || 'Not provided';
+                document.getElementById('customerBirthday').textContent = data.birthday ? new Date(data.birthday).toLocaleDateString() : 'Not provided';
+                document.getElementById('customerAddress').textContent = data.address || 'Not provided';
+                document.getElementById('customerPayment').textContent = data.payment || 'Not provided';
+                document.getElementById('customerCreatedAt').textContent = new Date(data.created_at).toLocaleDateString();
+            } else {
+                document.getElementById('customerPhone').textContent = 'No customer information available';
+                document.getElementById('customerBirthday').textContent = 'N/A';
+                document.getElementById('customerAddress').textContent = 'N/A';
+                document.getElementById('customerPayment').textContent = 'N/A';
+                document.getElementById('customerCreatedAt').textContent = 'N/A';
+            }
+            
+            customerDetailsModal.style.display = 'block';
+            setTimeout(() => customerDetailsModal.classList.add('active'), 10);
+        } catch (error) {
+            console.error('Error fetching customer details:', error);
+            alert('Failed to load customer details. Please try again.');
+        }
+    }
+  
+    // Event delegation for view buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.view-button')) {
+            const userId = e.target.closest('.view-button').dataset.userId;
+            showCustomerDetails(userId);
+        }
+    });
+  
+    // Close modal events
+    [closeCustomerDetails, closeCustomerDetailsBtn].forEach(btn => {
+        btn.addEventListener('click', () => {
+            customerDetailsModal.classList.remove('active');
+            setTimeout(() => customerDetailsModal.style.display = 'none', 300);
+        });
+    });
+  
+    // Close modal when clicking outside
+    customerDetailsModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            customerDetailsModal.classList.remove('active');
+            setTimeout(() => customerDetailsModal.style.display = 'none', 300);
+        }
+    });
   });
   

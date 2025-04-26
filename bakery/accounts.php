@@ -1,3 +1,18 @@
+<?php
+session_start();
+require_once 'config.php';
+
+// Check if user is logged in and is admin
+if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
+    header("location: login.php");
+    exit;
+}
+
+// Fetch all accounts from login table
+$sql = "SELECT * FROM login ORDER BY created_at DESC";
+$result = mysqli_query($conn, $sql);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,15 +118,14 @@
           </div>
           <div class="filter-buttons">
             <select class="filter-select" id="roleFilter">
-              <option>All Roles</option>
-              <option>Admin</option>
-              <option>Staff</option>
-              <option>Customer</option>
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="customer">Customer</option>
             </select>
             <select class="filter-select" id="statusFilter">
-              <option>All Status</option>
-              <option>Active</option>
-              <option>Inactive</option>
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
             </select>
           </div>
         </div>
@@ -123,47 +137,103 @@
               <thead>
                 <tr>
                   <th>
-                    <input type="checkbox" id="selectAll">
+                    <input type="checkbox" id="selectAll" class="account-checkbox">
                   </th>
+                  <th>User ID</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
                   <th>Status</th>
-                  <th>Last Login</th>
+                  <th>Created At</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="accountsTableBody">
-                <!-- Accounts will be populated by JavaScript -->
+              <tbody>
+                <?php 
+                if ($result && mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $userId = $row['user_id'];
+                        $fullName = $row['Fname'] . ' ' . $row['Lname'];
+                        $email = $row['email'];
+                        $role = $row['role'];
+                        $status = $row['status'];
+                        $createdAt = date('M j, Y', strtotime($row['created_at']));
+                        
+                        $statusClass = $status === 'active' ? 'status-completed' : 'status-cancelled';
+                        $roleClass = $role === 'admin' ? 'status-in-progress' : 'status-pending';
+                        
+                        echo "<tr>";
+                        echo "<td><input type='checkbox' class='account-checkbox' data-id='$userId'></td>";
+                        echo "<td>USR-" . str_pad($userId, 3, '0', STR_PAD_LEFT) . "</td>";
+                        echo "<td>$fullName</td>";
+                        echo "<td>$email</td>";
+                        echo "<td><span class='status-badge $roleClass'>" . ucfirst($role) . "</span></td>";
+                        echo "<td><span class='status-badge $statusClass'>" . ucfirst($status) . "</span></td>";
+                        echo "<td>$createdAt</td>";
+                        echo "<td>
+                                <div class='action-buttons'>
+                                    <button class='action-button view-button' title='View Details' onclick='showCustomerDetails($userId)'>
+                                        <i class='fas fa-eye'></i>
+                                    </button>
+                                    <button class='action-button edit-button' title='Edit Account' onclick='showEditModal($userId)'>
+                                        <i class='fas fa-pen'></i>
+                                    </button>";
+                        if ($role !== 'admin') {
+                            echo "<button class='action-button delete-button' title='Delete Account' onclick='confirmDeleteAccount($userId)'>
+                                    <i class='fas fa-trash'></i>
+                                  </button>";
+                        }
+                        echo "</div></td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='8' class='no-accounts'>No accounts found</td></tr>";
+                }
+                ?>
               </tbody>
             </table>
           </div>
+        </div>
 
-          <!-- Pagination -->
-          <div class="pagination">
-            <div class="pagination-mobile">
-              <button class="pagination-button pagination-button-prev" id="prevPageMobile" disabled>
-                Previous
-              </button>
-              <button class="pagination-button pagination-button-next" id="nextPageMobile">
-                Next
-              </button>
+        <!-- Customer Details Modal -->
+        <div class="modal-overlay" id="customerDetailsModal" style="display: none;">
+            <div class="modal-container">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Customer Details</h3>
+                        <button class="close-modal" id="closeCustomerDetails">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="customer-info">
+                            <div class="info-group">
+                                <label>Phone Number</label>
+                                <p id="customerPhone">Loading...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Birthday</label>
+                                <p id="customerBirthday">Loading...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Address</label>
+                                <p id="customerAddress">Loading...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Payment Method</label>
+                                <p id="customerPayment">Loading...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Customer Since</label>
+                                <p id="customerCreatedAt">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-button modal-button-secondary" id="closeCustomerDetailsBtn">
+                            Close
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="pagination-desktop">
-              <div class="pagination-info">
-                Showing <span id="startIndex">1</span> to <span id="endIndex">5</span> of <span id="totalItems">8</span> results
-              </div>
-              <div class="pagination-nav" id="paginationNav">
-                <button class="pagination-button pagination-button-prev" id="prevPage" disabled>
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <!-- Page buttons will be added by JavaScript -->
-                <button class="pagination-button pagination-button-next" id="nextPage">
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </main>
@@ -271,6 +341,54 @@
         <button class="modal-button modal-button-secondary" id="closeAccount">
           Cancel
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Edit Modal -->
+  <div class="modal" id="accountEditModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Account</h2>
+        <button class="close-modal" id="closeEditModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="accountEditForm">
+          <input type="hidden" id="editUserId">
+          <div class="form-group">
+            <label for="editFirstName">First Name</label>
+            <input type="text" id="editFirstName" required>
+          </div>
+          <div class="form-group">
+            <label for="editLastName">Last Name</label>
+            <input type="text" id="editLastName" required>
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" required>
+          </div>
+          <div class="form-group">
+            <label for="editPhone">Phone</label>
+            <input type="tel" id="editPhone">
+          </div>
+          <div class="form-group">
+            <label for="editAddress">Address</label>
+            <textarea id="editAddress"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="editStatus">Status</label>
+            <select id="editStatus" required>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-button" id="cancelEdit">Cancel</button>
+            <button type="submit" class="submit-button">Save Changes</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

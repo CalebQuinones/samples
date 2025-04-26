@@ -48,6 +48,8 @@ if (isset($_POST['signin'])) {
 
     // Admin checker
     if ($email === 'admin.bakery@gmail.com' && $password === 'adminuser123') {
+        $_SESSION['user_id'] = 1; // Set user_id for admin
+        $_SESSION['role'] = 'admin'; // Set role as admin
         $_SESSION['admin_email'] = $email; // Store admin email in session
         echo "<script>alert('Admin login successful!'); window.location.href='dashbrd.php';</script>";
         exit();
@@ -61,6 +63,8 @@ if (isset($_POST['signin'])) {
         if (mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_assoc($result);
             if (password_verify($password, $row['password'])) {
+                $_SESSION['user_id'] = $row['id']; // Set user_id from database
+                $_SESSION['role'] = 'user'; // Set role as user
                 $_SESSION['user_email'] = $email; // Store user email in session
                 echo "<script>alert('Login successful!'); window.location.href='TriplesJ_sandroseBakery.php';</script>";
                 exit();
