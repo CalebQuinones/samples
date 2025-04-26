@@ -1787,3 +1787,96 @@ input[type="password"]:focus {
 .hover\:text-pink-800:hover {
   color: var(--pink-800);
 }
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    background-color: #fdf2f8;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-button:hover {
+    background-color: #fbcfe8;
+    color: #9d174d;
+}
+
+.action-button i {
+    font-size: 14px;
+}
+
+.edit-button {
+    color: #666;
+}
+
+.delete-button {
+    color: #666;
+}
+
+.edit-button:hover {
+    color: #9d174d;
+}
+
+.delete-button:hover {
+    color: #9d174d;
+}
+
+/* Account Checkboxes */
+.account-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  border: 2px solid #E84B8A;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.account-checkbox:checked {
+  background-color: #E84B8A;
+  border-color: #E84B8A;
+}
+
+.account-checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.account-checkbox:hover {
+  border-color: #D43D7A;
+}
+
+.account-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
+}
+
+/* Adjust table header checkbox */
+th .account-checkbox {
+  margin: 0 auto;
+}
+
+/* Adjust table cell checkbox */
+td .account-checkbox {
+  margin: 0 auto;
+}

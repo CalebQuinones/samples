@@ -9,50 +9,98 @@ document.addEventListener("DOMContentLoaded", () => {
       paymentForm.addEventListener("submit", (e) => {
         e.preventDefault()
   
-        // Close the checkout modal
-        if (checkoutModal) {
-          checkoutModal.classList.remove("active")
-          setTimeout(() => {
-            checkoutModal.style.display = "none"
-          }, 300)
+        // Get form data
+        const email = document.getElementById("email").value
+        const fullname = document.getElementById("fullname").value
+        const address = document.getElementById("address").value
+        const deliveryDate = document.getElementById("deliveryDate").value
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value
+        
+        // Get cart data from localStorage
+        const cart = JSON.parse(localStorage.getItem("cart")) || []
+        
+        // Calculate total
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        
+        // Prepare order data
+        const orderData = {
+          items: cart,
+          customer: {
+            email,
+            fullname,
+            address,
+            deliveryDate,
+            paymentMethod
+          },
+          total
         }
+        
+        // Send order data to server
+        fetch('process_order.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Clear the cart
+            localStorage.removeItem("cart")
+            
+            // Close the checkout modal
+            if (checkoutModal) {
+              checkoutModal.classList.remove("active")
+              setTimeout(() => {
+                checkoutModal.style.display = "none"
+              }, 300)
+            }
   
-        // Show the order confirmation modal
-        if (orderConfirmationModal && modalOverlay) {
-          // Set current date for the confirmation
-          const currentDate = new Date().toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
+            // Show the order confirmation modal
+            if (orderConfirmationModal && modalOverlay) {
+              // Set current date for the confirmation
+              const currentDate = new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
   
-          const dateElement = document.getElementById("confirmationOrderDate")
-          if (dateElement) {
-            dateElement.textContent = currentDate
+              const dateElement = document.getElementById("confirmationOrderDate")
+              if (dateElement) {
+                dateElement.textContent = currentDate
+              }
+  
+              // Use the order ID from the server response
+              const orderIdElement = document.getElementById("confirmationOrderId")
+              if (orderIdElement) {
+                orderIdElement.textContent = "TJR-" + data.orderId
+              }
+  
+              // Display the modal and overlay
+              modalOverlay.style.display = "block"
+              orderConfirmationModal.style.display = "block"
+  
+              // Force a reflow before adding the active class for the transition
+              void modalOverlay.offsetWidth
+              void orderConfirmationModal.offsetWidth
+  
+              // Add active class for fade-in effect
+              modalOverlay.classList.add("active")
+              orderConfirmationModal.classList.add("active")
+  
+              // Prevent scrolling when modal is open
+              document.body.style.overflow = "hidden"
+            }
+          } else {
+            // Show error message
+            alert("Error placing order: " + data.message)
           }
-  
-          // Generate a random order ID
-          const orderId = "TJR-" + Math.floor(10000 + Math.random() * 90000)
-          const orderIdElement = document.getElementById("confirmationOrderId")
-          if (orderIdElement) {
-            orderIdElement.textContent = orderId
-          }
-  
-          // Display the modal and overlay
-          modalOverlay.style.display = "block"
-          orderConfirmationModal.style.display = "block"
-  
-          // Force a reflow before adding the active class for the transition
-          void modalOverlay.offsetWidth
-          void orderConfirmationModal.offsetWidth
-  
-          // Add active class for fade-in effect
-          modalOverlay.classList.add("active")
-          orderConfirmationModal.classList.add("active")
-  
-          // Prevent scrolling when modal is open
-          document.body.style.overflow = "hidden"
-        }
+        })
+        .catch(error => {
+          console.error("Error:", error)
+          alert("An error occurred while processing your order. Please try again.")
+        })
       })
     }
   
