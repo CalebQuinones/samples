@@ -63,7 +63,7 @@ if (isset($_POST['signin'])) {
         if (mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_assoc($result);
             if (password_verify($password, $row['password'])) {
-                $_SESSION['user_id'] = $row['id']; // Set user_id from database
+                $_SESSION['user_id'] = $row['user_id']; // Set user_id from database
                 $_SESSION['role'] = 'user'; // Set role as user
                 $_SESSION['user_email'] = $email; // Store user email in session
                 echo "<script>alert('Login successful!'); window.location.href='TriplesJ_sandroseBakery.php';</script>";

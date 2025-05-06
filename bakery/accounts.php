@@ -9,7 +9,7 @@ if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
 }
 
 // Fetch all accounts from login table
-$sql = "SELECT * FROM login ORDER BY created_at DESC";
+$sql = "SELECT * FROM login ORDER BY created_at ASC";
 $result = mysqli_query($conn, $sql);
 ?>
 

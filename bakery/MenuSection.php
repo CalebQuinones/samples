@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php
 // Start the session
 session_start();
@@ -16,6 +17,293 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 ?>
+<script>
+window.isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+window.userId = <?php echo isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 'null'; ?>;
+
+// Initialize cart from localStorage or create empty array
+window.cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Function to save cart to localStorage
+function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(window.cart));
+}
+
+// Function to update cart UI
+function updateCartUI() {
+    const cartPopupItems = document.getElementById('cartPopupItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartCount = document.querySelector('.cart-count');
+    
+    if (!cartPopupItems || !cartTotal || !cartCount) return;
+    
+    // Update cart count
+    const totalItems = window.cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalItems;
+    
+    // Update cart items
+    cartPopupItems.innerHTML = '';
+    let total = 0;
+    
+    window.cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        cartPopupItems.innerHTML += `
+            <div class="cart-popup-item" data-id="${item.id}">
+                <div class="cart-item-image">
+                    <img src="${item.image}" alt="${item.name}">
+                </div>
+                <div class="cart-item-details">
+                    <h4>${item.name}</h4>
+                    <p>Php ${item.price.toLocaleString()} × ${item.quantity}</p>
+                </div>
+                <div class="cart-item-actions">
+                    <button class="cart-minus">-</button>
+                    <span class="cart-quantity">${item.quantity}</span>
+                    <button class="cart-plus">+</button>
+                    <button class="cart-item-remove">×</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    // Update total
+    cartTotal.textContent = `Php ${total.toLocaleString()}`;
+    
+    // Update checkout items if checkout modal is open
+    const orderItemsList = document.getElementById('orderItemsList');
+    if (orderItemsList) {
+        orderItemsList.innerHTML = '';
+        window.cart.forEach(item => {
+            orderItemsList.innerHTML += `
+                <div class="cart-item">
+                    <div class="item-image">
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="item-details">
+                        <h4>${item.name}</h4>
+                        <p>Php ${item.price.toLocaleString()} × ${item.quantity}</p>
+                    </div>
+                </div>
+            `;
+        });
+    }
+}
+
+// Function to add item to cart
+function addToCart(productId, quantity = 1) {
+    const product = window.products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const existingItem = window.cart.find(item => item.id === productId);
+    if (existingItem) {
+        existingItem.quantity += quantity;
+    } else {
+        window.cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            quantity: quantity
+        });
+    }
+    
+    saveCart();
+    updateCartUI();
+}
+
+// Function to remove item from cart
+function removeFromCart(productId) {
+    window.cart = window.cart.filter(item => item.id !== productId);
+    saveCart();
+    updateCartUI();
+}
+
+// Function to update cart quantity
+function updateCartQuantity(productId, quantity) {
+    const item = window.cart.find(item => item.id === productId);
+    if (item) {
+        item.quantity = quantity;
+        saveCart();
+        updateCartUI();
+    }
+}
+
+// Function to calculate total
+function calculateTotal() {
+    return window.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+}
+</script>
+<script>
+// Debug logging
+console.log('Script starting...');
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
+    
+    // Initialize products array
+    window.products = [];
+    <?php
+    // Get products from database
+    $sql = "SELECT * FROM products ORDER BY created_at DESC";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "window.products.push({
+                id: '" . $row['product_id'] . "',
+                name: '" . addslashes($row['name']) . "',
+                price: " . $row['price'] . ",
+                image: '" . $row['image'] . "'
+            });\n";
+        }
+    }
+    ?>
+    console.log('Products loaded:', window.products);
+
+    // Cart elements
+    const cartIcon = document.getElementById('cartIcon');
+    const cartPopup = document.getElementById('cartPopup');
+    const closeCart = document.getElementById('closeCart');
+    const shopMoreBtn = document.getElementById('shopMoreBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const checkoutModal = document.getElementById('checkoutModal');
+    const closeCheckout = document.getElementById('closeCheckout');
+    const backToCart = document.querySelector('.back-to-cart');
+    const cartPopupItems = document.getElementById('cartPopupItems');
+
+    // Open cart popup
+    cartIcon.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        modalOverlay.style.display = 'block';
+        cartPopup.style.display = 'block';
+        void cartPopup.offsetWidth;
+        modalOverlay.classList.add('active');
+        cartPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        updateCartUI();
+    });
+
+    function closeCartPopup() {
+        cartPopup.classList.remove('active');
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+            cartPopup.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
+
+    closeCart.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeCartPopup();
+    });
+
+    shopMoreBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeCartPopup();
+    });
+
+    // Checkout button opens checkout modal
+    checkoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!window.cart || window.cart.length === 0) {
+            alert('Your cart is empty. Please add items before checking out.');
+            return;
+        }
+        cartPopup.classList.remove('active');
+        cartPopup.style.display = 'none';
+        checkoutModal.style.display = 'block';
+        setTimeout(() => { checkoutModal.classList.add('active'); }, 10);
+        modalOverlay.style.display = 'block';
+        modalOverlay.classList.add('active');
+        updateCartUI(); // Update checkout items
+    });
+
+    // Close checkout modal
+    closeCheckout.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        checkoutModal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+            checkoutModal.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    });
+
+    // Back to cart from checkout
+    if (backToCart) {
+        backToCart.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            checkoutModal.classList.remove('active');
+            setTimeout(() => { checkoutModal.style.display = 'none'; }, 300);
+            cartPopup.style.display = 'block';
+            setTimeout(() => { cartPopup.classList.add('active'); }, 10);
+            modalOverlay.style.display = 'block';
+            modalOverlay.classList.add('active');
+        });
+    }
+
+    // Close cart or checkout when clicking outside
+    modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+            if (cartPopup.classList.contains('active')) closeCartPopup();
+            if (checkoutModal.classList.contains('active')) {
+                checkoutModal.classList.remove('active');
+                setTimeout(() => {
+                    checkoutModal.style.display = 'none';
+                    modalOverlay.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+    });
+
+    // Event delegation for cart popup items
+    if (cartPopupItems) {
+        cartPopupItems.addEventListener('click', function(e) {
+            const cartItem = e.target.closest('.cart-popup-item');
+            if (!cartItem) return;
+
+            const productId = cartItem.dataset.id;
+
+            // Handle remove button click
+            if (e.target.closest('.cart-item-remove')) {
+                removeFromCart(productId);
+            }
+
+            // Handle quantity buttons
+            if (e.target.classList.contains('cart-plus')) {
+                const quantityElement = cartItem.querySelector('.cart-quantity');
+                const currentQuantity = parseInt(quantityElement.textContent);
+                updateCartQuantity(productId, currentQuantity + 1);
+            }
+
+            if (e.target.classList.contains('cart-minus')) {
+                const quantityElement = cartItem.querySelector('.cart-quantity');
+                const currentQuantity = parseInt(quantityElement.textContent);
+                if (currentQuantity > 1) {
+                    updateCartQuantity(productId, currentQuantity - 1);
+                } else {
+                    removeFromCart(productId);
+                }
+            }
+        });
+    }
+
+    // Initialize cart UI
+    updateCartUI();
+});
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,10 +320,9 @@ if (!$conn) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Menu3.css">
-    <script src="product-popup.js"></script>
     <link rel="stylesheet" href="order-confirmation.css">
-    <script src="cart-confirmation.js"></script>
-
+    <script src="cart-manager.js"></script>
+    <script src="product-popup.js"></script>
 </head>
 <body>
     <div class="top-banner">
@@ -105,7 +392,142 @@ if (!$conn) {
         </div>
     </div>
 
-<span class="pangbg"></span>
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="checkout-content">
+            <div class="checkout-header">
+                <h2>Checkout</h2>
+                <button class="close-checkout" id="closeCheckout">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 6L18 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="checkout-body">
+                <div class="checkout-left">
+                    <div class="back-to-cart">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 19L5 12L12 5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Back to cart</span>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3>Review your purchases</h3>
+                        <div class="cart-items-container">
+                            <div class="cart-items" id="orderItemsList">
+                                <!-- Cart items will be dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3>Delivery Options</h3>
+                        <div class="delivery-options">
+                            <div class="delivery-option">
+                                <input type="radio" id="standardDelivery" name="deliveryOption" value="standard" checked>
+                                <label for="standardDelivery">
+                                    <div class="option-title">Php 50 - Standard delivery</div>
+                                    <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
+                                </label>
+                            </div>
+                            <div class="delivery-option">
+                                <input type="radio" id="pickupOption" name="deliveryOption" value="pickup">
+                                <label for="pickupOption">
+                                    <div class="option-title">No cost - Pick-up</div>
+                                    <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-right">
+                    <div class="payment-details">
+                        <h3>Payment Details</h3>
+                        <p class="payment-subtitle">Complete your order by providing your payment details</p>
+
+                        <form id="paymentForm">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" autocomplete="email" placeholder="Enter your email here..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fullname">Fullname</label>
+                                <input type="text" id="fullname" name="fullname" autocomplete="name" placeholder="Enter your fullname here..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address">Delivery Address</label>
+                                <input type="text" id="address" name="address" autocomplete="street-address" placeholder="Enter your address..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="deliveryDate">Delivery date/Pick-up date</label>
+                                <input type="date" id="deliveryDate" name="deliveryDate" autocomplete="off" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment</label>
+                                <div class="payment-options">
+                                    <div class="payment-option">
+                                        <input type="radio" id="cardPayment" name="paymentMethod" value="card" autocomplete="off" checked>
+                                        <label for="cardPayment">Card</label>
+                                    </div>
+                                    <div class="payment-option">
+                                        <input type="radio" id="gcashPayment" name="paymentMethod" value="gcash" autocomplete="off">
+                                        <label for="gcashPayment">
+                                            <img src="https://www.gcash.com/wp-content/uploads/2019/04/gcash-logo.png" alt="GCash" class="payment-icon">
+                                        </label>
+                                    </div>
+                                    <div class="view-all-options">
+                                        <span>View all options</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="confirm-button">CONFIRM</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Confirmation Modal -->
+    <div class="order-confirmation-modal" id="orderConfirmationModal">
+        <div class="order-confirmation-content">
+            <div class="confirmation-icon">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#E84B8A" />
+                    <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h2>Order Confirmed!</h2>
+            <p>Thank you for your order. We've received your payment and are preparing your items.</p>
+            <div class="order-details">
+                <div class="order-id">
+                    <span>Order ID:</span>
+                    <span id="confirmationOrderId">TJR-12345</span>
+                </div>
+                <div class="order-date">
+                    <span>Date:</span>
+                    <span id="confirmationOrderDate">April 1, 2025</span>
+                </div>
+            </div>
+            <p class="confirmation-message">A confirmation email has been sent to your email address.</p>
+            <button class="check-status-btn" id="checkStatusBtn">Check Order Status</button>
+        </div>
+    </div>
+
+    <span class="pangbg"></span>
     </section>
     <section class="buong-content">
         <img src="meltdown2.png" class="melt">
@@ -179,9 +601,6 @@ if (!$conn) {
             <h3>Customize your own cake!</h3>
             <button class="custom-order-btn" id="customOrderBtn">CUSTOM ORDER</button>
         </div>
-    
-        <!-- Modal Overlay -->
-        <div class="modal-overlay" id="modalOverlay"></div>
     
         <!-- Custom Cake Modal -->
         <div class="custom-cake-modal" id="customCakeModal">
@@ -317,140 +736,7 @@ if (!$conn) {
                 </div>
             </div>
         </div>
-        <!-- Checkout Modal -->
-<div class="checkout-modal" id="checkoutModal">
-    <div class="checkout-content">
-        <div class="checkout-header">
-            <h2>Checkout</h2>
-            <button class="close-checkout" id="closeCheckout">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18 6L6 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M6 6L18 18" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-        </div>
-
-        <div class="checkout-body">
-            <div class="checkout-left">
-                <div class="back-to-cart">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 12H5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 19L5 12L12 5" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Back to cart</span>
-                </div>
-
-                <div class="checkout-section">
-                    <h3>Review your purchases</h3>
-                    <div class="cart-items-container">
-                        <div class="cart-items" id="orderItemsList">
-                            <!-- Cart items will be dynamically inserted here -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="checkout-section">
-                    <h3>Delivery Options</h3>
-                    <div class="delivery-options">
-                        <div class="delivery-option">
-                            <input type="radio" id="standardDelivery" name="deliveryOption" value="standard" checked>
-                            <label for="standardDelivery">
-                                <div class="option-title">Php 50 - Standard delivery</div>
-                                <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
-                            </label>
-                        </div>
-                        <div class="delivery-option">
-                            <input type="radio" id="pickupOption" name="deliveryOption" value="pickup">
-                            <label for="pickupOption">
-                                <div class="option-title">No cost - Pick-up</div>
-                                <div class="option-subtitle">Get it tomorrow, 12 Dec 23</div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="checkout-right">
-                <div class="payment-details">
-                    <h3>Payment Details</h3>
-                    <p class="payment-subtitle">Complete your order by providing your payment details</p>
-
-                    <form id="paymentForm">
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" placeholder="Enter your email here..." required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="fullname">Fullname</label>
-                            <input type="text" id="fullname" placeholder="Enter your fullname here..." required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="address">Delivery Address</label>
-                            <input type="text" id="address" placeholder="Enter your address..." required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="deliveryDate">Delivery date/Pick-up date</label>
-                            <input type="date" id="deliveryDate" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Payment</label>
-                            <div class="payment-options">
-                                <div class="payment-option">
-                                    <input type="radio" id="cardPayment" name="paymentMethod" value="card" checked>
-                                    <label for="cardPayment">Card</label>
-                                </div>
-                                <div class="payment-option">
-                                    <input type="radio" id="gcashPayment" name="paymentMethod" value="gcash">
-                                    <label for="gcashPayment">
-                                        <img src="https://www.gcash.com/wp-content/uploads/2019/04/gcash-logo.png" alt="GCash" class="payment-icon">
-                                    </label>
-                                </div>
-                                <div class="view-all-options">
-                                    <span>View all options</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="confirm-button">CONFIRM</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Order Confirmation Modal -->
-<div class="order-confirmation-modal" id="orderConfirmationModal">
-    <div class="order-confirmation-content">
-        <div class="confirmation-icon">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="#E84B8A" />
-                <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
-        <h2>Order Confirmed!</h2>
-        <p>Thank you for your order. We've received your payment and are preparing your items.</p>
-        <div class="order-details">
-            <div class="order-id">
-                <span>Order ID:</span>
-                <span id="confirmationOrderId">TJR-12345</span>
-            </div>
-            <div class="order-date">
-                <span>Date:</span>
-                <span id="confirmationOrderDate">April 1, 2025</span>
-            </div>
-        </div>
-        <p class="confirmation-message">A confirmation email has been sent to your email address.</p>
-        <button class="check-status-btn" id="checkStatusBtn">Check Order Status</button>
-    </div>
-</div>
-
-
-            
-    </section>
+        </section>
         <div class="product-grid">
             <?php
             // Get products from database
@@ -459,7 +745,7 @@ if (!$conn) {
 
             if ($result && mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
-                    echo '<div class="product-card">';
+                    echo '<div class="product-card" data-product-id="' . $row['product_id'] . '">';
                     echo '<div class="product-image" style="background-image: url(\'' . $row['image'] . '\')"></div>';
                     echo '<div class="product-details">';
                     echo '<h3 class="product-name">' . $row['name'] . '</h3>';
@@ -472,11 +758,11 @@ if (!$conn) {
                     echo '</div>';
                     echo '<p class="product-price">Php ' . number_format($row['price'], 2) . '</p>';
                     echo '<div class="quantity-control">';
-                    echo '<button class="quantity-btn minus">-</button>';
+                    echo '<button class="quantity-btn minus" type="button">-</button>';
                     echo '<span class="quantity">1</span>';
-                    echo '<button class="quantity-btn plus">+</button>';
+                    echo '<button class="quantity-btn plus" type="button">+</button>';
                     echo '</div>';
-                    echo '<button class="add-to-order">Add to order</button>';
+                    echo '<button class="add-to-order" type="button" data-product-id="' . $row['product_id'] . '" data-product-name="' . htmlspecialchars($row['name']) . '" data-product-price="' . $row['price'] . '" data-product-image="' . $row['image'] . '">Add to order</button>';
                     echo '</div>';
                     echo '</div>';
                 }
@@ -494,7 +780,7 @@ if (!$conn) {
           <div class="footer-contact">
             <p>001 Road 10 Joseph Sitt Bagumbayan, Taguig City</p>
             <p>Call us: +63 918 746 4342</p>
-            <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f694978595979a9b978f9a939893b6919b979f9ad895999b">[email&#160;protected]</a></p>
+            <p>Email: <a href="mailto:info@triplejsbakery.com">info@triplejsbakery.com</a></p>
           </div>
           <div class="footer-social">
               <a href="#"><i class="fab fa-facebook"></i></a>
@@ -513,1049 +799,7 @@ if (!$conn) {
           <p>&copy; 2024 Triple J's Bakery. All rights reserved.</p>
       </div>
   </footer>
-  <script src="cart-persistence.js"></script>
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        document.addEventListener('DOMContentLoaded', function() {
-          const slidesContainer = document.querySelector('.slides');
-          const slides = document.querySelectorAll('.slide');
-          const prevButton = document.querySelector('.nav-button-prev');
-          const nextButton = document.querySelector('.nav-button-next');
-          const indicators = document.querySelectorAll('.indicator');
-          let currentSlide = 0;
-          const totalSlides = slides.length;
-          let slideInterval;
-    
-          // Function to move to a specific slide
-          function goToSlide(slideIndex) {
-            currentSlide = slideIndex;
-            slidesContainer.style.transform = `translateX(-${currentSlide * 20}%)`;
-            
-            // Update indicators
-            indicators.forEach((indicator, index) => {
-              indicator.classList.toggle('active', index === currentSlide);
-            });
-          }
-    
-          // Next slide function
-          function nextSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            goToSlide(currentSlide);
-          }
-    
-          // Previous slide function
-          function prevSlide() {
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            goToSlide(currentSlide);
-          }
-    
-          // Set up click handlers for navigation buttons
-          nextButton.addEventListener('click', () => {
-            nextSlide();
-            resetInterval();
-          });
-    
-          prevButton.addEventListener('click', () => {
-            prevSlide();
-            resetInterval();
-          });
-    
-          // Set up click handlers for indicators
-          indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => {
-              goToSlide(index);
-              resetInterval();
-            });
-          });
-    
-          // Auto-advance slides
-          function startInterval() {
-            slideInterval = setInterval(nextSlide, 3000); // Change slide every 5 seconds
-          }
-    
-          function resetInterval() {
-            clearInterval(slideInterval);
-            startInterval();
-          }
-    
-          // Start the auto-advance
-          startInterval();
-    
-          // Pause auto-advance on hover
-          slidesContainer.addEventListener('mouseenter', () => {
-            clearInterval(slideInterval);
-          });
-    
-          slidesContainer.addEventListener('mouseleave', () => {
-            startInterval();
-          });
-        });
-      </script>
-       <script>
-        // Simple JavaScript to handle quantity buttons
-        document.addEventListener('DOMContentLoaded', function() {
-    // Use event delegation to handle quantity controls for all product cards
-    document.querySelector('.product-grid').addEventListener('click', function(e) {
-        // Check if the clicked element is a quantity button
-        if (e.target.classList.contains('quantity-btn')) {
-            const quantityElement = e.target.parentElement.querySelector('.quantity');
-            let quantity = parseInt(quantityElement.textContent);
-
-            if (e.target.classList.contains('plus')) {
-                // Increase quantity (no upper limit specified)
-                quantityElement.textContent = quantity + 1;
-            } else if (e.target.classList.contains('minus')) {
-                // Decrease quantity, but never go below 1
-                if (quantity > 1) {
-                    quantityElement.textContent = quantity - 1;
-                }
-            }
-        }
-    });
-});
-
-    </script>
- <script>
-    // Select all delivery option elements
-    const deliveryOptions = document.querySelectorAll('.delivery-option');
-
-    // Add click event listener to each delivery option
-    deliveryOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            // Remove 'selected' class from all options
-            deliveryOptions.forEach(opt => {
-                opt.classList.remove('selected');
-                // Uncheck radio buttons
-                opt.querySelector('input[type="radio"]').checked = false;
-            });
-
-            // Add 'selected' class to clicked option
-            this.classList.add('selected');
-            // Check the radio button for the clicked option
-            this.querySelector('input[type="radio"]').checked = true;
-        });
-    });
-</script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-  // Get DOM elements
-  const submitOrderBtn = document.querySelector(".submit-order-btn")
-  const checkoutModal = document.getElementById("checkoutModal")
-  const closeCheckout = document.getElementById("closeCheckout")
-  const modalOverlay = document.getElementById("modalOverlay")
-  const paymentForm = document.getElementById("paymentForm")
-
-  // Function to open checkout modal
-  function openCheckoutModal() {
-    // Display the overlay and modal
-    modalOverlay.style.display = "block"
-    checkoutModal.style.display = "block"
-
-    // Force a reflow before adding the active class for the transition
-    void modalOverlay.offsetWidth
-    void checkoutModal.offsetWidth
-
-    // Add active class for fade-in effect
-    modalOverlay.classList.add("active")
-    checkoutModal.classList.add("active")
-
-    // Prevent scrolling when modal is open
-    document.body.style.overflow = "hidden"
-  }
-
-  // Function to close checkout modal
-  function closeCheckoutModal() {
-    // Remove active class first (for fade-out effect)
-    modalOverlay.classList.remove("active")
-    checkoutModal.classList.remove("active")
-
-    // Wait for transition to complete before hiding elements
-    setTimeout(() => {
-      modalOverlay.style.display = "none"
-      checkoutModal.style.display = "none"
-      document.body.style.overflow = "auto" // Re-enable scrolling
-    }, 300) // Match this with your CSS transition time
-  }
-
-  // Event listeners
-  if (submitOrderBtn) {
-    submitOrderBtn.addEventListener("click", (e) => {
-      e.preventDefault() // Prevent form submission
-
-      // First close the photo upload modal if it's open
-      const photoUploadModal = document.getElementById("photoUploadModal")
-      if (photoUploadModal) {
-        photoUploadModal.classList.remove("active")
-        setTimeout(() => {
-          photoUploadModal.style.display = "none"
-        }, 300)
-      }
-
-      // Then open the checkout modal
-      openCheckoutModal()
-    })
-  }
-
-  if (closeCheckout) {
-    closeCheckout.addEventListener("click", closeCheckoutModal)
-  }
-
-  if (modalOverlay) {
-    modalOverlay.addEventListener("click", (e) => {
-      // Only close if the overlay itself is clicked, not its children
-      if (e.target === modalOverlay) {
-        closeCheckoutModal()
-      }
-    })
-  }
-
-  // Handle payment form submission
-  
-
-  // Add event listener to the back to cart button
-  const backToCartBtn = document.querySelector(".back-to-cart")
-  if (backToCartBtn) {
-    backToCartBtn.addEventListener("click", closeCheckoutModal)
-  }
-})
-
-    </script>
-<script>
-       document.addEventListener('DOMContentLoaded', function() {
-    // Get DOM elements
-    const customOrderBtn = document.getElementById('customOrderBtn');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const customCakeModal = document.getElementById('customCakeModal');
-    const photoUploadModal = document.getElementById('photoUploadModal');
-    const closeModal = document.getElementById('closeModal');
-    const closePhotoModal = document.getElementById('closePhotoModal');
-    const chooseLaterBtn = document.querySelector('.choose-later-btn');
-    const startCustomizingBtn = document.querySelector('.start-customizing-btn');
-    const orderOptions = document.querySelectorAll('.order-option');
-    const uploadArea = document.getElementById('uploadArea');
-    const cakePhotoInput = document.getElementById('cakePhotoInput');
-    const previewContainer = document.getElementById('previewContainer');
-    const cakeDetailsForm = document.getElementById('cakeDetailsForm');
-    
-    // Function to open modal with backdrop effect
-    function openModal(modal) {
-        // Display the overlay and modal
-        modalOverlay.style.display = 'block';
-        modal.style.display = 'block';
-        
-        // Force a reflow before adding the active class for the transition
-        void modalOverlay.offsetWidth;
-        void modal.offsetWidth;
-        
-        // Add active class for fade-in effect
-        modalOverlay.classList.add('active');
-        modal.classList.add('active');
-        
-        // No more blur effect, just use the overlay as backdrop
-        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
-    }
-    
-    // Function to close modal
-    function closeModalFunc() {
-        // Remove active class first (for fade-out effect)
-        modalOverlay.classList.remove('active');
-        customCakeModal.classList.remove('active');
-        photoUploadModal.classList.remove('active');
-        
-        // Wait for transition to complete before hiding elements
-        setTimeout(() => {
-            modalOverlay.style.display = 'none';
-            customCakeModal.style.display = 'none';
-            photoUploadModal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Re-enable scrolling
-        }, 300); // Match this with your CSS transition time
-    }
-    
-    // Event listeners
-    customOrderBtn.addEventListener('click', function() {
-        openModal(customCakeModal);
-    });
-    
-    closeModal.addEventListener('click', closeModalFunc);
-    closePhotoModal.addEventListener('click', closeModalFunc);
-    modalOverlay.addEventListener('click', closeModalFunc);
-    chooseLaterBtn.addEventListener('click', closeModalFunc);
-    
-    // Handle option selection
-    orderOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            // Remove selected class from all options
-            orderOptions.forEach(opt => opt.classList.remove('selected'));
-            
-            // Add selected class to clicked option
-            this.classList.add('selected');
-            
-            // Update button text based on selection
-            const optionTitle = this.querySelector('h3').textContent;
-            startCustomizingBtn.textContent = optionTitle === 'Customize Online' 
-                ? 'START CUSTOMIZING' 
-                : 'UPLOAD PHOTO';
-        });
-    });
-    
-    // Handle start customizing button click
-    startCustomizingBtn.addEventListener('click', function() {
-        const selectedOption = document.querySelector('.order-option.selected');
-        
-        if (selectedOption) {
-            const optionTitle = selectedOption.querySelector('h3').textContent;
-            
-            if (optionTitle === 'Customize Online') {
-                // Redirect to cake customization page
-                alert('Redirecting to cake customization page...');
-                // window.location.href = 'cake-customizer.html';
-            } else {
-                // Close the first modal
-                customCakeModal.classList.remove('active');
-                customCakeModal.style.display = 'none';
-                
-                // Open the photo upload modal
-                openModal(photoUploadModal);
-            }
-        } else {
-            // If no option is selected, default to customization
-            alert('Redirecting to cake customization page...');
-            // window.location.href = 'cake-customizer.html';
-        }
-    });
-    
-    // Handle file upload area
-    uploadArea.addEventListener('click', function() {
-        cakePhotoInput.click();
-    });
-    
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-    
-    uploadArea.addEventListener('dragleave', function() {
-        uploadArea.classList.remove('dragover');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        
-        if (e.dataTransfer.files.length) {
-            handleFileUpload(e.dataTransfer.files[0]);
-        }
-    });
-    
-    cakePhotoInput.addEventListener('change', function() {
-        if (this.files.length) {
-            handleFileUpload(this.files[0]);
-        }
-    });
-    
-    function handleFileUpload(file) {
-        if (!file.type.match('image.*')) {
-            alert('Please upload an image file');
-            return;
-        }
-        
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            // Clear previous preview
-            previewContainer.innerHTML = '';
-            
-            // Create image preview
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.className = 'preview-image';
-            
-            // Create remove button
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-image-btn';
-            removeBtn.innerHTML = '×';
-            removeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                previewContainer.innerHTML = '';
-                uploadArea.querySelector('.upload-placeholder').style.display = 'flex';
-                cakePhotoInput.value = '';
-            });
-            
-            // Add elements to preview container
-            previewContainer.appendChild(img);
-            previewContainer.appendChild(removeBtn);
-            
-            // Hide placeholder
-            uploadArea.querySelector('.upload-placeholder').style.display = 'none';
-        };
-        
-        reader.readAsDataURL(file);
-    }
-    
-    // Handle form submission
-    cakeDetailsForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Check if image is uploaded
-        if (previewContainer.innerHTML === '') {
-            alert('Please upload an image of your cake design');
-            return;
-        }
-        
-        // Get form values
-        const cakeSize = document.getElementById('cakeSize').value;
-        const cakeFlavor = document.getElementById('cakeFlavor').value;
-        const fillingType = document.getElementById('fillingType').value;
-        const frostingType = document.getElementById('frostingType').value;
-        const specialInstructions = document.getElementById('specialInstructions').value;
-        
-        // Here you would typically send this data to your server
-        // For now, we'll just show a success message
-        alert('Your custom cake order has been submitted! We will contact you shortly to confirm the details.');
-        
-        // Close the modal
-        closeModalFunc();
-        
-        // Reset form
-        cakeDetailsForm.reset();
-        previewContainer.innerHTML = '';
-        uploadArea.querySelector('.upload-placeholder').style.display = 'flex';
-    });
-    
-    // Add CSS for selected option
-    const style = document.createElement('style');
-    style.textContent = `
-        .order-option.selected {
-            background-color: var(--light-pink);
-            border: 2px solid var(--primary);
-        }
-    `;
-    document.head.appendChild(style);
-});
-
-</script>
-      
-      <script>
-       const products = [
-    {
-        id: 1,
-        name: "Wedding Cake",
-        price: 600,
-        category: "Wedding Cakes",
-        availability: "In Stock",
-        image: "1.png"
-    },
-    {
-        id: 2,
-        name: "Number Cake",
-        price: 300,
-        category: "Birthday Cakes",
-        availability: "In Stock",
-        image: "17.png"
-    },
-    {
-        id: 3,
-        name: "Dog Cake",
-        price: 1000,
-        category: "Birthday Cakes",
-        availability: "In Stock",
-        image: "8.png"
-    },
-    {
-        id: 4,
-        name: "Vanilla Cake",
-        price: 1200,
-        category: "Shower Cakes",
-        availability: "In Stock",
-        image: "2.png"
-    },
-    {
-        id: 5,
-        name: "Cup Cakes",
-        price: 100,
-        category: "Cupcakes",
-        availability: "In Stock",
-        image: "3.png"
-    },
-    {
-        id: 6,
-        name: "Fathers Day",
-        price: 200,
-        category: "Celebration",
-        availability: "In Stock",
-        image: "4.png"
-    },
-    {
-        id: 7,
-        name: "Strawberry Cupcakes",
-        price: 1200,
-        category: "Cupcakes",
-        availability: "In Stock",
-        image: "5.png"
-    },
-    {
-        id: 8,
-        name: "Ube Cupcakes",
-        price: 500,
-        category: "Cupcakes",
-        availability: "In Stock",
-        image: "6.png"
-    },
-    {
-        id: 9,
-        name: "Jack Daniels Celebration",
-        price: 100,
-        category: "Celebration",
-        availability: "In Stock",
-        image: "10.png"
-    },
-    {
-        id: 10,
-        name: "Monthsary Cake",
-        price: 150,
-        category: "Wedding Cakes",
-        availability: "In Stock",
-        image: "12.png"
-    },
-    {
-        id: 11,
-        name: "Kiddie Cupcakes",
-        price: 100,
-        category: "Birthday Cakes",
-        availability: "In Stock",
-        image: "13.png"
-    },
-    {
-        id: 12,
-        name: "Monthsary Cakes",
-        price: 100,
-        category: "Wedding Cakes",
-        availability: "In Stock",
-        image: "14.png"
-    },
-    {
-        id: 13,
-        name: "Birthday Cakes",
-        price: 100,
-        category: "Birthday Cakes",
-        availability: "In Stock",
-        image: "15.png"
-    },
-    {
-        id: 14,
-        name: "Coquette",
-        price: 100,
-        category: "Breads",
-        availability: "In Stock",
-        image: "16.png"
-    },
-    {
-        id: 15,
-        name: "Tasty",
-        price: 100,
-        category: "Breads",
-        availability: "In Stock",
-        image: "breads.png"
-    },
-    
-];
-
-// Cart functionality
-let cart = [];
-
-// Get DOM elements
-const searchInput = document.querySelector('.search-input');
-const productGrid = document.querySelector('.product-grid');
-const filterAvailability = document.querySelector('.filter-dropdown');
-const filterPrice = document.querySelectorAll('.filter-dropdown')[1];
-const categoryCards = document.querySelectorAll('.category-card');
-const cartIcon = document.getElementById('cartIcon');
-const cartPopup = document.getElementById('cartPopup');
-const closeCart = document.getElementById('closeCart');
-const cartPopupItems = document.getElementById('cartPopupItems');
-const cartTotal = document.getElementById('cartTotal');
-const shopMoreBtn = document.getElementById('shopMoreBtn');
-const checkoutBtn = document.getElementById('checkoutBtn');
-
-// Function to display products
-function displayProducts(productsToShow) {
-    productGrid.innerHTML = productsToShow.map(product => `
-        <div class="product-card" data-category="${product.category}" data-id="${product.id}">
-            <div class="product-image" style="background-image: url(${product.image})"></div>
-            <div class="product-details">
-                <h3 class="product-name">${product.name}</h3>
-                <!-- STAR RATING ADDED HERE -->
-                <div class="product-rating">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star">★</span>
-                </div>
-                <p class="product-price">Php ${product.price.toLocaleString()}</p>
-                <!-- QUANTITY CONTROL ADDED HERE -->
-                <div class="quantity-control">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus">+</button>
-                </div>
-                <button class="add-to-order">Add to order</button>
-            </div>
-        </div>
-    `).join('');
-    
-    
-    // ADDED EVENT LISTENERS FOR QUANTITY BUTTONS
-    const plusButtons = document.querySelectorAll('.plus');
-    const minusButtons = document.querySelectorAll('.minus');
-    
-    plusButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event bubbling
-            const quantityElement = this.parentElement.querySelector('.quantity');
-            let quantity = parseInt(quantityElement.textContent);
-            quantityElement.textContent = quantity + 1;
-        });
-    });
-    
-    minusButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event bubbling
-            const quantityElement = this.parentElement.querySelector('.quantity');
-            let quantity = parseInt(quantityElement.textContent);
-            if (quantity > 1) {
-                quantityElement.textContent = quantity - 1;
-            }
-        });
-    });
-}
-// Add this function to your menu page JavaScript, right after the displayProducts function
-function attachProductPopupListeners() {
-    // Get all product cards
-    const productCards = document.querySelectorAll('.product-card');
-    
-    // Add click event to each product card to open the modal
-    productCards.forEach((card) => {
-        card.addEventListener('click', function(e) {
-            // Don't trigger if clicking on buttons inside the card
-            if (e.target.closest('.quantity-btn') || e.target.closest('.add-to-order')) {
-                return;
-            }
-
-            const productId = parseInt(this.getAttribute('data-id'));
-            console.log("Product card clicked, ID:", productId);
-            
-            // Call the openProductModal function from product-popup-direct.js
-            if (typeof window.openProductModal === 'function') {
-                window.openProductModal(productId);
-            } else {
-                console.error("openProductModal function not found!");
-            }
-        });
-    });
-}
-
-// Modify your displayProducts function to call attachProductPopupListeners at the end
-function displayProducts(productsToShow) {
-    productGrid.innerHTML = productsToShow.map(product => `
-        <div class="product-card" data-category="${product.category}" data-id="${product.id}">
-            <div class="product-image" style="background-image: url(${product.image})"></div>
-            <div class="product-details">
-                <h3 class="product-name">${product.name}</h3>
-                <!-- STAR RATING ADDED HERE -->
-                <div class="product-rating">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star">★</span>
-                </div>
-                <p class="product-price">Php ${product.price.toLocaleString()}</p>
-                <!-- QUANTITY CONTROL ADDED HERE -->
-                <div class="quantity-control">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn plus">+</button>
-                </div>
-                <button class="add-to-order">Add to order</button>
-            </div>
-        </div>
-    `).join('');
-    
-    // ADDED EVENT LISTENERS FOR QUANTITY BUTTONS
-    const plusButtons = document.querySelectorAll('.plus');
-    const minusButtons = document.querySelectorAll('.minus');
-    
-    plusButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event bubbling
-            const quantityElement = this.parentElement.querySelector('.quantity');
-            let quantity = parseInt(quantityElement.textContent);
-            quantityElement.textContent = quantity + 1;
-        });
-    });
-    
-    minusButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event bubbling
-            const quantityElement = this.parentElement.querySelector('.quantity');
-            let quantity = parseInt(quantityElement.textContent);
-            if (quantity > 1) {
-                quantityElement.textContent = quantity - 1;
-            }
-        });
-    });
-    
-    // Attach product popup listeners to the newly created product cards
-    attachProductPopupListeners();
-}
-// Function to filter products
-function filterProducts(searchTerm = '', categoryFilter = '', availabilityFilter = '', priceFilter = '') {
-    let filteredProducts = products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesCategory = categoryFilter === '' || 
-            categoryFilter === 'All' || 
-            product.category === categoryFilter;
-
-        const matchesAvailability = availabilityFilter === 'availability' || 
-            product.availability.toLowerCase() === availabilityFilter.toLowerCase();
-
-        let matchesPrice = true;
-        if (priceFilter === 'small') {
-            matchesPrice = product.price < 200;
-        } else if (priceFilter === 'medium') {
-            matchesPrice = product.price >= 200 && product.price <= 500;
-        } else if (priceFilter === 'large') {
-            matchesPrice = product.price > 500;
-        }
-
-        return matchesSearch && matchesCategory && matchesAvailability && matchesPrice;
-    });
-
-    displayProducts(filteredProducts);
-
-    // Show message if no products found
-    if (filteredProducts.length === 0) {
-        productGrid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 20px;">
-                No products found matching your criteria.
-            </div>
-        `;
-    }
-}
-
-// Event listeners for search and filters
-searchInput.addEventListener('input', () => {
-    filterProducts(
-        searchInput.value, 
-        document.querySelector('.category-card#color span.category-name').textContent,
-        filterAvailability.value,
-        filterPrice.value
-    );
-});
-
-filterAvailability.addEventListener('change', () => {
-    filterProducts(
-        searchInput.value, 
-        document.querySelector('.category-card#color span.category-name').textContent,
-        filterAvailability.value,
-        filterPrice.value
-    );
-});
-
-filterPrice.addEventListener('change', () => {
-    filterProducts(
-        searchInput.value, 
-        document.querySelector('.category-card#color span.category-name').textContent,
-        filterAvailability.value,
-        filterPrice.value
-    );
-});
-
-// Add event listeners to category cards
-categoryCards.forEach(card => {
-    card.addEventListener('click', () => {
-        // Remove 'color' class from all cards
-        categoryCards.forEach(c => c.removeAttribute('id'));
-        
-        // Add 'color' class to clicked card
-        card.setAttribute('id', 'color');
-        
-        // Get the category name
-        const categoryName = card.querySelector('.category-name').textContent;
-        
-        // Filter products based on the selected category
-        filterProducts(
-            searchInput.value,
-            categoryName,
-            filterAvailability.value,
-            filterPrice.value
-        );
-    });
-});
-
-// Function to add item to cart
-function addToCart(productId, quantity) {
-    const product = products.find(p => p.id === productId);
-    
-    if (!product) return;
-    
-    // Check if product already exists in cart
-    const existingItem = cart.find(item => item.id === productId);
-    
-    if (existingItem) {
-        existingItem.quantity += quantity;
-    } else {
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            quantity: quantity
-        });
-    }
-    
-    // Update cart UI
-    updateCartUI();
-}
-
-// Function to remove item from cart
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.id !== productId);
-    updateCartUI();
-}
-
-// Function to update cart quantity
-function updateCartQuantity(productId, newQuantity) {
-    const item = cart.find(item => item.id === productId);
-    
-    if (item) {
-        if (newQuantity <= 0) {
-            removeFromCart(productId);
-        } else {
-            item.quantity = newQuantity;
-            updateCartUI();
-        }
-    }
-}
-
-// Function to calculate cart total
-function calculateTotal() {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-}
-
-// Function to update cart UI
-function updateCartUI() {
-    // Update cart count
-    const cartCount = document.querySelector('.cart-count');
-    const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-    cartCount.textContent = totalItems;
-    cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
-    
-    // Update cart popup items
-    cartPopupItems.innerHTML = '';
-    
-    if (cart.length === 0) {
-        cartPopupItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
-    } else {
-        cart.forEach(item => {
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-popup-item';
-            cartItem.dataset.id = item.id;
-            
-            cartItem.innerHTML = `
-                <div class="cart-item-image">
-                    <img src="${item.image}" alt="${item.name}">
-                </div>
-                <div class="cart-item-details">
-                    <h4>${item.name}</h4>
-                    <p>Php ${item.price.toLocaleString()}</p>
-                </div>
-                <div class="cart-item-quantity">
-                    <button class="cart-quantity-btn cart-minus">-</button>
-                    <span class="cart-quantity">${item.quantity}</span>
-                    <button class="cart-quantity-btn cart-plus">+</button>
-                </div>
-                <button class="cart-item-remove">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            `;
-            
-            cartPopupItems.appendChild(cartItem);
-        });
-    }
-    
-    // Update cart total
-    cartTotal.textContent = `Php ${calculateTotal().toLocaleString()}`;
-    
-    // Also update checkout items list
-    updateCheckoutItems();
-}
-
-// Back to top functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const backToTopButton = document.querySelector('.back-to-top');
-  
-  if (backToTopButton) {
-    // Show button when scrolled down
-    window.addEventListener('scroll', function() {
-      if (window.scrollY > 300) {
-        backToTopButton.classList.add('visible');
-      } else {
-        backToTopButton.classList.remove('visible');
-      }
-    });
-    
-    // Scroll to top when clicked
-    backToTopButton.addEventListener('click', function() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
-  }
-});
-// Function to update checkout items
-function updateCheckoutItems() {
-    const orderItemsList = document.getElementById('orderItemsList');
-    
-    if (orderItemsList) {
-        orderItemsList.innerHTML = '';
-        
-        cart.forEach(item => {
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item';
-            
-            cartItem.innerHTML = `
-                <div class="item-image">
-                    <img src="${item.image}" alt="${item.name}">
-                </div>
-                <div class="item-details">
-                    <h4>${item.name}</h4>
-                    <p>Php ${item.price.toLocaleString()} × ${item.quantity}</p>
-                </div>
-            `;
-            
-            orderItemsList.appendChild(cartItem);
-        });
-    }
-}
-
-// Event listener for cart icon
-cartIcon.addEventListener('click', function() {
-    cartPopup.style.display = 'block';
-    setTimeout(() => {
-        cartPopup.classList.add('active');
-    }, 10);
-});
-
-// Event listener for close cart button
-closeCart.addEventListener('click', function() {
-    cartPopup.classList.remove('active');
-    setTimeout(() => {
-        cartPopup.style.display = 'none';
-    }, 300);
-});
-
-// Event listener for shop more button
-shopMoreBtn.addEventListener('click', function() {
-    cartPopup.classList.remove('active');
-    setTimeout(() => {
-        cartPopup.style.display = 'none';
-    }, 300);
-});
-
-// Event listener for checkout button
-checkoutBtn.addEventListener('click', function() {
-    if (cart.length === 0) {
-        alert('Your cart is empty. Please add items before checking out.');
-        return;
-    }
-    
-    // Close cart popup
-    cartPopup.classList.remove('active');
-    setTimeout(() => {
-        cartPopup.style.display = 'none';
-    }, 300);
-    
-    // Open checkout modal
-    const modalOverlay = document.getElementById('modalOverlay');
-    const checkoutModal = document.getElementById('checkoutModal');
-    
-    modalOverlay.style.display = 'block';
-    checkoutModal.style.display = 'block';
-    
-    void modalOverlay.offsetWidth;
-    void checkoutModal.offsetWidth;
-    
-    modalOverlay.classList.add('active');
-    checkoutModal.classList.add('active');
-    
-    document.body.style.overflow = 'hidden';
-});
-
-// Event delegation for cart popup items
-cartPopupItems.addEventListener('click', function(e) {
-    const cartItem = e.target.closest('.cart-popup-item');
-    if (!cartItem) return;
-    
-    const productId = parseInt(cartItem.dataset.id);
-    
-    // Handle remove button click
-    if (e.target.closest('.cart-item-remove')) {
-        removeFromCart(productId);
-    }
-    
-    // Handle quantity buttons
-    if (e.target.classList.contains('cart-plus')) {
-        const quantityElement = cartItem.querySelector('.cart-quantity');
-        const currentQuantity = parseInt(quantityElement.textContent);
-        updateCartQuantity(productId, currentQuantity + 1);
-    }
-    
-    if (e.target.classList.contains('cart-minus')) {
-        const quantityElement = cartItem.querySelector('.cart-quantity');
-        const currentQuantity = parseInt(quantityElement.textContent);
-        if (currentQuantity > 1) {
-            updateCartQuantity(productId, currentQuantity - 1);
-        } else {
-            removeFromCart(productId);
-        }
-    }
-});
-
-// Add to order functionality
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('add-to-order')) {
-        const productCard = e.target.closest('.product-card');
-        const productId = parseInt(productCard.dataset.id);
-        const quantity = parseInt(productCard.querySelector('.quantity').textContent);
-        
-        // Add item to cart
-        addToCart(productId, quantity);
-        
-        // Show success message
-        const productName = productCard.querySelector('.product-name').textContent;
-        alert(`${productName} has been successfully added to your order!`);
-    }
-});
-
-// Initial display
-displayProducts(products);
-updateCartUI();
-      </script>
-
-
-<button class="back-to-top" aria-label="Back to top">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 15l-6-6-6 6"/>
-    </svg>
-  </button>   
-
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
       const meltElement = document.querySelector('.melt');
       
@@ -1653,5 +897,108 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 });
   </script>
+  <script>
+// Payment form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentForm = document.getElementById('paymentForm');
+    const orderConfirmationModal = document.getElementById('orderConfirmationModal');
+    const confirmationOrderId = document.getElementById('confirmationOrderId');
+    const confirmationOrderDate = document.getElementById('confirmationOrderDate');
+    const checkStatusBtn = document.getElementById('checkStatusBtn');
+
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                // Get form values
+                const email = document.getElementById('email').value.trim();
+                const fullname = document.getElementById('fullname').value.trim();
+                const address = document.getElementById('address').value.trim();
+                const deliveryDate = document.getElementById('deliveryDate').value;
+                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+                const deliveryOption = document.querySelector('input[name="deliveryOption"]:checked')?.value;
+                
+                // Validate form values
+                if (!email || !fullname || !address || !deliveryDate || !paymentMethod || !deliveryOption) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Create order data
+                const orderData = {
+                    email,
+                    fullname,
+                    address,
+                    deliveryDate,
+                    paymentMethod,
+                    deliveryOption,
+                    items: window.cart,
+                    total: calculateTotal(),
+                    orderDate: new Date().toISOString()
+                };
+
+                // Send order to server
+                const response = await fetch('process_order.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to process order');
+                }
+
+                const result = await response.json();
+
+                // Show order confirmation
+                if (orderConfirmationModal) {
+                    // Generate a random order ID
+                    const orderId = 'TJR-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                    
+                    // Update confirmation modal
+                    if (confirmationOrderId) confirmationOrderId.textContent = orderId;
+                    if (confirmationOrderDate) confirmationOrderDate.textContent = new Date().toLocaleDateString();
+                    
+                    // Show confirmation modal
+                    orderConfirmationModal.style.display = 'block';
+                    setTimeout(() => { orderConfirmationModal.classList.add('active'); }, 10);
+                    
+                    // Clear cart
+                    window.cart = [];
+                    saveCart();
+                    updateCartUI();
+                    
+                    // Close checkout modal
+                    const checkoutModal = document.getElementById('checkoutModal');
+                    const modalOverlay = document.getElementById('modalOverlay');
+                    if (checkoutModal && modalOverlay) {
+                        checkoutModal.classList.remove('active');
+                        modalOverlay.classList.remove('active');
+                        setTimeout(() => {
+                            checkoutModal.style.display = 'none';
+                            modalOverlay.style.display = 'none';
+                            document.body.style.overflow = 'auto';
+                        }, 300);
+                    }
+                }
+
+                // Handle check status button
+                if (checkStatusBtn) {
+                    checkStatusBtn.addEventListener('click', function() {
+                        window.location.href = 'orders.php';
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error processing order:', error);
+                alert('There was an error processing your order. Please try again.');
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>

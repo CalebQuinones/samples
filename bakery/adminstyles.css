@@ -1513,24 +1513,22 @@ tbody tr:hover {
 
 /* Modal */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 50;
-  overflow-y: auto;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  background: rgba(0,0,0,0.2);
+  z-index: 1000;
+  overflow-y: unset !important;
 }
 
-.modal-container {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  width: 100%;
-  max-width: 32rem;
-  overflow: hidden;
+.modal-container, .modal-content {
+  margin: 0 !important;
+  transform: none !important;
 }
 
 .modal-content {
@@ -1879,4 +1877,166 @@ th .account-checkbox {
 /* Adjust table cell checkbox */
 td .account-checkbox {
   margin: 0 auto;
+}
+
+/* General Checkbox Styles */
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  border: 2px solid #E84B8A;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #E84B8A;
+  border-color: #E84B8A;
+}
+
+input[type="checkbox"]:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+input[type="checkbox"]:hover {
+  border-color: #D43D7A;
+}
+
+input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
+}
+
+/* Adjust table header checkbox */
+th input[type="checkbox"] {
+  margin: 0 auto;
+}
+
+/* Adjust table cell checkbox */
+td input[type="checkbox"] {
+  margin: 0 auto;
+}
+
+/* Account Checkboxes */
+.account-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  border: 2px solid #E84B8A;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.account-checkbox:checked {
+  background-color: #E84B8A;
+  border-color: #E84B8A;
+}
+
+.account-checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.account-checkbox:hover {
+  border-color: #D43D7A;
+}
+
+.account-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
+}
+
+/* Order Checkboxes */
+.order-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  border: 2px solid #E84B8A;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.order-checkbox:checked {
+  background-color: #E84B8A;
+  border-color: #E84B8A;
+}
+
+.order-checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.order-checkbox:hover {
+  border-color: #D43D7A;
+}
+
+.order-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
+}
+
+/* Product Checkboxes */
+.product-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  border: 2px solid #E84B8A;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.product-checkbox:checked {
+  background-color: #E84B8A;
+  border-color: #E84B8A;
+}
+
+.product-checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.product-checkbox:hover {
+  border-color: #D43D7A;
+}
+
+.product-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
 }

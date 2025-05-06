@@ -53,20 +53,26 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   
     selectAll.addEventListener("change", () => {
-      const checkboxes = document.querySelectorAll(".order-checkbox")
+      const checkboxes = document.querySelectorAll(".order-checkbox");
       checkboxes.forEach((checkbox) => {
-        checkbox.checked = selectAll.checked
-        const orderId = checkbox.value
-        if (selectAll.checked) {
-          if (!selectedOrders.includes(orderId)) {
-            selectedOrders.push(orderId)
-          }
+        checkbox.checked = selectAll.checked;
+      });
+      updateBulkActions();
+    });
+  
+    // Keep selectAll in sync with row checkboxes
+    const rowOrderCheckboxes = document.querySelectorAll(".order-checkbox");
+    rowOrderCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        if (!checkbox.checked) {
+          selectAll.checked = false;
         } else {
-          selectedOrders = selectedOrders.filter((id) => id !== orderId)
+          const allChecked = Array.from(document.querySelectorAll(".order-checkbox")).every(cb => cb.checked);
+          selectAll.checked = allChecked;
         }
-      })
-      updateBulkActions()
-    })
+        updateBulkActions();
+      });
+    });
   
     clearSelection.addEventListener("click", () => {
       selectedOrders = []
@@ -212,11 +218,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     function updateBulkActions() {
-      if (selectedOrders.length > 0) {
-        bulkActions.style.display = "block"
-        selectedCount.textContent = selectedOrders.length
-      } else {
-        bulkActions.style.display = "none"
+      const checkedCount = document.querySelectorAll('.order-checkbox:checked').length;
+      if (bulkActions) {
+        bulkActions.style.display = checkedCount > 0 ? 'flex' : 'none';
+        if (selectedCount) selectedCount.textContent = checkedCount;
       }
     }
   

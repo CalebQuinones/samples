@@ -140,16 +140,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const checkboxes = document.querySelectorAll(".account-checkbox");
       checkboxes.forEach((checkbox) => {
         checkbox.checked = selectAll.checked;
-        const accountId = parseInt(checkbox.getAttribute("data-id"));
-        if (selectAll.checked) {
-          if (!selectedAccounts.includes(accountId)) {
-            selectedAccounts.push(accountId);
-          }
-        } else {
-          selectedAccounts = selectedAccounts.filter((id) => id !== accountId);
-        }
       });
       updateBulkActions();
+    });
+  
+    // Keep selectAll in sync with row checkboxes
+    const rowAccountCheckboxes = document.querySelectorAll(".account-checkbox");
+    rowAccountCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        if (!checkbox.checked) {
+          selectAll.checked = false;
+        } else {
+          const allChecked = Array.from(document.querySelectorAll(".account-checkbox")).every(cb => cb.checked);
+          selectAll.checked = allChecked;
+        }
+        updateBulkActions();
+      });
     });
   
     clearSelection.addEventListener("click", () => {
@@ -404,11 +410,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     function updateBulkActions() {
-      if (selectedAccounts.length > 0) {
-        bulkActions.style.display = "flex";
-        selectedCount.textContent = selectedAccounts.length;
-      } else {
-        bulkActions.style.display = "none";
+      const checkedCount = Array.from(document.querySelectorAll('.account-checkbox'))
+        .filter(cb => cb !== selectAll && cb.checked).length;
+      if (bulkActions) {
+        bulkActions.style.display = checkedCount > 0 ? 'flex' : 'none';
+        if (selectedCount) selectedCount.textContent = checkedCount;
       }
     }
   

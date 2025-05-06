@@ -311,7 +311,7 @@ function setupNotificationSystem() {
   }
 }
 
-function setupCalendar() {
+async function setupCalendar() {
   // Calendar functionality
   const calendarGrid = document.getElementById("calendarGrid")
   const currentMonthElement = document.getElementById("currentMonth")
@@ -319,43 +319,19 @@ function setupCalendar() {
   const nextMonthButton = document.getElementById("nextMonth")
 
   if (calendarGrid && currentMonthElement) {
-    // Sample order data
-    const orderData = [
-      { id: "ORD-001", customer: "Sarah Johnson", product: "Birthday Cake", date: "2025-04-08", status: "Completed" },
-      { id: "ORD-002", customer: "Michael Brown", product: "Wedding Cake", date: "2025-04-09", status: "In Progress" },
-      { id: "ORD-003", customer: "Emily Davis", product: "Cupcakes", date: "2025-04-09", status: "Pending" },
-      { id: "ORD-004", customer: "David Wilson", product: "Bread Assortment", date: "2025-04-10", status: "Cancelled" },
-      {
-        id: "ORD-005",
-        customer: "Jessica Martinez",
-        product: "Birthday Cake",
-        date: "2025-04-10",
-        status: "In Progress",
-      },
-      { id: "ORD-006", customer: "Robert Taylor", product: "Assorted Pastries", date: "2025-04-11", status: "Pending" },
-      { id: "ORD-007", customer: "Amanda Lee", product: "Baby Shower Cake", date: "2025-04-12", status: "In Progress" },
-      {
-        id: "ORD-008",
-        customer: "Thomas Anderson",
-        product: "Chocolate Chip Cookies",
-        date: "2025-04-12",
-        status: "Pending",
-      },
-      { id: "ORD-009", customer: "Jennifer Smith", product: "Wedding Cake", date: "2025-04-15", status: "Pending" },
-      {
-        id: "ORD-010",
-        customer: "Christopher Davis",
-        product: "Anniversary Cake",
-        date: "2025-04-18",
-        status: "Pending",
-      },
-      { id: "ORD-011", customer: "Lisa Brown", product: "Cupcakes", date: "2025-04-20", status: "Pending" },
-      { id: "ORD-012", customer: "Kevin Wilson", product: "Birthday Cake", date: "2025-04-22", status: "Pending" },
-    ]
+    const currentDate = new Date() // Use the actual current month and year
 
-    const currentDate = new Date(2025, 3, 1) // April 2025
+    async function fetchOrderData() {
+      const response = await fetch(`calendar.php?month=${currentDate.getMonth() + 1}&year=${currentDate.getFullYear()}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch order data')
+      }
+      return await response.json()
+    }
 
-    function updateCalendar() {
+    let orderData = await fetchOrderData()
+
+    async function updateCalendar() {
       // Update month display
       currentMonthElement.textContent = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
 
@@ -368,6 +344,9 @@ function setupCalendar() {
       // Get first day of month and number of days
       const firstDay = new Date(year, month, 1).getDay()
       const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+      // Fetch new order data for the current month
+      orderData = await fetchOrderData()
 
       // Add empty cells for days before the first day of the month
       for (let i = 0; i < firstDay; i++) {
@@ -412,7 +391,7 @@ function setupCalendar() {
 
             const eventTitle = document.createElement("div")
             eventTitle.className = "calendar-event-title"
-            eventTitle.textContent = order.product
+            eventTitle.textContent = order.products
 
             const eventDetails = document.createElement("div")
             eventDetails.className = "calendar-event-details"
@@ -431,7 +410,7 @@ function setupCalendar() {
               if (window.bakeryNotifications) {
                 window.bakeryNotifications.addNotification(
                   "Order Details",
-                  `Viewing details for ${order.id}: ${order.product} for ${order.customer}`,
+                  `Viewing details for ${order.id}: ${order.products} for ${order.customer}`,
                 )
               }
               // You could also navigate to the order details page

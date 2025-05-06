@@ -1,3 +1,17 @@
+<?php
+session_start();
+require_once 'config.php';
+
+// Check if user is logged in and is admin
+if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
+    header("location: login.php");
+    exit;
+}
+
+// Fetch all inquiries from the database
+$sql = "SELECT * FROM inquiry ORDER BY dateSubmitted DESC";
+$result = mysqli_query($conn, $sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,7 +132,7 @@
               <thead>
                 <tr>
                   <th>
-                    <input type="checkbox" id="selectAll">
+                    <input type="checkbox" id="selectAll" class="account-checkbox">
                   </th>
                   <th>Subject</th>
                   <th>Customer</th>
@@ -128,7 +142,38 @@
                 </tr>
               </thead>
               <tbody id="inquiriesTableBody">
-                <!-- Inquiries will be populated by JavaScript -->
+                <?php
+                if(mysqli_num_rows($result) > 0) {
+                    while($row = mysqli_fetch_assoc($result)) {
+                        // If you add a status column in the future, map it to a badge class
+                        $status = 'New'; // Default for now
+                        $statusClass = 'status-pending'; // Use status-pending for New, status-in-progress for In Progress, status-completed for Resolved
+
+                        echo "<tr>";
+                        echo "<td><input type='checkbox' class='account-checkbox' data-id='" . $row['ID'] . "'></td>";
+                        echo "<td>"
+                            . "<span style='font-weight:bold;'>" . htmlspecialchars($row['subject']) . "</span><br>"
+                            . "<span style='color:#555;'>"
+                            . htmlspecialchars(mb_strimwidth($row['msg'], 0, 50, '...'))
+                            . "</span>"
+                            . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Fname'] . " " . $row['Lname']) . "</td>";
+                        echo "<td>" . date('M d, Y', strtotime($row['dateSubmitted'])) . "</td>";
+                        echo "<td><span class='status-badge $statusClass'>" . htmlspecialchars($status) . "</span></td>";
+                        echo "<td style='text-align:center; vertical-align:middle;'><div class='action-buttons'>
+                                <button class='action-button view-button' data-id='" . $row['ID'] . "' title='View'>
+                                    <i class='fas fa-eye'></i>
+                                </button>
+                                <button class='action-button delete-button' data-id='" . $row['ID'] . "' title='Delete'>
+                                    <i class='fas fa-trash'></i>
+                                </button>
+                              </div></td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='6' class='text-center'>No inquiries found</td></tr>";
+                }
+                ?>
               </tbody>
             </table>
           </div>

@@ -91,7 +91,7 @@ if ($stmt) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="account.css">
     <link rel="stylesheet" href="order-confirmation.css">
-    <script src="cart-confirmation.js"></script>
+    <script src="cart-manager.js"></script>
 </head>
 <body>
     <div class="top-banner">

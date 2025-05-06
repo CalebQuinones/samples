@@ -191,7 +191,7 @@ if (isset($popupMessage)) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="updateaccount.css">
     <link rel="stylesheet" href="order-confirmation.css">
-    <script src="cart-confirmation.js"></script>
+    <script src="cart-manager.js"></script>
 </head>
 <body>
     <div class="top-banner">
@@ -645,330 +645,39 @@ if (isset($popupMessage)) {
         });
     </script>
 <script>
-    // Cart functionality
-    let cart = [];
-
-    // Get DOM elements
-    const cartIcon = document.getElementById('cartIcon');
-    const cartPopup = document.getElementById('cartPopup');
-    const closeCart = document.getElementById('closeCart');
-    const cartPopupItems = document.getElementById('cartPopupItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const shopMoreBtn = document.getElementById('shopMoreBtn');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const cartCount = document.querySelector('.cart-count');
-    
-    // Function to add item to cart
-    function addToCart(productId, quantity) {
-        const product = products.find(p => p.id === productId);
-        
-        if (!product) return;
-        
-        // Check if product already exists in cart
-        const existingItem = cart.find(item => item.id === productId);
-        
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            cart.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                quantity: quantity
-            });
-        }
-        
-        // Update cart UI
-        updateCartUI();
-        
-        // Add bounce animation to cart icon
-        cartIcon.classList.add('bounce');
-        
-        // Remove the class after animation completes
-        setTimeout(() => {
-            cartIcon.classList.remove('bounce');
-        }, 500);
-    }
-
-    // Function to remove item from cart
-    function removeFromCart(productId) {
-        cart = cart.filter(item => item.id !== productId);
-        updateCartUI();
-    }
-
-    // Function to update cart quantity
-    function updateCartQuantity(productId, newQuantity) {
-        const item = cart.find(item => item.id === productId);
-        
-        if (item) {
-            if (newQuantity <= 0) {
-                removeFromCart(productId);
-            } else {
-                item.quantity = newQuantity;
-                updateCartUI();
-            }
-        }
-    }
-
-    // Function to calculate cart total
-    function calculateTotal() {
-        return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    }
-
-    // Function to update cart UI
-    function updateCartUI() {
-        // Update cart count
-        const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-        cartCount.textContent = totalItems;
-        cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
-        
-        // Update cart popup items
-        cartPopupItems.innerHTML = '';
-        
-        if (cart.length === 0) {
-            cartPopupItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
-        } else {
-            cart.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-popup-item';
-                cartItem.dataset.id = item.id;
-                
-                cartItem.innerHTML = `
-                    <div class="cart-item-image">
-                        <img src="${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="cart-item-details">
-                        <h4>${item.name}</h4>
-                        <p>Php ${item.price.toLocaleString()}</p>
-                    </div>
-                    <div class="cart-item-quantity">
-                        <button class="cart-quantity-btn cart-minus">-</button>
-                        <span class="cart-quantity">${item.quantity}</span>
-                        <button class="cart-quantity-btn cart-plus">+</button>
-                    </div>
-                    <button class="cart-item-remove">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                `;
-                
-                cartPopupItems.appendChild(cartItem);
-            });
-        }
-        
-        // Update cart total
-        cartTotal.textContent = `Php ${calculateTotal().toLocaleString()}`;
-        
-        // Also update checkout items list
-        updateCheckoutItems();
-    }
-
-    // Function to update checkout items
-    function updateCheckoutItems() {
-        const orderItemsList = document.getElementById('orderItemsList');
-        
-        if (orderItemsList) {
-            orderItemsList.innerHTML = '';
-            
-            cart.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                
-                cartItem.innerHTML = `
-                    <div class="item-image">
-                        <img src="${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="item-details">
-                        <h4>${item.name}</h4>
-                        <p>Php ${item.price.toLocaleString()} × ${item.quantity}</p>
-                    </div>
-                `;
-                
-                orderItemsList.appendChild(cartItem);
-            });
-        }
-    }
-
-    // Event listener for cart icon
-    cartIcon.addEventListener('click', function() {
-        cartPopup.style.display = 'block';
-        setTimeout(() => {
-            cartPopup.classList.add('active');
-        }, 10);
-    });
-
-    // Event listener for close cart button
-    closeCart.addEventListener('click', function() {
-        cartPopup.classList.remove('active');
-        setTimeout(() => {
-            cartPopup.style.display = 'none';
-        }, 300);
-    });
-
-    // Event listener for shop more button
-    shopMoreBtn.addEventListener('click', function() {
-        cartPopup.classList.remove('active');
-        setTimeout(() => {
-            cartPopup.style.display = 'none';
-        }, 300);
-    });
-
-    // Event listener for checkout button
-    checkoutBtn.addEventListener('click', function() {
-        if (cart.length === 0) {
-            alert('Your cart is empty. Please add items before checking out.');
-            return;
-        }
-        
-        // Close cart popup
-        cartPopup.classList.remove('active');
-        setTimeout(() => {
-            cartPopup.style.display = 'none';
-        }, 300);
-        
-        // Open checkout modal
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get DOM elements
+        const cartIcon = document.getElementById('cartIcon');
+        const cartPopup = document.getElementById('cartPopup');
+        const closeCart = document.getElementById('closeCart');
+        const shopMoreBtn = document.getElementById('shopMoreBtn');
+        const checkoutBtn = document.getElementById('checkoutBtn');
         const modalOverlay = document.getElementById('modalOverlay');
-        const checkoutModal = document.getElementById('checkoutModal');
-        
-        if (modalOverlay) {
+
+        // Add click event listeners
+        cartIcon.addEventListener('click', function() {
+            cartPopup.style.display = 'block';
             modalOverlay.style.display = 'block';
-            void modalOverlay.offsetWidth;
-            modalOverlay.classList.add('active');
-        }
-        
-        checkoutModal.style.display = 'block';
-        void checkoutModal.offsetWidth;
-        checkoutModal.classList.add('active');
-        
-        document.body.style.overflow = 'hidden';
-    });
-
-    // Event delegation for cart popup items
-    cartPopupItems.addEventListener('click', function(e) {
-        const cartItem = e.target.closest('.cart-popup-item');
-        if (!cartItem) return;
-        
-        const productId = parseInt(cartItem.dataset.id);
-        
-        // Handle remove button click
-        if (e.target.closest('.cart-item-remove')) {
-            removeFromCart(productId);
-        }
-        
-        // Handle quantity buttons
-        if (e.target.classList.contains('cart-plus')) {
-            const quantityElement = cartItem.querySelector('.cart-quantity');
-            const currentQuantity = parseInt(quantityElement.textContent);
-            updateCartQuantity(productId, currentQuantity + 1);
-        }
-        
-        if (e.target.classList.contains('cart-minus')) {
-            const quantityElement = cartItem.querySelector('.cart-quantity');
-            const currentQuantity = parseInt(quantityElement.textContent);
-            if (currentQuantity > 1) {
-                updateCartQuantity(productId, currentQuantity - 1);
-            } else {
-                removeFromCart(productId);
-            }
-        }
-    });
-
-    // Close checkout modal
-    const closeCheckout = document.getElementById('closeCheckout');
-    if (closeCheckout) {
-        closeCheckout.addEventListener('click', function() {
-            const modalOverlay = document.getElementById('modalOverlay');
-            const checkoutModal = document.getElementById('checkoutModal');
-            
-            if (modalOverlay) {
-                modalOverlay.classList.remove('active');
-            }
-            
-            checkoutModal.classList.remove('active');
-            
-            setTimeout(() => {
-                if (modalOverlay) {
-                    modalOverlay.style.display = 'none';
-                }
-                checkoutModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 300);
+            updateCartUI();
         });
-    }
 
-    // Sample products data (you can replace this with your actual products)
-    const products = [
-        {
-            id: 1,
-            name: "Wedding Cake",
-            price: 600,
-            category: "Wedding Cakes",
-            availability: "In Stock",
-            image: "1.png"
-        },
-        {
-            id: 2,
-            name: "Number Cake",
-            price: 300,
-            category: "Birthday Cakes",
-            availability: "In Stock",
-            image: "17.png"
-        },
-        {
-            id: 3,
-            name: "Dog Cake",
-            price: 1000,
-            category: "Birthday Cakes",
-            availability: "In Stock",
-            image: "8.png"
-        }
-        // Add more products as needed
-    ];
+        closeCart.addEventListener('click', function() {
+            cartPopup.style.display = 'none';
+            modalOverlay.style.display = 'none';
+        });
 
-    // Initialize cart UI
-    updateCartUI();
-</script>
-<script>
-    // This assumes you're storing cart items in localStorage
-function updateCartCount() {
-    // Get cart items from localStorage (or your preferred storage method)
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    
-    // Update the cart count display
-    const cartCountElement = document.querySelector('.cart-count');
-    if (cartCountElement) {
-        cartCountElement.textContent = cartItems.length;
-        
-        // Hide the count if cart is empty
-        if (cartItems.length === 0) {
-            cartCountElement.style.display = 'none';
-        } else {
-            cartCountElement.style.display = 'flex';
-        }
-    }
-}
+        shopMoreBtn.addEventListener('click', function() {
+            cartPopup.style.display = 'none';
+            modalOverlay.style.display = 'none';
+        });
 
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', updateCartCount);
+        checkoutBtn.addEventListener('click', function() {
+            window.location.href = 'checkout.php';
+        });
 
-// Call this function whenever items are added to or removed from the cart
-// For example: after adding an item to cart
-function addToCart(item) {
-    // Get current cart
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    
-    // Add new item
-    cartItems.push(item);
-    
-    // Save updated cart
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    
-    // Update the display
-    updateCartCount();
-}
+        // Initialize cart UI
+        updateCartUI();
+    });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

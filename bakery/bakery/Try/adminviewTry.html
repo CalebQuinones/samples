@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin View - Content Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+    </header>
+    <main>
+        <section id="login-form">
+            <h2>Login</h2>
+            <form id="admin-login">
+                <input type="password" id="password" placeholder="Enter password" required>
+                <button type="submit">Login</button>
+            </form>
+        </section>
+        <section id="admin-panel" style="display: none;">
+            <h2>Content Management</h2>
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h3>Add New Content</h3>
+                    <input type="text" id="new-content-title" placeholder="Enter content title" required>
+                    <textarea id="new-content-body" rows="5" cols="50" placeholder="Enter content body" required></textarea>
+                    <input type="url" id="new-content-image" placeholder="Enter image URL">
+                    <input type="number" id="new-content-stock" placeholder="Enter stock quantity" min="0">
+                    <button id="add-new-content">Add New Content</button>
+                </div>
+                <div class="admin-section">
+                    <h3>Manage Content</h3>
+                    <div id="content-list"></div>
+                </div>
+            </div>
+            <p id="update-message"></p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Content Management System. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
+
