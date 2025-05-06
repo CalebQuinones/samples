@@ -8,11 +8,12 @@ if (isset($_POST['submit'])) {
     $Lname = $_POST['Lname'];
     $email = $_POST['email'];
     $phone = $_POST['pnum'];
+    $subject = $_POST['subject'];
     $message = $_POST['msg'];
 
 
-    $stmt = $conn->prepare("INSERT INTO inquiry (Fname, Lname, email, Pnum, msg) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $Fname, $Lname, $email, $phone, $message);
+    $stmt = $conn->prepare("INSERT INTO inquiry (Fname, Lname, email, Pnum, subject, msg) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $Fname, $Lname, $email, $phone, $subject, $message);
 
 
     if ($stmt->execute()) {
@@ -48,7 +49,7 @@ if (isset($_POST['submit'])) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Contact.css">
     <link rel="stylesheet" href="order-confirmation.css">
-    <script src="cart-confirmation.js"></script>
+    <script src="cart-manager.js"></script>
 
 </head>
 <body>
@@ -80,7 +81,7 @@ if (isset($_POST['submit'])) {
                       <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="#E44486" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  <span class="cart-count">0</span>
+                  <span class="cart-count"></span>
               </div>
               <a href="account.php"><div class="profile-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -280,6 +281,10 @@ if (isset($_POST['submit'])) {
             </div>
         </div>
         <div class="form-group">
+            <p>Subject</p>
+            <input type="text" name="subject" placeholder="Enter your subject of inquiry here" required>
+        </div>
+        <div class="form-group">
             <textarea name="msg" placeholder="Enter your message here" required></textarea>
         </div>
         <button type="submit" name="submit" class="submit">Submit</button>
@@ -384,63 +389,118 @@ if (isset($_POST['submit'])) {
         </div>
     </footer>
 </div>
-    <script src="cart-persistence.js"></script>
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const navToggle = document.querySelector('.nav-toggle');
-        const navLinks = document.querySelector('.nav-links');
-    
-        navToggle.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-            
-            // Toggle hamburger to X
-            this.classList.toggle('active');
+        // Get DOM elements
+        const cartIcon = document.getElementById('cartIcon');
+        const cartPopup = document.getElementById('cartPopup');
+        const closeCart = document.getElementById('closeCart');
+        const shopMoreBtn = document.getElementById('shopMoreBtn');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const checkoutModal = document.getElementById('checkoutModal');
+        const closeCheckout = document.getElementById('closeCheckout');
+        const backToCart = document.querySelector('.back-to-cart');
+
+        // Cart icon click
+        cartIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            modalOverlay.style.display = 'block';
+            cartPopup.style.display = 'block';
+            void cartPopup.offsetWidth;
+            modalOverlay.classList.add('active');
+            cartPopup.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            if (typeof updateCartUI === 'function') updateCartUI();
         });
-    
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const isClickInsideNav = navLinks.contains(event.target) || navToggle.contains(event.target);
-            if (!isClickInsideNav && navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-                navToggle.classList.remove('active');
+
+        function closeCartPopup() {
+            cartPopup.classList.remove('active');
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+                cartPopup.style.display = 'none';
+                modalOverlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        closeCart.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCartPopup();
+        });
+
+        shopMoreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCartPopup();
+        });
+
+        // Checkout button opens checkout modal
+        checkoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!window.cart || window.cart.length === 0) {
+                alert('Your cart is empty. Please add items before checking out.');
+                return;
+            }
+            cartPopup.classList.remove('active');
+            cartPopup.style.display = 'none';
+            checkoutModal.style.display = 'block';
+            setTimeout(() => { checkoutModal.classList.add('active'); }, 10);
+            modalOverlay.style.display = 'block';
+            modalOverlay.classList.add('active');
+        });
+
+        // Close checkout modal
+        closeCheckout.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            checkoutModal.classList.remove('active');
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+                checkoutModal.style.display = 'none';
+                modalOverlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        });
+
+        // Back to cart from checkout
+        if (backToCart) {
+            backToCart.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                checkoutModal.classList.remove('active');
+                setTimeout(() => { checkoutModal.style.display = 'none'; }, 300);
+                cartPopup.style.display = 'block';
+                setTimeout(() => { cartPopup.classList.add('active'); }, 10);
+                modalOverlay.style.display = 'block';
+                modalOverlay.classList.add('active');
+            });
+        }
+
+        // Close cart when clicking outside
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                if (cartPopup.classList.contains('active')) closeCartPopup();
+                if (checkoutModal.classList.contains('active')) {
+                    checkoutModal.classList.remove('active');
+                    setTimeout(() => {
+                        checkoutModal.style.display = 'none';
+                        modalOverlay.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }, 300);
+                }
             }
         });
+
+        cartPopup.addEventListener('click', function(e) { e.stopPropagation(); });
+        checkoutModal.addEventListener('click', function(e) { e.stopPropagation(); });
+
+        if (typeof updateCartUI === 'function') updateCartUI();
     });
 </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-  const meltElement = document.querySelector('.melt');
-  
-  if (meltElement) {
-    // Initial position (slightly up)
-    meltElement.style.transform = 'translateY(-30px)';
-    
-    // Maximum scroll position where the effect should complete
-    const maxScrollPosition = 200; // Adjust this value as needed
-    
-    window.addEventListener('scroll', function() {
-      // Get current scroll position
-      const scrollPosition = window.scrollY;
-      
-      // Calculate how far to move the element (from -30px to 0px)
-      if (scrollPosition <= maxScrollPosition) {
-        // Calculate percentage of scroll progress
-        const scrollPercentage = scrollPosition / maxScrollPosition;
-        
-        // Calculate new Y position (from -30px to 0px)
-        const newYPosition = -30 + (scrollPercentage * 30);
-        
-        // Apply the transform
-        meltElement.style.transform = `translateY(${newYPosition}px)`;
-      } else {
-        // Keep it at final position once scroll exceeds max
-        meltElement.style.transform = 'translateY(0)';
-      }
-    });
-  }
-});
-</script>
-<!-- Add this before your closing </body> tag -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
       const meltElement = document.querySelector('.melt');
@@ -473,6 +533,6 @@ if (isset($_POST['submit'])) {
         });
       }
     });
-  </script>
+</script>
 </body>
 </html>

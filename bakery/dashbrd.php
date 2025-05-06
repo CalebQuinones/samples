@@ -1,3 +1,57 @@
+<?php
+session_start();
+require_once 'config.php';
+
+// Check if user is logged in and is admin
+if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
+    header("location: login.php");
+    exit;
+}
+
+// Fetch total orders count
+$sql = "SELECT COUNT(*) as total_orders FROM orders";
+$result = mysqli_query($conn, $sql);
+$totalOrders = mysqli_fetch_assoc($result)['total_orders'];
+
+// Fetch custom orders count (orders with custom products)
+$sql = "SELECT COUNT(DISTINCT o.order_id) as custom_orders 
+        FROM orders o 
+        JOIN order_items oi ON o.order_id = oi.order_id 
+        JOIN products p ON oi.product_id = p.product_id 
+        WHERE p.category = 'Custom'";
+$result = mysqli_query($conn, $sql);
+$customOrders = mysqli_fetch_assoc($result)['custom_orders'];
+
+// Fetch total customers count
+$sql = "SELECT COUNT(*) as total_customers FROM login WHERE role = 'user'";
+$result = mysqli_query($conn, $sql);
+$totalCustomers = mysqli_fetch_assoc($result)['total_customers'];
+
+// Fetch new inquiries count (last 7 days)
+$sql = "SELECT COUNT(*) as new_inquiries FROM inquiry WHERE dateSubmitted >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+$result = mysqli_query($conn, $sql);
+$newInquiries = mysqli_fetch_assoc($result)['new_inquiries'];
+
+// Fetch recent orders
+$sql = "SELECT o.*, 
+        CONCAT(l.Fname, ' ', l.Lname) as customer_name,
+        SUM(oi.quantity * oi.price) as total_amount
+        FROM orders o 
+        LEFT JOIN login l ON o.user_id = l.user_id 
+        LEFT JOIN order_items oi ON o.order_id = oi.order_id
+        GROUP BY o.order_id
+        ORDER BY o.created_at DESC
+        LIMIT 5";
+$recentOrders = mysqli_query($conn, $sql);
+
+// Fetch recent inquiries
+$sql = "SELECT i.*, 
+        CONCAT(i.Fname, ' ', i.Lname) as customer_name
+        FROM inquiry i 
+        ORDER BY i.dateSubmitted DESC 
+        LIMIT 4";
+$recentInquiries = mysqli_query($conn, $sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,7 +166,7 @@
               </div>
               <div>
                 <p class="stats-card-label">Total Orders</p>
-                <p class="stats-card-value">142</p>
+                <p class="stats-card-value"><?php echo $totalOrders; ?></p>
               </div>
             </div>
           </div>
@@ -123,7 +177,7 @@
               </div>
               <div>
                 <p class="stats-card-label">Custom Orders</p>
-                <p class="stats-card-value">38</p>
+                <p class="stats-card-value"><?php echo $customOrders; ?></p>
               </div>
             </div>
           </div>
@@ -134,7 +188,7 @@
               </div>
               <div>
                 <p class="stats-card-label">Total Customers</p>
-                <p class="stats-card-value">2,845</p>
+                <p class="stats-card-value"><?php echo $totalCustomers; ?></p>
               </div>
             </div>
           </div>
@@ -145,7 +199,7 @@
               </div>
               <div>
                 <p class="stats-card-label">New Inquiries</p>
-                <p class="stats-card-value">24</p>
+                <p class="stats-card-value"><?php echo $newInquiries; ?></p>
               </div>
             </div>
           </div>
@@ -205,7 +259,7 @@
           <div class="recent-orders">
             <div class="recent-orders-header">
               <h2 class="recent-orders-title">Recent Orders</h2>
-              <a href="orders.html" class="view-all">View All</a>
+              <a href="orders.php" class="view-all">View All</a>
             </div>
             <div class="table-container">
               <table>
@@ -218,36 +272,14 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <?php while($row = mysqli_fetch_assoc($recentOrders)): ?>
                   <tr>
-                    <td class="order-id">#ORD-001</td>
-                    <td>Sarah Johnson</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
-                    <td>$89.99</td>
+                    <td class="order-id">ORD-<?php echo str_pad($row['order_id'], 3, '0', STR_PAD_LEFT); ?></td>
+                    <td><?php echo $row['customer_name']; ?></td>
+                    <td><span class="status-badge status-<?php echo strtolower($row['status']); ?>"><?php echo $row['status']; ?></span></td>
+                    <td>₱<?php echo number_format($row['total_amount'], 2); ?></td>
                   </tr>
-                  <tr>
-                    <td class="order-id">#ORD-002</td>
-                    <td>Michael Brown</td>
-                    <td><span class="status-badge status-in-progress">In Progress</span></td>
-                    <td>$349.99</td>
-                  </tr>
-                  <tr>
-                    <td class="order-id">#ORD-003</td>
-                    <td>Emily Davis</td>
-                    <td><span class="status-badge status-pending">Pending</span></td>
-                    <td>$72.00</td>
-                  </tr>
-                  <tr>
-                    <td class="order-id">#ORD-004</td>
-                    <td>David Wilson</td>
-                    <td><span class="status-badge status-cancelled">Cancelled</span></td>
-                    <td>$45.50</td>
-                  </tr>
-                  <tr>
-                    <td class="order-id">#ORD-005</td>
-                    <td>Jessica Martinez</td>
-                    <td><span class="status-badge status-in-progress">In Progress</span></td>
-                    <td>$65.99</td>
-                  </tr>
+                  <?php endwhile; ?>
                 </tbody>
               </table>
             </div>
@@ -257,57 +289,26 @@
           <div class="recent-inquiries">
             <div class="recent-orders-header">
               <h2 class="recent-orders-title">Recent Inquiries</h2>
-              <a href="inquiries.html" class="view-all">View All</a>
+              <a href="inquiries.php" class="view-all">View All</a>
             </div>
             <div class="inquiries-list">
+              <?php while($row = mysqli_fetch_assoc($recentInquiries)): ?>
               <div class="inquiry-item">
                 <div class="inquiry-header">
                   <div>
-                    <p class="inquiry-title">Wedding Cake Inquiry</p>
-                    <p class="inquiry-customer">From: Jennifer Smith</p>
+                    <p class="inquiry-title" style="font-weight:bold;"><?php echo $row['subject']; ?></p>
+                    <p class="inquiry-customer">From: <?php echo $row['customer_name']; ?></p>
                   </div>
-                  <span class="inquiry-time">2 hours ago</span>
+                  <span class="inquiry-time"><?php echo $row['dateSubmitted']; ?></span>
                 </div>
-                <p class="inquiry-preview">
-                  I'm interested in ordering a 3-tier wedding cake for my upcoming wedding on June 15th...
+                <p class="inquiry-preview" style="color:#555; margin:0;">
+                  <?php
+                    $preview = mb_strimwidth($row['msg'], 0, 50, '...');
+                    echo htmlspecialchars($preview);
+                  ?>
                 </p>
               </div>
-              <div class="inquiry-item">
-                <div class="inquiry-header">
-                  <div>
-                    <p class="inquiry-title">Custom Birthday Cake</p>
-                    <p class="inquiry-customer">From: Robert Johnson</p>
-                  </div>
-                  <span class="inquiry-time">5 hours ago</span>
-                </div>
-                <p class="inquiry-preview">
-                  Do you offer superhero-themed cakes? My son is turning 8 and loves Spider-Man...
-                </p>
-              </div>
-              <div class="inquiry-item">
-                <div class="inquiry-header">
-                  <div>
-                    <p class="inquiry-title">Corporate Order</p>
-                    <p class="inquiry-customer">From: Sarah Williams (Acme Corp)</p>
-                  </div>
-                  <span class="inquiry-time">Yesterday</span>
-                </div>
-                <p class="inquiry-preview">
-                  We're hosting a company event next month and would like to order assorted pastries...
-                </p>
-              </div>
-              <div class="inquiry-item">
-                <div class="inquiry-header">
-                  <div>
-                    <p class="inquiry-title">Gluten-Free Options</p>
-                    <p class="inquiry-customer">From: Michael Davis</p>
-                  </div>
-                  <span class="inquiry-time">2 days ago</span>
-                </div>
-                <p class="inquiry-preview">
-                  Do you offer any gluten-free cake options? I have celiac disease but would love to order...
-                </p>
-              </div>
+              <?php endwhile; ?>
             </div>
           </div>
         </div>

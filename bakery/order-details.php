@@ -60,7 +60,7 @@
         <div class="order-details-header-content">
           <div class="order-details-title">
             <a href="orders.php"><i class="fas fa-arrow-left"></i></a>
-            <h1>Order #ORD-002</h1>
+            <h1 id="orderIdTitle">Order #<span id="orderId">...</span></h1>
           </div>
           <div>
             <button class="edit-button edit-button-edit" id="editButton">
@@ -87,71 +87,41 @@
                 <div class="order-info-grid">
                   <div>
                     <p class="order-info-label">Order ID</p>
-                    <p class="order-info-value">#ORD-002</p>
+                    <p class="order-info-value" id="orderIdValue">...</p>
                   </div>
                   <div>
                     <p class="order-info-label">Order Date</p>
-                    <p class="order-info-value">April 2, 2025</p>
+                    <p class="order-info-value" id="orderDate">...</p>
                   </div>
                   <div>
                     <p class="order-info-label">Status</p>
                     <div id="statusContainer">
-                      <span class="status-badge status-in-progress">In Progress</span>
+                      <span class="status-badge" id="orderStatus">...</span>
                     </div>
                   </div>
                   <div>
                     <p class="order-info-label">Payment Method</p>
-                    <p class="order-info-value">Bank Transfer</p>
+                    <p class="order-info-value" id="paymentMethod">...</p>
                   </div>
                   <div>
                     <p class="order-info-label">Delivery Date</p>
-                    <p class="order-info-value">April 9, 2025</p>
+                    <p class="order-info-value" id="deliveryDate">...</p>
                   </div>
                   <div>
                     <p class="order-info-label">Delivery Method</p>
-                    <p class="order-info-value">Standard Delivery</p>
+                    <p class="order-info-value" id="deliveryMethod">...</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Custom Cake Details -->
-            <div class="order-card">
+            <div class="order-card" id="customCakeDetails" style="display:none;">
               <div class="order-card-header">
                 <h2 class="order-card-title">Custom Cake Details</h2>
               </div>
-              <div class="order-card-content">
-                <div class="cake-details-grid">
-                  <div>
-                    <div class="cake-details-section">
-                      <p class="cake-details-label">Cake Size</p>
-                      <p class="cake-details-value">3-tier (6", 8", 10")</p>
-                    </div>
-                    <div class="cake-details-section">
-                      <p class="cake-details-label">Cake Flavor</p>
-                      <p class="cake-details-value">Vanilla</p>
-                    </div>
-                    <div class="cake-details-section">
-                      <p class="cake-details-label">Filling</p>
-                      <p class="cake-details-value">Strawberry Jam</p>
-                    </div>
-                    <div class="cake-details-section">
-                      <p class="cake-details-label">Frosting Type</p>
-                      <p class="cake-details-value">Buttercream</p>
-                    </div>
-                    <div class="cake-details-section">
-                      <p class="cake-details-label">Special Instructions</p>
-                      <p class="cake-details-value">Please make the cake in white and gold colors. We would like some floral decorations on each tier if possible. The cake is for our 25th wedding anniversary.</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p class="cake-details-label">Inspiration Image</p>
-                    <div class="cake-image-container">
-                      <img src="placeholder.svg" alt="Cake Inspiration" class="cake-image">
-                    </div>
-                    <p class="cake-image-caption">Customer-provided inspiration image</p>
-                  </div>
-                </div>
+              <div class="order-card-content" id="customCakeContent">
+                <!-- Populated by JS if custom cake -->
               </div>
             </div>
 
@@ -170,45 +140,10 @@
                       <th>Total</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div style="display: flex; align-items: center;">
-                          <div style="width: 40px; height: 40px; border-radius: 6px; background-color: var(--pink-100); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                            <i class="fas fa-birthday-cake" style="color: var(--pink-600);"></i>
-                          </div>
-                          <div>
-                            <div style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900);">Wedding Cake (3-tier)</div>
-                            <div style="font-size: 0.875rem; color: var(--gray-500);">White vanilla with buttercream frosting</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>$349.99</td>
-                      <td>1</td>
-                      <td>$349.99</td>
-                    </tr>
+                  <tbody id="orderItemsBody">
+                    <tr><td colspan="4">Loading...</td></tr>
                   </tbody>
-                  <tfoot style="background-color: var(--pink-50);">
-                    <tr>
-                      <td colspan="2"></td>
-                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Subtotal</td>
-                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">$349.99</td>
-                    </tr>
-                    <tr>
-                      <td colspan="2"></td>
-                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Tax</td>
-                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">$0.00</td>
-                    </tr>
-                    <tr>
-                      <td colspan="2"></td>
-                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">Delivery Fee</td>
-                      <td style="font-size: 0.875rem; font-weight: 500; color: var(--gray-700);">$0.00</td>
-                    </tr>
-                    <tr>
-                      <td colspan="2"></td>
-                      <td style="font-size: 0.875rem; font-weight: 700; color: var(--gray-900);">Total</td>
-                      <td style="font-size: 0.875rem; font-weight: 700; color: var(--gray-900);">$349.99</td>
-                    </tr>
+                  <tfoot id="orderItemsFooter">
                   </tfoot>
                 </table>
               </div>
@@ -228,18 +163,18 @@
                     <i class="fas fa-user"></i>
                   </div>
                   <div>
-                    <p class="customer-name">Michael Brown</p>
-                    <p class="customer-since">Customer since Jan 2023</p>
+                    <p class="customer-name" id="customerName">...</p>
+                    <p class="customer-since" id="customerSince">...</p>
                   </div>
                 </div>
                 <div class="customer-info">
                   <div class="customer-info-item">
                     <i class="fas fa-phone customer-info-icon"></i>
-                    <span class="customer-info-text">+1 (555) 123-4567</span>
+                    <span class="customer-info-text" id="customerPhone">...</span>
                   </div>
                   <div class="customer-info-item">
                     <i class="fas fa-envelope customer-info-icon"></i>
-                    <span class="customer-info-text">michael.brown@example.com</span>
+                    <span class="customer-info-text" id="customerEmail">...</span>
                   </div>
                 </div>
               </div>
@@ -254,11 +189,11 @@
                 <div class="customer-info-item">
                   <i class="fas fa-map-marker-alt customer-info-icon"></i>
                   <div>
-                    <p class="customer-name">Michael Brown</p>
-                    <p class="customer-info-text">123 Wedding Lane</p>
-                    <p class="customer-info-text">Apt 4B</p>
-                    <p class="customer-info-text">San Francisco, CA 94107</p>
-                    <p class="customer-info-text">United States</p>
+                    <p class="customer-name" id="shippingName">...</p>
+                    <p class="customer-info-text" id="shippingAddress1">...</p>
+                    <p class="customer-info-text" id="shippingAddress2">...</p>
+                    <p class="customer-info-text" id="shippingCity">...</p>
+                    <p class="customer-info-text" id="shippingCountry">...</p>
                   </div>
                 </div>
               </div>
@@ -273,10 +208,10 @@
                 <div class="customer-info-item">
                   <i class="fas fa-credit-card customer-info-icon"></i>
                   <div>
-                    <p class="customer-name">Bank Transfer</p>
-                    <p class="customer-info-text">Transaction ID: TRX-98765432</p>
-                    <p class="customer-info-text">Date: April 3, 2025</p>
-                    <p class="customer-info-text">Status: Completed</p>
+                    <p class="customer-name" id="paymentType">...</p>
+                    <p class="customer-info-text" id="paymentTransaction">...</p>
+                    <p class="customer-info-text" id="paymentDate">...</p>
+                    <p class="customer-info-text" id="paymentStatus">...</p>
                   </div>
                 </div>
               </div>
@@ -291,16 +226,16 @@
                 <div class="customer-info-item">
                   <i class="fas fa-truck customer-info-icon"></i>
                   <div>
-                    <p class="customer-name">Standard Delivery</p>
-                    <p class="customer-info-text">Carrier: Bakery Delivery Service</p>
+                    <p class="customer-name" id="deliveryType">...</p>
+                    <p class="customer-info-text" id="deliveryCarrier">...</p>
                   </div>
                 </div>
                 <div class="customer-info-item" style="margin-top: 1rem;">
                   <i class="fas fa-calendar-alt customer-info-icon"></i>
                   <div>
                     <p class="customer-name">Delivery Date</p>
-                    <p class="customer-info-text">April 9, 2025</p>
-                    <p class="customer-info-text">Time: 10:00 AM - 2:00 PM</p>
+                    <p class="customer-info-text" id="deliveryDateInfo">...</p>
+                    <p class="customer-info-text" id="deliveryTime">...</p>
                   </div>
                 </div>
               </div>
@@ -323,7 +258,7 @@
             <label for="status" class="form-label">Status</label>
             <select id="status" class="form-select">
               <option>Pending</option>
-              <option selected>In Progress</option>
+              <option>In Progress</option>
               <option>Ready for Pickup</option>
               <option>Out for Delivery</option>
               <option>Completed</option>

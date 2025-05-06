@@ -1,108 +1,174 @@
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Initializing cart confirmation...")
+    
     // Get references to all necessary elements
     const paymentForm = document.getElementById("paymentForm")
     const modalOverlay = document.getElementById("modalOverlay")
     const checkoutModal = document.getElementById("checkoutModal")
     const orderConfirmationModal = document.getElementById("orderConfirmationModal")
+    const closeCheckout = document.getElementById("closeCheckout")
+    const backToCartBtn = document.querySelector(".back-to-cart")
+    const orderItemsList = document.getElementById("orderItemsList")
+    const orderTotal = document.getElementById("orderTotal")
+    const cartCount = document.querySelector(".cart-count")
+  
+    // Close checkout modal handler
+    if (closeCheckout) {
+        closeCheckout.addEventListener("click", () => {
+            if (modalOverlay && checkoutModal) {
+                modalOverlay.classList.remove("active")
+                checkoutModal.classList.remove("active")
+                setTimeout(() => {
+                    modalOverlay.style.display = "none"
+                    checkoutModal.style.display = "none"
+                    document.body.style.overflow = "auto"
+                }, 300)
+            }
+        })
+    }
+  
+    // Back to cart button handler
+    if (backToCartBtn) {
+        backToCartBtn.addEventListener("click", () => {
+            // Close checkout modal
+            if (modalOverlay && checkoutModal) {
+                modalOverlay.classList.remove("active")
+                checkoutModal.classList.remove("active")
+                setTimeout(() => {
+                    modalOverlay.style.display = "none"
+                    checkoutModal.style.display = "none"
+                }, 300)
+            }
+            
+            // Open cart popup
+            const cartPopup = document.getElementById("cartPopup")
+            if (cartPopup) {
+                cartPopup.style.display = "block"
+                setTimeout(() => {
+                    cartPopup.classList.add("active")
+                }, 10)
+            }
+        })
+    }
+  
+    // Function to update checkout items
+    function updateCheckoutItems() {
+        if (orderItemsList) {
+            orderItemsList.innerHTML = ""
+
+            const cart = window.getCart()
+            if (!cart || cart.length === 0) {
+                orderItemsList.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>'
+                return
+            }
+
+            cart.forEach((item) => {
+                const cartItem = document.createElement("div")
+                cartItem.className = "cart-item"
+                cartItem.dataset.id = item.id
+
+                cartItem.innerHTML = `
+                    <div class="cart-item-image">
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <p>Php ${item.price.toLocaleString()}</p>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <span class="cart-quantity">${item.quantity}</span>
+                    </div>
+                `
+
+                orderItemsList.appendChild(cartItem)
+            })
+        }
+
+        // Update order total
+        if (orderTotal) {
+            const total = window.calculateTotal()
+            orderTotal.textContent = `Php ${total.toLocaleString()}`
+        }
+    }
   
     if (paymentForm) {
-      paymentForm.addEventListener("submit", (e) => {
+      paymentForm.addEventListener("submit", async function(e) {
         e.preventDefault()
+        try {
+          console.log("Payment form submitted")
+          console.log("Initial window.cart state:", window.cart)
+          console.log("Initial localStorage cart:", localStorage.getItem("cart"))
   
-        // Get form data
-        const email = document.getElementById("email").value
-        const fullname = document.getElementById("fullname").value
-        const address = document.getElementById("address").value
-        const deliveryDate = document.getElementById("deliveryDate").value
-        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value
-        
-        // Get cart data from localStorage
-        const cart = JSON.parse(localStorage.getItem("cart")) || []
-        
-        // Calculate total
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-        
-        // Prepare order data
-        const orderData = {
-          items: cart,
-          customer: {
-            email,
-            fullname,
-            address,
-            deliveryDate,
-            paymentMethod
-          },
-          total
-        }
-        
-        // Send order data to server
-        fetch('process_order.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Clear the cart
-            localStorage.removeItem("cart")
-            
-            // Close the checkout modal
-            if (checkoutModal) {
-              checkoutModal.classList.remove("active")
-              setTimeout(() => {
-                checkoutModal.style.display = "none"
-              }, 300)
-            }
+          // Get cart data from global cart object
+          const cart = window.getCart()
+          console.log('Final cart state during checkout:', cart)
+          console.log('Final localStorage cart:', localStorage.getItem("cart"))
   
-            // Show the order confirmation modal
-            if (orderConfirmationModal && modalOverlay) {
-              // Set current date for the confirmation
-              const currentDate = new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-  
-              const dateElement = document.getElementById("confirmationOrderDate")
-              if (dateElement) {
-                dateElement.textContent = currentDate
-              }
-  
-              // Use the order ID from the server response
-              const orderIdElement = document.getElementById("confirmationOrderId")
-              if (orderIdElement) {
-                orderIdElement.textContent = "TJR-" + data.orderId
-              }
-  
-              // Display the modal and overlay
-              modalOverlay.style.display = "block"
-              orderConfirmationModal.style.display = "block"
-  
-              // Force a reflow before adding the active class for the transition
-              void modalOverlay.offsetWidth
-              void orderConfirmationModal.offsetWidth
-  
-              // Add active class for fade-in effect
-              modalOverlay.classList.add("active")
-              orderConfirmationModal.classList.add("active")
-  
-              // Prevent scrolling when modal is open
-              document.body.style.overflow = "hidden"
-            }
-          } else {
-            // Show error message
-            alert("Error placing order: " + data.message)
+          // Validate cart
+          if (!cart || !Array.isArray(cart) || cart.length === 0) {
+              console.error('Invalid cart state:', cart)
+              alert('Your cart is empty. Please add items before checking out.')
+              return
           }
-        })
-        .catch(error => {
-          console.error("Error:", error)
-          alert("An error occurred while processing your order. Please try again.")
-        })
+  
+          // Get form values
+          const email = document.getElementById("email").value.trim()
+          const name = document.getElementById("name").value.trim()
+          const address = document.getElementById("address").value.trim()
+          const phone = document.getElementById("phone").value.trim()
+          const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value
+          
+          // Validate form values
+          if (!email || !name || !address || !phone || !paymentMethod) {
+              alert("Please fill in all required fields")
+              return
+          }
+          
+          // Create order data
+          const orderData = {
+            email,
+            name,
+            address,
+            phone,
+            paymentMethod,
+            items: cart,
+            total: window.calculateTotal(),
+            orderDate: new Date().toISOString()
+          }
+  
+          // Send order to server
+          const response = await fetch("process_order.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(orderData)
+          })
+  
+          if (!response.ok) {
+            throw new Error("Failed to process order")
+          }
+  
+          const result = await response.json()
+  
+          if (result.success) {
+            // Clear cart after successful order
+            window.clearCart()
+            
+            // Redirect to confirmation page
+            window.location.href = "order-confirmation.php?orderId=" + result.orderId
+          } else {
+            throw new Error(result.message || "Failed to process order")
+          }
+        } catch (error) {
+          console.error("Error processing order:", error)
+          alert("Failed to process order. Please try again.")
+        }
       })
     }
+  
+    // Initialize checkout items
+    updateCheckoutItems()
   
     // Add click event listener to the "Check Order Status" button
     const checkStatusBtn = document.getElementById("checkStatusBtn")
@@ -129,12 +195,10 @@ document.addEventListener("DOMContentLoaded", () => {
         modalOverlay.classList.remove("active")
         orderConfirmationModal.classList.remove("active")
   
-        // Wait for transition to complete before hiding elements
+        // Hide the modal and overlay after the transition
         setTimeout(() => {
           modalOverlay.style.display = "none"
           orderConfirmationModal.style.display = "none"
-  
-          // Re-enable scrolling
           document.body.style.overflow = "auto"
         }, 300)
       }

@@ -196,6 +196,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Select All functionality for server-rendered checkboxes
+    selectAllCheckbox.addEventListener("change", () => {
+        const checkboxes = document.querySelectorAll(".product-checkbox");
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+        updateBulkActions();
+    });
+
+    // Keep selectAll in sync with row checkboxes
+    const rowProductCheckboxes = document.querySelectorAll(".product-checkbox");
+    rowProductCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+            if (!checkbox.checked) {
+                selectAllCheckbox.checked = false;
+            } else {
+                const allChecked = Array.from(document.querySelectorAll(".product-checkbox")).every(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+            }
+            updateBulkActions();
+        });
+    });
+
     // Initial setup
     updatePagination();
     updateBulkActions();

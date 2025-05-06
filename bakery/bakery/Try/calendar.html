@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservation Management Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .calendar-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .calendar-day {
+            border: 1px solid #ddd;
+            padding: 10px;
+            position: relative;
+            min-height: 100px;
+        }
+
+        .time-slot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .time-slot.booked {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .time-slot.available {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .booking-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .booking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cancel-btn {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .message.success {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .message.error {
+            background-color: #f56565;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <button id="prevMonth">Previous</button>
+            <h2 id="currentMonthYear">January 2024</h2>
+            <button id="nextMonth">Next</button>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
+
+    <div class="section">
+        <h3>Make a Reservation</h3>
+        <form id="reservationForm">
+            <div>
+                <label>Customer Name:</label>
+                <input type="text" id="customerName" required>
+            </div>
+            <div>
+                <label>Customer Phone:</label>
+                <input type="tel" id="customerPhone" required>
+            </div>
+            <div>
+                <label>Reservation Date:</label>
+                <input type="date" id="reservationDate" required>
+            </div>
+            <div>
+                <label>Time Slot:</label>
+                <select id="timeSlot" required>
+                    <option value="09:00">9:00 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="14:00">2:00 PM</option>
+                    <option value="15:00">3:00 PM</option>
+                    <option value="16:00">4:00 PM</option>
+                </select>
+            </div>
+            <div>
+                <label>Service Type:</label>
+                <select id="serviceType" required>
+                    <option value="Consultation">Consultation</option>
+                    <option value="Check-up">Check-up</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Follow-up">Follow-up</option>
+                </select>
+            </div>
+            <button type="submit">Book Reservation</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h3>Cancel Reservation</h3>
+        <form id="cancelReservationForm">
+            <div>
+                <label>Booking Reference:</label>
+                <input type="text" id="bookingReference" required placeholder="Enter booking reference">
+            </div>
+            <button type="submit">Cancel Booking</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h3>Current Bookings</h3>
+        <div id="bookingList" class="booking-list"></div>
+    </div>
+
+    <div id="messageBox" class="message"></div>
+
+    <script>
+        class ReservationManagementSystem {
+            constructor() {
+                this.currentDate = new Date();
+                this.reservations = {};
+                this.timeSlots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
+                this.bookingCounter = 1000; // Starting reference number
+            }
+
+            initializeEventListeners() {
+                // Reservation form submission
+                document.getElementById('reservationForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.makeReservation();
+                });
+
+                // Cancel reservation form submission
+                document.getElementById('cancelReservationForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.cancelReservation();
+                });
+
+                // Month navigation
+                document.getElementById('prevMonth').addEventListener('click', () => this.changeMonth(-1));
+                document.getElementById('nextMonth').addEventListener('click', () => this.changeMonth(1));
+            }
+
+            makeReservation() {
+                const customerName = document.getElementById('customerName').value;
+                const customerPhone = document.getElementById('customerPhone').value;
+                const reservationDate = new Date(document.getElementById('reservationDate').value);
+                const timeSlot = document.getElementById('timeSlot').value;
+                const serviceType = document.getElementById('serviceType').value;
+
+                // Create a unique key for the reservation
+                const reservationKey = this.getReservationKey(reservationDate, timeSlot);
+
+                // Check if the time slot is already booked
+                if (this.isTimeSlotBooked(reservationDate, timeSlot)) {
+                    this.showMessage('This time slot is already booked!', 'error');
+                    return;
+                }
+
+                // Generate unique booking reference
+                const bookingReference = this.generateBookingReference();
+
+                // Create reservation object
+                const reservation = {
+                    id: bookingReference,
+                    customerName,
+                    customerPhone,
+                    date: reservationDate,
+                    timeSlot,
+                    serviceType
+                };
+
+                // Store the reservation
+                this.reservations[reservationKey] = reservation;
+
+                // Show success message and booking reference
+                this.showMessage(`Reservation successful! Your booking reference is: ${bookingReference}`, 'success');
+                
+                // Update calendar and booking list
+                this.renderCalendar();
+                this.updateBookingList();
+                
+                // Reset form
+                document.getElementById('reservationForm').reset();
+            }
+
+            cancelReservation() {
+                const bookingReference = document.getElementById('bookingReference').value;
+                
+                // Find and remove the reservation
+                let canceledReservation = null;
+                for (const key in this.reservations) {
+                    if (this.reservations[key].id.toString() === bookingReference) {
+                        canceledReservation = this.reservations[key];
+                        delete this.reservations[key];
+                        break;
+                    }
+                }
+
+                if (canceledReservation) {
+                    this.showMessage(`Booking ${bookingReference} has been canceled successfully.`, 'success');
+                    this.renderCalendar();
+                    this.updateBookingList();
+                } else {
+                    this.showMessage('Invalid booking reference. No reservation found.', 'error');
+                }
+
+                // Reset cancel form
+                document.getElementById('cancelReservationForm').reset();
+            }
+
+            generateBookingReference() {
+                // Increment and return the booking counter as reference
+                return this.bookingCounter++;
+            }
+
+            getReservationKey(date, timeSlot) {
+                // Create a unique key for each reservation
+                return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${timeSlot}`;
+            }
+
+            isTimeSlotBooked(date, timeSlot) {
+                const reservationKey = this.getReservationKey(date, timeSlot);
+                return !!this.reservations[reservationKey];
+            }
+
+            showMessage(message, type) {
+                const messageBox = document.getElementById('messageBox');
+                messageBox.textContent = message;
+                messageBox.className = `message ${type}`;
+            }
+
+            updateBookingList() {
+                const bookingList = document.getElementById('bookingList');
+                bookingList.innerHTML = ''; // Clear previous list
+
+                // Sort reservations by date
+                const sortedReservations = Object.values(this.reservations)
+                    .sort((a, b) => a.date - b.date);
+
+                // Populate booking list
+                sortedReservations.forEach(reservation => {
+                    const bookingItem = document.createElement('div');
+                    bookingItem.classList.add('booking-item');
+                    bookingItem.innerHTML = `
+                        <span>
+                            Ref: ${reservation.id} | 
+                            ${reservation.customerName} | 
+                            ${reservation.date.toLocaleDateString()} | 
+                            ${reservation.timeSlot} | 
+                            ${reservation.serviceType}
+                        </span>
+                    `;
+                    bookingList.appendChild(bookingItem);
+                });
+            }
+
+            changeMonth(delta) {
+                this.currentDate.setMonth(this.currentDate.getMonth() + delta);
+                this.renderCalendar();
+            }
+
+            renderCalendar() {
+                const calendarGrid = document.getElementById('calendarGrid');
+                const currentMonthYear = document.getElementById('currentMonthYear');
+
+                calendarGrid.innerHTML = '';
+                currentMonthYear.textContent = this.currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+                const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                daysOfWeek.forEach(day => {
+                    const dayHeader = document.createElement('div');
+                    dayHeader.textContent = day;
+                    dayHeader.style.fontWeight = 'bold';
+                    calendarGrid.appendChild(dayHeader);
+                });
+
+                const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+                const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+
+                for (let i = 0; i < firstDay.getDay(); i++) {
+                    calendarGrid.appendChild(document.createElement('div'));
+                }
+
+                for (let day = 1; day <= lastDay.getDate(); day++) {
+                    const dayCell = document.createElement('div');
+                    dayCell.classList.add('calendar-day');
+                    dayCell.textContent = day;
+
+                    const currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day);
+
+                    // Display time slots and their booking status
+                    this.timeSlots.forEach(timeSlot => {
+                        const reservationKey = this.getReservationKey(currentDate, timeSlot);
+                        const reservation = this.reservations[reservationKey];
+
+                        const timeSlotElement = document.createElement('div');
+                        timeSlotElement.classList.add('time-slot');
+                        
+                        if (reservation) {
+                            timeSlotElement.classList.add('booked');
+                            timeSlotElement.textContent = `${timeSlot} - ${reservation.customerName} (${reservation.serviceType})`;
+                        } else {
+                            timeSlotElement.classList.add('available');
+                            timeSlotElement.textContent = `${timeSlot} - Available`;
+                        }
+
+                        dayCell.appendChild(timeSlotElement);
+                    });
+
+                    calendarGrid.appendChild(dayCell);
+                }
+            }
+
+            init() {
+                this.initializeEventListeners();
+                this.renderCalendar();
+            }
+        }
+
+        // Initialize the reservation management system
+        const reservationSystem = new ReservationManagementSystem();
+        reservationSystem.init();
+    </script>
+</body>
+</html>

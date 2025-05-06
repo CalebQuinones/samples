@@ -231,9 +231,9 @@ if (!$result) {
                         echo "<td>₱$total</td>";
                         echo "<td>
                                 <div class='action-buttons'>
-                                    <button class='action-button edit-button' title='Edit Order' data-order-id='$orderId'>
+                                    <a class='action-button edit-button' title='Edit Order' href='order-details.php?id=$orderId'>
                                         <i class='fas fa-pen'></i>
-                                    </button>
+                                    </a>
                                     <button class='action-button delete-button' title='Delete Order' data-order-id='$orderId'>
                                         <i class='fas fa-trash'></i>
                                     </button>
