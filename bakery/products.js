@@ -1,36 +1,85 @@
 document.addEventListener('DOMContentLoaded', function() {
+    var modalOverlay = document.getElementById('modalOverlay');
     // DOM Elements
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
     const availabilityFilter = document.getElementById('availabilityFilter');
     const selectAllCheckbox = document.getElementById('selectAll');
     const productModal = document.getElementById('productModal');
-    const addProductBtn = document.getElementById('addProductBtn');
+    const editProductModal = document.getElementById('editProductModal');
+    const addProductBtn = document.getElementById('addProductButton');
     const closeProductModal = document.getElementById('closeProductModal');
-    const cancelProductUpdate = document.getElementById('cancelProductUpdate');
+    const cancelProduct = document.getElementById('cancelProduct');
+    const closeEditProduct = document.getElementById('closeEditProduct');
+    const cancelEditProduct = document.getElementById('cancelEditProduct');
+    const productsTableBody = document.getElementById('productsTableBody');
 
-    // Event Listeners
-    searchInput.addEventListener('input', filterProducts);
-    categoryFilter.addEventListener('change', filterProducts);
-    availabilityFilter.addEventListener('change', filterProducts);
-    selectAllCheckbox.addEventListener('change', toggleSelectAll);
-    addProductBtn.addEventListener('click', showAddProductModal);
-    if (closeProductModal) closeProductModal.addEventListener('click', closeModal);
-    if (cancelProductUpdate) cancelProductUpdate.addEventListener('click', closeModal);
+    // Guard: Only run if main elements exist
+    if (!addProductBtn || !productModal || !modalOverlay) {
+        console.warn('Products JS: Required elements not found. Script will not run.');
+        return;
+    }
 
-    // Add event listeners for edit and delete buttons using event delegation
-    document.getElementById('productsTableBody').addEventListener('click', function(e) {
-        const target = e.target.closest('.action-button');
-        if (!target) return;
+    // Debug logging for all main DOM elements
+    console.log('searchInput:', searchInput);
+    console.log('categoryFilter:', categoryFilter);
+    console.log('availabilityFilter:', availabilityFilter);
+    console.log('selectAllCheckbox:', selectAllCheckbox);
+    console.log('productModal:', productModal);
+    console.log('editProductModal:', editProductModal);
+    console.log('addProductBtn:', addProductBtn);
+    console.log('closeProductModal:', closeProductModal);
+    console.log('cancelProduct:', cancelProduct);
+    console.log('closeEditProduct:', closeEditProduct);
+    console.log('cancelEditProduct:', cancelEditProduct);
+    console.log('productsTableBody:', productsTableBody);
 
-        const productId = target.dataset.productId;
-        
-        if (target.classList.contains('edit-button')) {
-            showEditProductModal(productId);
-        } else if (target.classList.contains('delete-button')) {
-            confirmDeleteProduct(productId);
+    if (modalOverlay) {
+        modalOverlay.style.display = 'none';
+        modalOverlay.classList.remove('active');
+    }
+    document.body.style.overflow = 'auto';
+
+    // Event Listeners (all guarded)
+    if (searchInput) searchInput.addEventListener('input', filterProducts);
+    if (categoryFilter) categoryFilter.addEventListener('change', filterProducts);
+    if (availabilityFilter) availabilityFilter.addEventListener('change', filterProducts);
+    if (selectAllCheckbox) selectAllCheckbox.addEventListener('change', toggleSelectAll);
+    if (addProductBtn) addProductBtn.addEventListener('click', showAddProductModal);
+    if (closeProductModal) closeProductModal.addEventListener('click', () => closeModal(productModal));
+    if (cancelProduct) cancelProduct.addEventListener('click', () => closeModal(productModal));
+    if (closeEditProduct) closeEditProduct.addEventListener('click', () => closeModal(editProductModal));
+    if (cancelEditProduct) cancelEditProduct.addEventListener('click', () => closeModal(editProductModal));
+    if (productsTableBody) {
+        productsTableBody.addEventListener('click', function(e) {
+            const target = e.target.closest('.action-button');
+            if (!target) return;
+            const productId = target.getAttribute('data-product-id');
+            if (target.classList.contains('edit-button')) {
+                showEditProductModal(productId);
+            } else if (target.classList.contains('delete-button')) {
+                if (confirm('Are you sure you want to delete this product?')) {
+                    deleteProduct(productId);
+                }
+            }
+        });
+    }
+
+    function showAddProductModal() {
+        console.log('Add Product button clicked!');
+        if (productModal) {
+            productModal.style.display = 'block';
+            if (modalOverlay) {
+                modalOverlay.style.display = 'flex';
+                modalOverlay.style.visibility = 'visible';
+                setTimeout(() => {
+                    productModal.classList.add('active');
+                    modalOverlay.classList.add('active');
+                }, 10);
+            }
+            document.body.style.overflow = 'hidden';
         }
-    });
+    }
 
     // Filter products based on search input and filters
     function filterProducts() {
@@ -64,67 +113,93 @@ document.addEventListener('DOMContentLoaded', function() {
         updateBulkActions();
     }
 
-    // Show add product modal
-    function showAddProductModal() {
-        const modalTitle = document.getElementById('productModalTitle');
-        if (modalTitle) modalTitle.textContent = 'Add Product';
-        if (productModal) {
-            productModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    // Show edit product modal
     function showEditProductModal(productId) {
         fetch(`get_product.php?id=${productId}`)
             .then(response => response.json())
             .then(product => {
-                const modalTitle = document.getElementById('productModalTitle');
-                if (modalTitle) modalTitle.textContent = 'Edit Product';
-                
-                // Fill in the form fields
-                const fields = ['name', 'category', 'price', 'availability'];
-                fields.forEach(field => {
-                    const input = document.getElementById(`edit-product-${field}`);
-                    if (input) input.value = product[field];
-                });
-                
-                if (productModal) {
-                    productModal.style.display = 'block';
+                if (editProductModal) {
+                    // Fill in the form fields
+                    const fields = ['name', 'category', 'price', 'status'];
+                    fields.forEach(field => {
+                        const input = document.getElementById(`edit-product-${field}`);
+                        if (input) input.value = product[field];
+                    });
+                    
+                    editProductModal.style.display = 'block';
+                    if (modalOverlay) {
+                        modalOverlay.style.display = 'flex';
+                        modalOverlay.style.visibility = 'visible';
+                        setTimeout(() => {
+                            editProductModal.classList.add('active');
+                            modalOverlay.classList.add('active');
+                        }, 10);
+                    }
                     document.body.style.overflow = 'hidden';
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to load product details');
+            });
     }
 
-    // Close modal
-    function closeModal() {
-        if (productModal) {
-            productModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
+    function closeModal(modal) {
+        if (modal) {
+            modal.classList.remove('active');
+            if (modalOverlay) {
+                modalOverlay.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    modalOverlay.style.display = 'none';
+                    modalOverlay.style.visibility = 'hidden';
+                    hideOverlayIfNoModal();
+                }, 300);
+            }
         }
     }
 
-    // Confirm and delete product
-    function confirmDeleteProduct(productId) {
-        if (confirm('Are you sure you want to delete this product?')) {
-            fetch('delete_product.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ product_id: productId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error deleting product');
+    function hideOverlayIfNoModal() {
+        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
+            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
+        if (modalOverlay) {
+            if (!anyOpen) {
+                modalOverlay.style.display = 'none';
+                modalOverlay.style.visibility = 'hidden';
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            } else {
+                modalOverlay.style.display = 'flex';
+                modalOverlay.style.visibility = 'visible';
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    }
+
+    function deleteProduct(productId) {
+        fetch('delete_product.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                if (row) {
+                    row.remove();
+                    updateTable();
                 }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+            } else {
+                alert('Error deleting product: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the product');
+        });
     }
 
     // Update bulk actions visibility
@@ -188,36 +263,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearSelectionBtn = document.getElementById('clearSelection');
     if (clearSelectionBtn) {
         clearSelectionBtn.addEventListener('click', () => {
-            selectAllCheckbox.checked = false;
+            if (selectAllCheckbox) selectAllCheckbox.checked = false;
             document.querySelectorAll('.product-checkbox').forEach(checkbox => {
                 checkbox.checked = false;
             });
             updateBulkActions();
         });
     }
-
-    // Select All functionality for server-rendered checkboxes
-    selectAllCheckbox.addEventListener("change", () => {
-        const checkboxes = document.querySelectorAll(".product-checkbox");
-        checkboxes.forEach((checkbox) => {
-            checkbox.checked = selectAllCheckbox.checked;
-        });
-        updateBulkActions();
-    });
-
-    // Keep selectAll in sync with row checkboxes
-    const rowProductCheckboxes = document.querySelectorAll(".product-checkbox");
-    rowProductCheckboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-            if (!checkbox.checked) {
-                selectAllCheckbox.checked = false;
-            } else {
-                const allChecked = Array.from(document.querySelectorAll(".product-checkbox")).every(cb => cb.checked);
-                selectAllCheckbox.checked = allChecked;
-            }
-            updateBulkActions();
-        });
-    });
 
     // Initial setup
     updatePagination();

@@ -239,8 +239,17 @@ function setupNotificationSystem() {
       setTimeout(() => popup.remove(), 300)
     })
 
-    // Add to container
-    sidePopupContainer.appendChild(popup)
+    // Add to container and handle multiple popups
+    const existingPopups = sidePopupContainer.querySelectorAll(".notification-side-popup")
+    if (existingPopups.length >= 3) {
+      // Remove the oldest popup if we have more than 3
+      const oldestPopup = existingPopups[existingPopups.length - 1]
+      oldestPopup.classList.add("fade-out")
+      setTimeout(() => oldestPopup.remove(), 300)
+    }
+
+    // Add the new popup
+    sidePopupContainer.insertBefore(popup, sidePopupContainer.firstChild)
 
     // Auto remove after 5 seconds
     setTimeout(() => {
@@ -319,19 +328,39 @@ async function setupCalendar() {
   const nextMonthButton = document.getElementById("nextMonth")
 
   if (calendarGrid && currentMonthElement) {
-    const currentDate = new Date() // Use the actual current month and year
+    const currentDate = new Date()
+    let isLoading = false
 
     async function fetchOrderData() {
-      const response = await fetch(`calendar.php?month=${currentDate.getMonth() + 1}&year=${currentDate.getFullYear()}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch order data')
+      try {
+        isLoading = true
+        calendarGrid.classList.add("loading")
+        
+        const response = await fetch(`calendar.php?month=${currentDate.getMonth() + 1}&year=${currentDate.getFullYear()}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch order data')
+        }
+        return await response.json()
+      } catch (error) {
+        console.error('Error fetching calendar data:', error)
+        if (window.bakeryNotifications) {
+          window.bakeryNotifications.addNotification(
+            "Calendar Error",
+            "Failed to load calendar data. Please try again."
+          )
+        }
+        return []
+      } finally {
+        isLoading = false
+        calendarGrid.classList.remove("loading")
       }
-      return await response.json()
     }
 
     let orderData = await fetchOrderData()
 
     async function updateCalendar() {
+      if (isLoading) return
+
       // Update month display
       currentMonthElement.textContent = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
 
@@ -406,15 +435,16 @@ async function setupCalendar() {
 
             // Add click event to show notification when clicking on calendar event
             event.addEventListener("click", (e) => {
-              e.preventDefault()
               if (window.bakeryNotifications) {
                 window.bakeryNotifications.addNotification(
                   "Order Details",
                   `Viewing details for ${order.id}: ${order.products} for ${order.customer}`,
                 )
               }
-              // You could also navigate to the order details page
-              // window.location.href = event.href;
+              // Navigate to the order details page after a short delay
+              setTimeout(() => {
+                window.location.href = event.href
+              }, 300)
             })
 
             eventsContainer.appendChild(event)
@@ -433,6 +463,7 @@ async function setupCalendar() {
     // Previous month button
     if (prevMonthButton) {
       prevMonthButton.addEventListener("click", () => {
+        if (isLoading) return
         currentDate.setMonth(currentDate.getMonth() - 1)
         updateCalendar()
 
@@ -449,6 +480,7 @@ async function setupCalendar() {
     // Next month button
     if (nextMonthButton) {
       nextMonthButton.addEventListener("click", () => {
+        if (isLoading) return
         currentDate.setMonth(currentDate.getMonth() + 1)
         updateCalendar()
 

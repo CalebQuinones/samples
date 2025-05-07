@@ -279,6 +279,9 @@ if (!$result) {
     </main>
   </div>
 
+  <!-- Modal Overlay (single, shared) -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
   <!-- Order Details Modal -->
   <div class="modal" id="orderDetailsModal">
     <div class="modal-content">

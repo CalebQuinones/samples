@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
+    var modalOverlay = document.getElementById('modalOverlay');
+    if (modalOverlay) {
+        modalOverlay.style.display = 'none';
+        modalOverlay.classList.remove('active');
+    }
+    document.body.style.overflow = 'auto';
     // Sample accounts data
     const accountsData = [
       {
@@ -200,15 +206,23 @@ document.addEventListener("DOMContentLoaded", () => {
   
     // Modal event listeners
     addAccountButton.addEventListener("click", () => {
-      addAccountModal.style.display = "flex";
+        addAccountModal.style.display = "block";
+        setTimeout(() => {
+            addAccountModal.classList.add('active');
+            if (modalOverlay) {
+                modalOverlay.style.display = 'flex';
+                setTimeout(() => modalOverlay.classList.add('active'), 10);
+            }
+            document.body.style.overflow = 'hidden';
+        }, 10);
     });
   
     cancelAccount.addEventListener("click", () => {
-      addAccountModal.style.display = "none";
+        closeModal(addAccountModal);
     });
   
     closeAccount.addEventListener("click", () => {
-      viewAccountModal.style.display = "none";
+        closeModal(viewAccountModal);
     });
   
     saveAccount.addEventListener("click", () => {
@@ -229,12 +243,12 @@ document.addEventListener("DOMContentLoaded", () => {
   
     // Close modals when clicking outside
     window.addEventListener("click", (event) => {
-      if (event.target === addAccountModal) {
-        addAccountModal.style.display = "none";
-      }
-      if (event.target === viewAccountModal) {
-        viewAccountModal.style.display = "none";
-      }
+        if (event.target === modalOverlay) {
+            const openModal = document.querySelector('.modal.active, .modal-container.active');
+            if (openModal) {
+                closeModal(openModal);
+            }
+        }
     });
   
     // Add event listeners for edit and delete buttons using event delegation
@@ -271,9 +285,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const start = (currentPage - 1) * itemsPerPage + 1;
       const end = Math.min(start + itemsPerPage - 1, filteredAccounts.length);
   
-      startIndex.textContent = filteredAccounts.length > 0 ? start : 0;
-      endIndex.textContent = end;
-      totalItems.textContent = filteredAccounts.length;
+      if (startIndex) startIndex.textContent = filteredAccounts.length > 0 ? start : 0;
+      if (endIndex) endIndex.textContent = end;
+      if (totalItems) totalItems.textContent = filteredAccounts.length;
   
       // Update pagination buttons
       prevPage.disabled = currentPage === 1;
@@ -446,15 +460,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById('editStatus').value = account.status;
                 
                 accountEditModal.style.display = 'block';
-                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    accountEditModal.classList.add('active');
+                    if (modalOverlay) {
+                        modalOverlay.style.display = 'flex';
+                        modalOverlay.style.visibility = 'visible';
+                        setTimeout(() => modalOverlay.classList.add('active'), 10);
+                    }
+                    document.body.style.overflow = 'hidden';
+                }, 10);
             })
             .catch(error => console.error('Error:', error));
     }
   
-    function closeModal() {
-        accountEditModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        accountEditForm.reset();
+    function closeModal(modal) {
+        if (modal) {
+            modal.classList.remove('active');
+            if (modalOverlay) {
+                modalOverlay.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    modalOverlay.style.display = 'none';
+                    modalOverlay.style.visibility = 'hidden';
+                    hideOverlayIfNoModal();
+                }, 300);
+            }
+        }
     }
   
     function handleAccountEdit(e) {
@@ -557,5 +588,24 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => customerDetailsModal.style.display = 'none', 300);
         }
     });
+  
+    // Helper to hide overlay if no modal is open
+    function hideOverlayIfNoModal() {
+        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
+            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
+        if (modalOverlay) {
+            if (!anyOpen) {
+                modalOverlay.style.display = 'none';
+                modalOverlay.style.visibility = 'hidden';
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            } else {
+                modalOverlay.style.display = 'flex';
+                modalOverlay.style.visibility = 'visible';
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    }
   });
   

@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
+    var modalOverlay = document.getElementById('modalOverlay');
+    if (modalOverlay) {
+        modalOverlay.style.display = 'none';
+        modalOverlay.classList.remove('active');
+    }
+    document.body.style.overflow = 'auto';
     // DOM elements
     const ordersTableBody = document.getElementById("ordersTableBody")
     const searchInput = document.getElementById("searchInput")
@@ -123,15 +129,45 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     if (closeStatusModal) {
-      closeStatusModal.addEventListener('click', closeModal)
+      closeStatusModal.addEventListener('click', () => closeModal(statusUpdateModal))
     }
     
     if (cancelStatusUpdate) {
-      cancelStatusUpdate.addEventListener('click', closeModal)
+      cancelStatusUpdate.addEventListener('click', () => closeModal(statusUpdateModal))
     }
     
     if (statusUpdateForm) {
       statusUpdateForm.addEventListener('submit', handleStatusUpdate)
+    }
+  
+    // Add event listeners for action buttons
+    if (ordersTableBody) {
+        ordersTableBody.addEventListener('click', function(e) {
+            const target = e.target.closest('.action-button');
+            if (!target) return;
+
+            const orderId = target.getAttribute('data-order-id');
+            
+            if (target.classList.contains('edit-button')) {
+                openStatusModal(orderId);
+            } else if (target.classList.contains('delete-button')) {
+                if (confirm('Are you sure you want to delete this order?')) {
+                    deleteOrder(orderId);
+                }
+            }
+        });
+    }
+  
+    // Close modal when clicking outside
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                const openModal = document.querySelector('.modal.active, .modal-container.active');
+                if (openModal) {
+                    closeModal(openModal);
+                }
+            }
+        });
     }
   
     // Functions
@@ -225,17 +261,54 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   
-    function openStatusModal(orderId) {
-      if (statusUpdateModal && updateOrderId) {
-        updateOrderId.value = orderId
-        statusUpdateModal.style.display = "block"
-      }
+    // Helper to hide overlay if no modal is open
+    function hideOverlayIfNoModal() {
+        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
+            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
+        if (modalOverlay) {
+            if (!anyOpen) {
+                modalOverlay.style.display = 'none';
+                modalOverlay.style.visibility = 'hidden';
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            } else {
+                modalOverlay.style.display = 'flex';
+                modalOverlay.style.visibility = 'visible';
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
     }
   
-    function closeModal() {
-      if (statusUpdateModal) {
-        statusUpdateModal.style.display = "none"
-      }
+    function openStatusModal(orderId) {
+        if (statusUpdateModal && updateOrderId) {
+            updateOrderId.value = orderId;
+            statusUpdateModal.style.display = 'block';
+            if (modalOverlay) {
+                modalOverlay.style.display = 'flex';
+                modalOverlay.style.visibility = 'visible';
+                setTimeout(() => {
+                    statusUpdateModal.classList.add('active');
+                    modalOverlay.classList.add('active');
+                }, 10);
+            }
+            document.body.style.overflow = 'hidden';
+        }
+    }
+  
+    function closeModal(modal) {
+        if (modal) {
+            modal.classList.remove('active');
+            if (modalOverlay) {
+                modalOverlay.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    modalOverlay.style.display = 'none';
+                    modalOverlay.style.visibility = 'hidden';
+                    hideOverlayIfNoModal();
+                }, 300);
+            }
+        }
     }
   
     function handleStatusUpdate(e) {
@@ -297,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           
           // Close the modal
-          closeModal()
+          closeModal(statusUpdateModal)
           
           // Show success message
           alert('Order status updated successfully!')
@@ -309,6 +382,32 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error('Error:', error)
         alert('An error occurred while updating the order status')
       })
+    }
+  
+    function deleteOrder(orderId) {
+        fetch('delete_order.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ order_id: orderId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                if (row) {
+                    row.remove();
+                    updateTable();
+                }
+            } else {
+                alert('Error deleting order: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the order');
+        });
     }
   
     // Add event listeners to order checkboxes
@@ -325,15 +424,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         updateBulkActions()
-      }
-    })
-    
-    // Add event listeners to edit buttons
-    document.addEventListener('click', function(e) {
-      if (e.target.closest('.edit-button')) {
-        const button = e.target.closest('.edit-button')
-        const orderId = button.getAttribute('data-order-id')
-        openStatusModal(orderId)
       }
     })
 })

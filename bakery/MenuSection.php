@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="order-details">
                 <div class="order-id">
                     <span>Order ID:</span>
-                    <span id="confirmationOrderId">TJR-12345</span>
+                    <span id="confirmationOrderId">ORD-12345</span>
                 </div>
                 <div class="order-date">
                     <span>Date:</span>
@@ -927,12 +927,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Create order data
                 const orderData = {
-                    email,
-                    fullname,
-                    address,
-                    deliveryDate,
-                    paymentMethod,
-                    deliveryOption,
+                    customer: {
+                        email,
+                        fullname,
+                        address,
+                        deliveryDate,
+                        paymentMethod,
+                        deliveryMethod: deliveryOption
+                    },
                     items: window.cart,
                     total: calculateTotal(),
                     orderDate: new Date().toISOString()
@@ -953,48 +955,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const result = await response.json();
 
-                // Show order confirmation
-                if (orderConfirmationModal) {
-                    // Generate a random order ID
-                    const orderId = 'TJR-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                    
-                    // Update confirmation modal
-                    if (confirmationOrderId) confirmationOrderId.textContent = orderId;
-                    if (confirmationOrderDate) confirmationOrderDate.textContent = new Date().toLocaleDateString();
-                    
-                    // Show confirmation modal
-                    orderConfirmationModal.style.display = 'block';
-                    setTimeout(() => { orderConfirmationModal.classList.add('active'); }, 10);
-                    
-                    // Clear cart
-                    window.cart = [];
-                    saveCart();
-                    updateCartUI();
-                    
-                    // Close checkout modal
-                    const checkoutModal = document.getElementById('checkoutModal');
-                    const modalOverlay = document.getElementById('modalOverlay');
-                    if (checkoutModal && modalOverlay) {
-                        checkoutModal.classList.remove('active');
-                        modalOverlay.classList.remove('active');
-                        setTimeout(() => {
-                            checkoutModal.style.display = 'none';
-                            modalOverlay.style.display = 'none';
-                            document.body.style.overflow = 'auto';
-                        }, 300);
+                if (result.success) {
+                    const orderId = result.orderId;
+                    // Fetch real order data from the database
+                    let realOrderId = orderId;
+                    let realOrderDate = '';
+                    try {
+                        const orderResponse = await fetch('get_order.php?id=' + orderId);
+                        const orderData = await orderResponse.json();
+                        if (orderData.success && orderData.order) {
+                            realOrderId = orderData.order.order_id;
+                            realOrderDate = new Date(orderData.order.created_at).toLocaleDateString();
+                        }
+                    } catch (e) {
+                        // fallback: use generated orderId and today's date
+                        realOrderDate = new Date().toLocaleDateString();
                     }
+                    // Show order confirmation with real data
+                    if (orderConfirmationModal) {
+                        if (confirmationOrderId) confirmationOrderId.textContent = 'ORD-' + realOrderId;
+                        if (confirmationOrderDate) confirmationOrderDate.textContent = realOrderDate;
+                        orderConfirmationModal.style.display = 'block';
+                        setTimeout(() => { orderConfirmationModal.classList.add('active'); }, 10);
+                        // Clear cart
+                        window.cart = [];
+                        saveCart();
+                        updateCartUI();
+                        // Close checkout modal
+                        const checkoutModal = document.getElementById('checkoutModal');
+                        const modalOverlay = document.getElementById('modalOverlay');
+                        if (checkoutModal && modalOverlay) {
+                            checkoutModal.classList.remove('active');
+                            modalOverlay.classList.remove('active');
+                            setTimeout(() => {
+                                checkoutModal.style.display = 'none';
+                                modalOverlay.style.display = 'none';
+                                document.body.style.overflow = 'auto';
+                            }, 300);
+                        }
+                    }
+                } else {
+                    throw new Error(result.message || 'Failed to process order');
                 }
 
                 // Handle check status button
                 if (checkStatusBtn) {
                     checkStatusBtn.addEventListener('click', function() {
-                        window.location.href = 'orders.php';
+                        window.location.href = 'account.php#my-orders';
                     });
                 }
 
             } catch (error) {
                 console.error('Error processing order:', error);
-                alert('There was an error processing your order. Please try again.');
+                alert(error.message || 'There was an error processing your order. Please try again.');
             }
         });
     }

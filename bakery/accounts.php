@@ -196,7 +196,7 @@ $result = mysqli_query($conn, $sql);
         </div>
 
         <!-- Customer Details Modal -->
-        <div class="modal-overlay" id="customerDetailsModal" style="display: none;">
+        <div class="modal" id="customerDetailsModal" style="display: none;">
             <div class="modal-container">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -239,8 +239,11 @@ $result = mysqli_query($conn, $sql);
     </main>
   </div>
 
+  <!-- Modal Overlay (single, shared) -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
   <!-- Add Account Modal -->
-  <div class="modal-overlay" id="addAccountModal" style="display: none;">
+  <div class="modal" id="addAccountModal" style="display: none;">
     <div class="modal-container">
       <div class="modal-content">
         <div class="modal-header">
@@ -289,7 +292,7 @@ $result = mysqli_query($conn, $sql);
   </div>
 
   <!-- View/Edit Account Modal -->
-  <div class="modal-overlay" id="viewAccountModal" style="display: none;">
+  <div class="modal" id="viewAccountModal" style="display: none;">
     <div class="modal-container">
       <div class="modal-content">
         <div class="modal-header">
