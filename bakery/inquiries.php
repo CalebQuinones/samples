@@ -208,8 +208,11 @@ $result = mysqli_query($conn, $sql);
     </main>
   </div>
 
+  <!-- Modal Overlay (single, shared) -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
   <!-- View Inquiry Modal -->
-  <div class="modal-overlay" id="inquiryModal" style="display: none;">
+  <div class="modal" id="inquiryModal" style="display: none;">
     <div class="modal-container">
       <div class="modal-content">
         <div class="modal-header">

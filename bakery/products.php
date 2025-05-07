@@ -230,54 +230,56 @@ $result = mysqli_query($conn, $sql);
     </main>
   </div>
 
+  <!-- Modal Overlay (single, shared) -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
   <!-- Add Product Modal -->
-  <div class="modal-overlay" id="productModal" style="display: none;">
-    <div class="modal-container">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title" id="productModalTitle">Add New Product</h3>
+  <div class="modal-container" id="productModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="productModalTitle">Add New Product</h3>
+        <button class="close-modal" id="closeProductModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="product-name" class="form-label">Product Name</label>
+          <input type="text" id="product-name" class="form-textarea" style="min-height: auto;">
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="product-name" class="form-label">Product Name</label>
-            <input type="text" id="product-name" class="form-textarea" style="min-height: auto;">
-          </div>
-          <div class="form-group">
-            <label for="product-category" class="form-label">Category</label>
-            <select id="product-category" class="form-select">
-              <option>Cakes</option>
-              <option>Cupcakes</option>
-              <option>Breads</option>
-              <option>Pastries</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="product-price" class="form-label">Price</label>
-            <div style="position: relative;">
-              <div style="position: absolute; top: 0; bottom: 0; left: 0; display: flex; align-items: center; padding-left: 0.75rem;">
-                <span style="color: var(--gray-500);">$</span>
-              </div>
-              <input type="text" id="product-price" class="form-textarea" style="min-height: auto; padding-left: 1.75rem;" placeholder="0.00">
+        <div class="form-group">
+          <label for="product-category" class="form-label">Category</label>
+          <select id="product-category" class="form-select">
+            <option>Cakes</option>
+            <option>Cupcakes</option>
+            <option>Breads</option>
+            <option>Pastries</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="product-price" class="form-label">Price</label>
+          <div style="position: relative;">
+            <div style="position: absolute; top: 0; bottom: 0; left: 0; display: flex; align-items: center; padding-left: 0.75rem;">
+              <span style="color: var(--gray-500);">$</span>
             </div>
+            <input type="text" id="product-price" class="form-textarea" style="min-height: auto; padding-left: 1.75rem;" placeholder="0.00">
           </div>
-          <div class="form-group">
-            <label for="product-status" class="form-label">Status</label>
-            <select id="product-status" class="form-select">
-              <option>In Stock</option>
-              <option>Low Stock</option>
-              <option>Out of Stock</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Product Image</label>
-            <div style="border: 2px dashed var(--gray-300); border-radius: 0.375rem; padding: 1.5rem; text-align: center;">
-              <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400);"></i>
-              <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-600);">
-                <span style="color: var(--pink-600); font-weight: 500; cursor: pointer;">Upload a file</span>
-                or drag and drop
-              </p>
-              <p style="font-size: 0.75rem; color: var(--gray-500);">PNG, JPG, GIF up to 10MB</p>
-            </div>
+        </div>
+        <div class="form-group">
+          <label for="product-status" class="form-label">Status</label>
+          <select id="product-status" class="form-select">
+            <option>In Stock</option>
+            <option>Low Stock</option>
+            <option>Out of Stock</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Product Image</label>
+          <div style="border: 2px dashed var(--gray-300); border-radius: 0.375rem; padding: 1.5rem; text-align: center;">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400);"></i>
+            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-600);">
+              <span style="color: var(--pink-600); font-weight: 500; cursor: pointer;">Upload a file</span>
+              or drag and drop
+            </p>
+            <p style="font-size: 0.75rem; color: var(--gray-500);">PNG, JPG, GIF up to 10MB</p>
           </div>
         </div>
       </div>
@@ -292,19 +294,17 @@ $result = mysqli_query($conn, $sql);
     </div>
   </div>
   <!-- Product Edit Modal -->
-<div class="modal-overlay" id="editProductModal" style="display: none;">
-  <div class="modal-container">
+  <div class="modal-container" id="editProductModal" style="display: none;">
     <div class="modal-content">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
         <h3 class="modal-title">Product Details</h3>
         <div id="productInitials" style="width: 48px; height: 48px; border-radius: 50%; background-color: var(--pink-100); color: var(--pink-600); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 500;">PD</div>
+        <button class="close-modal" id="closeEditProduct">&times;</button>
       </div>
-      
       <div class="form-group">
         <label for="edit-product-name" class="form-label">Product Name</label>
         <input type="text" id="edit-product-name" class="form-textarea" style="min-height: auto;">
       </div>
-      
       <div class="form-group">
         <label for="edit-product-category" class="form-label">Category</label>
         <select id="edit-product-category" class="form-select">
@@ -314,12 +314,10 @@ $result = mysqli_query($conn, $sql);
           <option>Pastries</option>
         </select>
       </div>
-      
       <div class="form-group">
         <label for="edit-product-price" class="form-label">Price</label>
         <input type="text" id="edit-product-price" class="form-textarea" style="min-height: auto;">
       </div>
-      
       <div class="form-group">
         <label for="edit-product-status" class="form-label">Status</label>
         <select id="edit-product-status" class="form-select">
@@ -328,13 +326,12 @@ $result = mysqli_query($conn, $sql);
           <option>Out of Stock</option>
         </select>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button class="modal-button modal-button-primary" id="saveEditProduct">Save Changes</button>
-      <button class="modal-button modal-button-secondary" id="cancelEditProduct">Cancel</button>
+      <div class="modal-footer">
+        <button class="modal-button modal-button-primary" id="saveEditProduct">Save Changes</button>
+        <button class="modal-button modal-button-secondary" id="cancelEditProduct">Cancel</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script src="products.js"></script>
 </body>

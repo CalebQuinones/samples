@@ -2635,3 +2635,37 @@ nav {
 .product-card {
   transition-duration: 0.6s;
 }
+
+/* Add to Order Notification Styles */
+.add-to-order-notification {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: #4CAF50;
+    color: #fff;
+    padding: 18px 32px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-20px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+.add-to-order-notification.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+.add-to-order-notification .icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

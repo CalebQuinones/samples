@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 require_once 'config.php';
 
@@ -78,16 +82,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $totalAmount = $orderData['total'] + $deliveryFee;
         
         // Insert the order into the orders table
-        $sql = "INSERT INTO orders (user_id, total_amount, delivery_date, status, payment_status, payment_method, delivery_method, delivery_fee, created_at) 
-                VALUES (?, ?, ?, 'Pending', 'Pending', ?, ?, ?, NOW())";
+        $sql = "INSERT INTO orders (user_id, total_amount, delivery_address, delivery_method, delivery_date, payment_method, delivery_fee, created_at, status, payment_status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'Pending', 'Pending')";
         
         $stmt = mysqli_prepare($conn, $sql);
         
         $deliveryDate = $orderData['customer']['deliveryDate'];
         $paymentMethod = $orderData['customer']['paymentMethod'];
         $deliveryMethod = $orderData['customer']['deliveryMethod'];
+        $deliveryAddress = $orderData['customer']['address'];
         
-        mysqli_stmt_bind_param($stmt, "idsssd", $userId, $totalAmount, $deliveryDate, $paymentMethod, $deliveryMethod, $deliveryFee);
+        mysqli_stmt_bind_param($stmt, "idssssd", $userId, $totalAmount, $deliveryAddress, $deliveryMethod, $deliveryDate, $paymentMethod, $deliveryFee);
         
         if (!mysqli_stmt_execute($stmt)) {
             throw new Exception("Error inserting order: " . mysqli_error($conn));
