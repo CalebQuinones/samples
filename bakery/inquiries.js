@@ -1,16 +1,119 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var modalOverlay = document.getElementById('modalOverlay');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('inquiryModal');
+    
+    // Initialize modal overlay
     if (modalOverlay) {
         modalOverlay.style.display = 'none';
-        modalOverlay.classList.remove('active');
+        modalOverlay.style.visibility = 'hidden';
     }
-    document.body.style.overflow = 'auto';
+
+    // Show modal function
+    window.showModal = function(modal) {
+        if (!modal) return;
+        
+        // Reset any existing modals
+        document.querySelectorAll('.modal.active').forEach(m => {
+            m.classList.remove('active');
+        });
+        
+        // Show modal overlay first
+        if (modalOverlay) {
+            modalOverlay.style.display = 'flex';
+            modalOverlay.style.visibility = 'visible';
+            // Force reflow
+            modalOverlay.offsetHeight;
+            modalOverlay.classList.add('active');
+        }
+        
+        // Show modal
+        modal.style.display = 'block';
+        // Force reflow
+        modal.offsetHeight;
+        modal.classList.add('active');
+        
+        // Prevent body scrolling
+        document.body.style.overflow = 'hidden';
+    };
+
+    // Close modal function
+    window.closeModal = function(modal) {
+        if (!modal || !modalOverlay) return;
+        
+        // Remove active classes
+        modal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+        
+        // Hide modal after transition
+        setTimeout(() => {
+            modal.style.display = 'none';
+            hideOverlayIfNoModal();
+        }, 300);
+        
+        // Restore body scrolling
+        document.body.style.overflow = '';
+    };
+
+    // Hide overlay if no modals are active
+    function hideOverlayIfNoModal() {
+        if (!modalOverlay) return;
+        
+        const hasActiveModal = document.querySelector('.modal.active');
+        if (!hasActiveModal) {
+            modalOverlay.style.display = 'none';
+            modalOverlay.style.visibility = 'hidden';
+        }
+    }
+
+    // Close modal when clicking outside
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                const activeModal = document.querySelector('.modal.active');
+                if (activeModal) {
+                    closeModal(activeModal);
+                }
+            }
+        });
+    }
+
+    // Close modal when clicking close button
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal);
+            }
+        });
+    });
 
     // View Inquiry Modal
     const inquiryModal = document.getElementById('inquiryModal');
     const closeInquiry = document.getElementById('closeInquiry');
     const sendReply = document.getElementById('sendReply');
     const inquiriesTableBody = document.getElementById('inquiriesTableBody');
+
+    function showInquiryDetails(inquiryId) {
+        fetch(`get_inquiry.php?id=${inquiryId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('inquirySubject').textContent = data.subject;
+                document.getElementById('inquiryCustomer').textContent = `${data.Fname} ${data.Lname}`;
+                document.getElementById('inquiryDate').textContent = new Date(data.dateSubmitted).toLocaleDateString();
+                document.getElementById('inquiryMessage').textContent = data.msg;
+                document.getElementById('inquiryEmail').textContent = data.email;
+                document.getElementById('inquiryPhone').textContent = data.Pnum;
+                
+                if (inquiryModal) {
+                    showModal(inquiryModal);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to load inquiry details');
+            });
+    }
 
     // Add event listeners for action buttons
     if (inquiriesTableBody) {
@@ -28,63 +131,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         });
-    }
-
-    // Close modal when clicking outside
-    if (modalOverlay) {
-        modalOverlay.addEventListener('click', function(e) {
-            if (e.target === modalOverlay) {
-                const openModal = document.querySelector('.modal.active, .modal-container.active');
-                if (openModal) {
-                    closeModal(openModal);
-                }
-            }
-        });
-    }
-
-    function showInquiryDetails(inquiryId) {
-        fetch(`get_inquiry.php?id=${inquiryId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('inquirySubject').textContent = data.subject;
-                document.getElementById('inquiryCustomer').textContent = `${data.Fname} ${data.Lname}`;
-                document.getElementById('inquiryDate').textContent = new Date(data.dateSubmitted).toLocaleDateString();
-                document.getElementById('inquiryMessage').textContent = data.msg;
-                document.getElementById('inquiryEmail').textContent = data.email;
-                document.getElementById('inquiryPhone').textContent = data.Pnum;
-                
-                if (inquiryModal) {
-                    inquiryModal.style.display = 'block';
-                    if (modalOverlay) {
-                        modalOverlay.style.display = 'flex';
-                        modalOverlay.style.visibility = 'visible';
-                        setTimeout(() => {
-                            inquiryModal.classList.add('active');
-                            modalOverlay.classList.add('active');
-                        }, 10);
-                        document.body.style.overflow = 'hidden';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to load inquiry details');
-            });
-    }
-
-    function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove('active');
-            if (modalOverlay) {
-                modalOverlay.classList.remove('active');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    modalOverlay.style.display = 'none';
-                    modalOverlay.style.visibility = 'hidden';
-                    hideOverlayIfNoModal();
-                }, 300);
-            }
-        }
     }
 
     function deleteInquiry(inquiryId) {
@@ -110,11 +156,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Modal close event listeners
-    if (closeInquiry) {
-        closeInquiry.addEventListener('click', () => closeModal(inquiryModal));
-    }
-
     // Send reply event listener
     if (sendReply) {
         sendReply.addEventListener('click', function() {
@@ -128,23 +169,4 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-
-    function hideOverlayIfNoModal() {
-        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
-            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
-        if (modalOverlay) {
-            if (!anyOpen) {
-                modalOverlay.style.display = 'none';
-                modalOverlay.style.visibility = 'hidden';
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                modalOverlay.style.display = 'flex';
-                modalOverlay.style.visibility = 'visible';
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-    }
 });
-  

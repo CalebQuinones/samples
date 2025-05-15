@@ -1,87 +1,151 @@
-document.addEventListener("DOMContentLoaded", () => {
-    var modalOverlay = document.getElementById('modalOverlay');
+// Global functions for account management
+function showCustomerDetails(userId) {
+    fetch(`get_customer_details.php?user_id=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            const elements = {
+                'customerPhone': data.phone || 'Not provided',
+                'customerBirthday': data.birthday ? new Date(data.birthday).toLocaleDateString() : 'Not provided',
+                'customerAddress': data.address || 'Not provided',
+                'customerPayment': data.payment || 'Not provided',
+                'customerCreatedAt': new Date(data.created_at).toLocaleDateString()
+            };
+
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = value;
+            });
+
+            const customerDetailsModal = document.getElementById('customerDetailsModal');
+            if (customerDetailsModal) {
+                window.showModal(customerDetailsModal);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching customer details:', error);
+            alert('Failed to load customer details. Please try again.');
+        });
+}
+
+function showEditModal(userId) {
+    fetch(`get_account.php?id=${userId}`)
+        .then(response => response.json())
+        .then(account => {
+            const accountEditModal = document.getElementById('accountEditModal');
+            if (!accountEditModal) return;
+
+            const fields = {
+                'editUserId': account.user_id,
+                'editFirstName': account.Fname,
+                'editLastName': account.Lname,
+                'editEmail': account.email,
+                'editPhone': account.phone || '',
+                'editAddress': account.address || '',
+                'editStatus': account.status
+            };
+
+            Object.entries(fields).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.value = value;
+            });
+
+            window.showModal(accountEditModal);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function confirmDeleteAccount(userId) {
+    if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
+        fetch('delete_account.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Error deleting account');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+// Global modal functions
+window.showModal = function(modal) {
+    if (!modal) return;
+    
+    const modalOverlay = document.getElementById('modalOverlay');
+    if (!modalOverlay) return;
+
+    // Reset any existing modals
+    const allModals = document.querySelectorAll('.modal');
+    allModals.forEach(m => {
+        m.classList.remove('active');
+        m.style.display = 'none';
+    });
+
+    // Show the modal overlay
+    modalOverlay.style.display = 'flex';
+    modalOverlay.style.visibility = 'visible';
+    setTimeout(() => {
+        modalOverlay.classList.add('active');
+    }, 10);
+
+    // Show the specific modal
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 10);
+
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeModal = function() {
+    const activeModal = document.querySelector('.modal.active');
+    if (activeModal) {
+        activeModal.classList.remove('active');
+        setTimeout(() => {
+            activeModal.style.display = 'none';
+            hideOverlayIfNoModal();
+        }, 300);
+    }
+
+    // Restore body scrolling
+    document.body.style.overflow = '';
+};
+
+function hideOverlayIfNoModal() {
+    const modalOverlay = document.getElementById('modalOverlay');
+    if (!modalOverlay) return;
+    
+    const activeModals = document.querySelectorAll('.modal.active');
+    if (activeModals.length === 0) {
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+            modalOverlay.style.display = 'none';
+            modalOverlay.style.visibility = 'hidden';
+        }, 300);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("accounts.js loaded");
+    console.log("DOM fully loaded");
+
+    // Initialize modal overlay
+    const modalOverlay = document.getElementById('modalOverlay');
     if (modalOverlay) {
         modalOverlay.style.display = 'none';
-        modalOverlay.classList.remove('active');
+        modalOverlay.style.visibility = 'hidden';
     }
-    document.body.style.overflow = 'auto';
-    // Sample accounts data
-    const accountsData = [
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john.doe@example.com",
-        role: "Admin",
-        status: "Active",
-        lastLogin: "Apr 9, 2025 10:30 AM",
-        avatar: "JD",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane.smith@example.com",
-        role: "Staff",
-        status: "Active",
-        lastLogin: "Apr 9, 2025 9:15 AM",
-        avatar: "JS",
-      },
-      {
-        id: 3,
-        name: "Robert Johnson",
-        email: "robert.johnson@example.com",
-        role: "Staff",
-        status: "Active",
-        lastLogin: "Apr 8, 2025 4:45 PM",
-        avatar: "RJ",
-      },
-      {
-        id: 4,
-        name: "Emily Davis",
-        email: "emily.davis@example.com",
-        role: "Customer",
-        status: "Active",
-        lastLogin: "Apr 7, 2025 2:30 PM",
-        avatar: "ED",
-      },
-      {
-        id: 5,
-        name: "Michael Wilson",
-        email: "michael.wilson@example.com",
-        role: "Customer",
-        status: "Inactive",
-        lastLogin: "Mar 15, 2025 11:20 AM",
-        avatar: "MW",
-      },
-      {
-        id: 6,
-        name: "Sarah Thompson",
-        email: "sarah.thompson@example.com",
-        role: "Customer",
-        status: "Active",
-        lastLogin: "Apr 6, 2025 8:45 AM",
-        avatar: "ST",
-      },
-      {
-        id: 7,
-        name: "David Brown",
-        email: "david.brown@example.com",
-        role: "Staff",
-        status: "Active",
-        lastLogin: "Apr 8, 2025 1:15 PM",
-        avatar: "DB",
-      },
-      {
-        id: 8,
-        name: "Jennifer Lee",
-        email: "jennifer.lee@example.com",
-        role: "Customer",
-        status: "Inactive",
-        lastLogin: "Mar 20, 2025 3:40 PM",
-        avatar: "JL",
-      },
-    ];
-  
-    // DOM elements
+
+    // DOM Elements
     const accountsTableBody = document.getElementById("accountsTableBody");
     const searchInput = document.getElementById("searchInput");
     const roleFilter = document.getElementById("roleFilter");
@@ -109,503 +173,103 @@ document.addEventListener("DOMContentLoaded", () => {
     const accountEditModal = document.getElementById('accountEditModal');
     const accountEditForm = document.getElementById('accountEditForm');
     const closeEditModal = document.getElementById('closeEditModal');
-    const cancelEdit = document.getElementById('cancelEdit');
-  
-    // Customer Details Modal
     const customerDetailsModal = document.getElementById('customerDetailsModal');
     const closeCustomerDetails = document.getElementById('closeCustomerDetails');
     const closeCustomerDetailsBtn = document.getElementById('closeCustomerDetailsBtn');
-  
-    // Pagination state
-    let currentPage = 1;
-    const itemsPerPage = 5;
-    let filteredAccounts = [...accountsData];
-    let selectedAccounts = [];
-    let currentAccount = null;
-  
-    // Initialize
-    updateTable();
-  
-    // Event listeners
-    searchInput.addEventListener("input", () => {
-      currentPage = 1;
-      updateTable();
-    });
-  
-    roleFilter.addEventListener("change", () => {
-      currentPage = 1;
-      updateTable();
-    });
-  
-    statusFilter.addEventListener("change", () => {
-      currentPage = 1;
-      updateTable();
-    });
-  
-    selectAll.addEventListener("change", () => {
-      const checkboxes = document.querySelectorAll(".account-checkbox");
-      checkboxes.forEach((checkbox) => {
-        checkbox.checked = selectAll.checked;
-      });
-      updateBulkActions();
-    });
-  
-    // Keep selectAll in sync with row checkboxes
-    const rowAccountCheckboxes = document.querySelectorAll(".account-checkbox");
-    rowAccountCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => {
-        if (!checkbox.checked) {
-          selectAll.checked = false;
-        } else {
-          const allChecked = Array.from(document.querySelectorAll(".account-checkbox")).every(cb => cb.checked);
-          selectAll.checked = allChecked;
-        }
-        updateBulkActions();
-      });
-    });
-  
-    clearSelection.addEventListener("click", () => {
-      selectedAccounts = [];
-      selectAll.checked = false;
-      const checkboxes = document.querySelectorAll(".account-checkbox");
-      checkboxes.forEach((checkbox) => {
-        checkbox.checked = false;
-      });
-      updateBulkActions();
-    });
-  
-    prevPage.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        updateTable();
-      }
-    });
-  
-    nextPage.addEventListener("click", () => {
-      const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
-      if (currentPage < totalPages) {
-        currentPage++;
-        updateTable();
-      }
-    });
-  
-    prevPageMobile.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        updateTable();
-      }
-    });
-  
-    nextPageMobile.addEventListener("click", () => {
-      const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
-      if (currentPage < totalPages) {
-        currentPage++;
-        updateTable();
-      }
-    });
-  
-    // Modal event listeners
-    addAccountButton.addEventListener("click", () => {
-        addAccountModal.style.display = "block";
-        setTimeout(() => {
-            addAccountModal.classList.add('active');
-            if (modalOverlay) {
-                modalOverlay.style.display = 'flex';
-                setTimeout(() => modalOverlay.classList.add('active'), 10);
-            }
-            document.body.style.overflow = 'hidden';
-        }, 10);
-    });
-  
-    cancelAccount.addEventListener("click", () => {
-        closeModal(addAccountModal);
-    });
-  
-    closeAccount.addEventListener("click", () => {
-        closeModal(viewAccountModal);
-    });
-  
-    saveAccount.addEventListener("click", () => {
-      // Here you would normally save the new account
-      addAccountModal.style.display = "none";
-      alert("Account added successfully!");
-    });
-  
-    saveChanges.addEventListener("click", () => {
-      // Here you would normally save the account changes
-      viewAccountModal.style.display = "none";
-      alert("Account updated successfully!");
-    });
-  
-    resetPasswordBtn.addEventListener("click", () => {
-      alert("Password reset link sent to " + currentAccount.email);
-    });
-  
-    // Close modals when clicking outside
-    window.addEventListener("click", (event) => {
-        if (event.target === modalOverlay) {
-            const openModal = document.querySelector('.modal.active, .modal-container.active');
-            if (openModal) {
-                closeModal(openModal);
-            }
-        }
-    });
-  
-    // Add event listeners for edit and delete buttons using event delegation
-    accountsTableBody.addEventListener('click', function(e) {
-        const target = e.target.closest('.action-button');
-        if (!target) return;
 
-        const userId = target.dataset.userId;
-        
-        if (target.classList.contains('edit-button')) {
-            showEditModal(userId);
-        } else if (target.classList.contains('delete-button')) {
-            confirmDeleteAccount(userId);
-        }
-    });
-  
-    // Functions
-    function updateTable() {
-      // Filter accounts
-      filteredAccounts = accountsData.filter((account) => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const matchesSearch =
-          account.name.toLowerCase().includes(searchTerm) ||
-          account.email.toLowerCase().includes(searchTerm);
-  
-        const matchesRole = roleFilter.value === "All Roles" || account.role === roleFilter.value;
-        const matchesStatus = statusFilter.value === "All Status" || account.status === statusFilter.value;
-  
-        return matchesSearch && matchesRole && matchesStatus;
-      });
-  
-      // Update pagination info
-      const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
-      const start = (currentPage - 1) * itemsPerPage + 1;
-      const end = Math.min(start + itemsPerPage - 1, filteredAccounts.length);
-  
-      if (startIndex) startIndex.textContent = filteredAccounts.length > 0 ? start : 0;
-      if (endIndex) endIndex.textContent = end;
-      if (totalItems) totalItems.textContent = filteredAccounts.length;
-  
-      // Update pagination buttons
-      prevPage.disabled = currentPage === 1;
-      nextPage.disabled = currentPage === totalPages || totalPages === 0;
-      prevPageMobile.disabled = currentPage === 1;
-      nextPageMobile.disabled = currentPage === totalPages || totalPages === 0;
-  
-      // Generate pagination numbers
-      paginationNav.innerHTML = "";
-      paginationNav.appendChild(prevPage);
-  
-      for (let i = 1; i <= totalPages; i++) {
-        const pageButton = document.createElement("button");
-        pageButton.className = `pagination-button pagination-button-page ${i === currentPage ? "active" : ""}`;
-        pageButton.textContent = i;
-        pageButton.addEventListener("click", () => {
-          currentPage = i;
-          updateTable();
-        });
-        paginationNav.appendChild(pageButton);
-      }
-  
-      paginationNav.appendChild(nextPage);
-  
-      // Render table rows
-      accountsTableBody.innerHTML = "";
-  
-      const paginatedAccounts = filteredAccounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  
-      paginatedAccounts.forEach((account) => {
-        const row = document.createElement("tr");
-  
-        // Checkbox cell
-        const checkboxCell = document.createElement("td");
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "account-checkbox";
-        checkbox.setAttribute("data-id", account.id);
-        checkbox.checked = selectedAccounts.includes(account.id);
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked) {
-            if (!selectedAccounts.includes(account.id)) {
-              selectedAccounts.push(account.id);
-            }
-          } else {
-            selectedAccounts = selectedAccounts.filter((id) => id !== account.id);
-            selectAll.checked = false;
-          }
-          updateBulkActions();
-        });
-        checkboxCell.appendChild(checkbox);
-        row.appendChild(checkboxCell);
-  
-        // Name cell
-        const nameCell = document.createElement("td");
-        nameCell.className = "whitespace-nowrap";
-        
-        const nameContent = document.createElement("div");
-        nameContent.className = "flex items-center";
-        
-        const avatar = document.createElement("div");
-        avatar.className = "h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center mr-3";
-        avatar.innerHTML = `<span class="text-pink-600 font-medium">${account.avatar}</span>`;
-        
-        const nameDiv = document.createElement("div");
-        nameDiv.className = "text-sm font-medium text-gray-900";
-        nameDiv.textContent = account.name;
-        
-        nameContent.appendChild(avatar);
-        nameContent.appendChild(nameDiv);
-        nameCell.appendChild(nameContent);
-        row.appendChild(nameCell);
-  
-        // Email cell
-        const emailCell = document.createElement("td");
-        emailCell.textContent = account.email;
-        row.appendChild(emailCell);
-  
-        // Role cell
-        const roleCell = document.createElement("td");
-        roleCell.textContent = account.role;
-        row.appendChild(roleCell);
-  
-        // Status cell
-        const statusCell = document.createElement("td");
-        const statusBadge = document.createElement("span");
-        statusBadge.className = `status-badge ${account.status === "Active" ? "status-completed" : "status-cancelled"}`;
-        statusBadge.textContent = account.status;
-        statusCell.appendChild(statusBadge);
-        row.appendChild(statusCell);
-  
-        // Last Login cell
-        const lastLoginCell = document.createElement("td");
-        lastLoginCell.textContent = account.lastLogin;
-        row.appendChild(lastLoginCell);
-  
-        // Actions cell
-        const actionsCell = document.createElement("td");
-        const actionsDiv = document.createElement("div");
-        actionsDiv.className = "actions";
-        
-        const editButton = document.createElement("button");
-        editButton.className = "edit-button";
-        editButton.innerHTML = '<i class="fas fa-edit"></i>';
-        editButton.title = "Edit Account";
-        editButton.dataset.userId = account.id;
-        editButton.addEventListener("click", () => showEditModal(account.id));
-        
-        const deleteButton = document.createElement("button");
-        deleteButton.className = "delete-button";
-        deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-        deleteButton.title = "Delete Account";
-        deleteButton.dataset.userId = account.id;
-        deleteButton.addEventListener("click", () => confirmDeleteAccount(account.id));
-        
-        actionsDiv.appendChild(editButton);
-        actionsDiv.appendChild(deleteButton);
-        actionsCell.appendChild(actionsDiv);
-        row.appendChild(actionsCell);
-  
-        accountsTableBody.appendChild(row);
-      });
-  
-      // If no accounts match the filters
-      if (paginatedAccounts.length === 0) {
-        const emptyRow = document.createElement("tr");
-        const emptyCell = document.createElement("td");
-        emptyCell.colSpan = 7;
-        emptyCell.className = "no-results";
-        emptyCell.textContent = "No accounts found matching your filters.";
-        emptyRow.appendChild(emptyCell);
-        accountsTableBody.appendChild(emptyRow);
-      }
+    // Event Listeners
+    if (addAccountButton) {
+        addAccountButton.addEventListener('click', () => window.showModal(addAccountModal));
     }
-  
-    function updateBulkActions() {
-      const checkedCount = Array.from(document.querySelectorAll('.account-checkbox'))
-        .filter(cb => cb !== selectAll && cb.checked).length;
-      if (bulkActions) {
-        bulkActions.style.display = checkedCount > 0 ? 'flex' : 'none';
-        if (selectedCount) selectedCount.textContent = checkedCount;
-      }
-    }
-  
-    function viewAccount(account) {
-      currentAccount = account;
-      
-      // Populate the modal with account details
-      document.getElementById("view-name").value = account.name;
-      document.getElementById("view-email").value = account.email;
-      document.getElementById("view-role").value = account.role;
-      document.getElementById("view-status").value = account.status;
-      document.getElementById("lastLogin").textContent = account.lastLogin;
-      document.getElementById("accountAvatar").textContent = account.avatar;
-      
-      // Show the modal
-      viewAccountModal.style.display = "flex";
-    }
-  
-    function showEditModal(userId) {
-        fetch(`get_account.php?id=${userId}`)
-            .then(response => response.json())
-            .then(account => {
-                document.getElementById('editUserId').value = account.user_id;
-                document.getElementById('editFirstName').value = account.Fname;
-                document.getElementById('editLastName').value = account.Lname;
-                document.getElementById('editEmail').value = account.email;
-                document.getElementById('editPhone').value = account.phone || '';
-                document.getElementById('editAddress').value = account.address || '';
-                document.getElementById('editStatus').value = account.status;
-                
-                accountEditModal.style.display = 'block';
-                setTimeout(() => {
-                    accountEditModal.classList.add('active');
-                    if (modalOverlay) {
-                        modalOverlay.style.display = 'flex';
-                        modalOverlay.style.visibility = 'visible';
-                        setTimeout(() => modalOverlay.classList.add('active'), 10);
-                    }
-                    document.body.style.overflow = 'hidden';
-                }, 10);
-            })
-            .catch(error => console.error('Error:', error));
-    }
-  
-    function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove('active');
-            if (modalOverlay) {
-                modalOverlay.classList.remove('active');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    modalOverlay.style.display = 'none';
-                    modalOverlay.style.visibility = 'hidden';
-                    hideOverlayIfNoModal();
-                }, 300);
-            }
-        }
-    }
-  
-    function handleAccountEdit(e) {
-        e.preventDefault();
-        
-        const formData = new FormData();
-        formData.append('user_id', document.getElementById('editUserId').value);
-        formData.append('first_name', document.getElementById('editFirstName').value);
-        formData.append('last_name', document.getElementById('editLastName').value);
-        formData.append('email', document.getElementById('editEmail').value);
-        formData.append('phone', document.getElementById('editPhone').value);
-        formData.append('address', document.getElementById('editAddress').value);
-        formData.append('status', document.getElementById('editStatus').value);
 
-        fetch('update_account.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeModal();
-                location.reload();
-            } else {
-                alert(data.message || 'Error updating account');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-  
-    function confirmDeleteAccount(userId) {
-        if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
-            fetch('delete_account.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user_id: userId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error deleting account');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            const accountCheckboxes = document.querySelectorAll('.account-checkbox');
+            accountCheckboxes.forEach(checkbox => {
+                if (checkbox !== selectAll) {
+                    checkbox.checked = isChecked;
                 }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    }
-  
-    // Function to fetch and display customer details
-    async function showCustomerDetails(userId) {
-        try {
-            const response = await fetch(`get_customer_details.php?user_id=${userId}`);
-            const data = await response.json();
-            
-            if (data.success) {
-                document.getElementById('customerPhone').textContent = data.phone || 'Not provided';
-                document.getElementById('customerBirthday').textContent = data.birthday ? new Date(data.birthday).toLocaleDateString() : 'Not provided';
-                document.getElementById('customerAddress').textContent = data.address || 'Not provided';
-                document.getElementById('customerPayment').textContent = data.payment || 'Not provided';
-                document.getElementById('customerCreatedAt').textContent = new Date(data.created_at).toLocaleDateString();
-            } else {
-                document.getElementById('customerPhone').textContent = 'No customer information available';
-                document.getElementById('customerBirthday').textContent = 'N/A';
-                document.getElementById('customerAddress').textContent = 'N/A';
-                document.getElementById('customerPayment').textContent = 'N/A';
-                document.getElementById('customerCreatedAt').textContent = 'N/A';
-            }
-            
-            customerDetailsModal.style.display = 'block';
-            setTimeout(() => customerDetailsModal.classList.add('active'), 10);
-        } catch (error) {
-            console.error('Error fetching customer details:', error);
-            alert('Failed to load customer details. Please try again.');
-        }
-    }
-  
-    // Event delegation for view buttons
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.view-button')) {
-            const userId = e.target.closest('.view-button').dataset.userId;
-            showCustomerDetails(userId);
-        }
-    });
-  
-    // Close modal events
-    [closeCustomerDetails, closeCustomerDetailsBtn].forEach(btn => {
-        btn.addEventListener('click', () => {
-            customerDetailsModal.classList.remove('active');
-            setTimeout(() => customerDetailsModal.style.display = 'none', 300);
+            });
+            updateBulkActions();
         });
-    });
-  
-    // Close modal when clicking outside
-    customerDetailsModal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            customerDetailsModal.classList.remove('active');
-            setTimeout(() => customerDetailsModal.style.display = 'none', 300);
+    }
+
+    // Add change event listeners to individual checkboxes
+    const accountCheckboxes = document.querySelectorAll('.account-checkbox');
+    accountCheckboxes.forEach(checkbox => {
+        if (checkbox !== selectAll) {
+            checkbox.addEventListener('change', function() {
+                updateBulkActions();
+                // Update select all checkbox state
+                if (selectAll) {
+                    const allChecked = Array.from(accountCheckboxes)
+                        .filter(cb => cb !== selectAll)
+                        .every(cb => cb.checked);
+                    selectAll.checked = allChecked;
+                }
+            });
         }
     });
-  
-    // Helper to hide overlay if no modal is open
-    function hideOverlayIfNoModal() {
-        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
-            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
-        if (modalOverlay) {
-            if (!anyOpen) {
-                modalOverlay.style.display = 'none';
-                modalOverlay.style.visibility = 'hidden';
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                modalOverlay.style.display = 'flex';
-                modalOverlay.style.visibility = 'visible';
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
+
+    // Close modal when clicking outside
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                window.closeModal();
             }
+        });
+    }
+
+    // Close modal when clicking close buttons
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => window.closeModal());
+    });
+
+    // Update bulk actions visibility
+    function updateBulkActions() {
+        const checkedCount = document.querySelectorAll('.account-checkbox:checked').length;
+        if (bulkActions) {
+            bulkActions.style.display = checkedCount > 0 ? 'flex' : 'none';
+            if (selectedCount) selectedCount.textContent = checkedCount;
         }
     }
-  });
-  
+
+    // Clear selection button
+    if (clearSelection) {
+        clearSelection.addEventListener('click', () => {
+            if (selectAll) selectAll.checked = false;
+            accountCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateBulkActions();
+        });
+    }
+
+    // Save account button
+    if (saveAccount) {
+        saveAccount.addEventListener('click', () => {
+            window.closeModal();
+            alert("Account added successfully!");
+        });
+    }
+
+    // Save changes button
+    if (saveChanges) {
+        saveChanges.addEventListener('click', () => {
+            window.closeModal();
+            alert("Account updated successfully!");
+        });
+    }
+
+    // Reset password button
+    if (resetPasswordBtn) {
+        resetPasswordBtn.addEventListener('click', () => {
+            alert("Password reset link sent!");
+        });
+    }
+
+    // Initialize
+    updateBulkActions();
+});
