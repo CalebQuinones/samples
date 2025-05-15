@@ -246,34 +246,39 @@
     </main>
   </div>
 
-  <!-- Status Update Modal -->
-  <div class="modal-overlay" id="statusModal" style="display: none;">
-    <div class="modal-container">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">Update Order Status</h3>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="status" class="form-label">Status</label>
-            <select id="status" class="form-select">
-              <option>Pending</option>
-              <option>In Progress</option>
-              <option>Ready for Pickup</option>
-              <option>Out for Delivery</option>
-              <option>Completed</option>
-              <option>Cancelled</option>
-            </select>
+  <!-- Modal Overlay (single, shared) -->
+  <div class="modal-overlay" id="modalOverlay">
+    <!-- Status Update Modal -->
+    <div class="modal" id="statusModal">
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Update Order Status</h3>
+            <button class="close-modal" id="closeStatusModal">&times;</button>
           </div>
-          <div class="form-group">
-            <label for="message" class="form-label">Message to Customer (Optional)</label>
-            <textarea id="message" class="form-textarea" placeholder="Add a message to notify the customer about this status update..."></textarea>
+          <div class="modal-body">
+            <form id="statusUpdateForm">
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" required>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="message">Message to Customer (Optional)</label>
+                <textarea id="message" name="message" rows="3" placeholder="Add a message to notify the customer about this status update..."></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-button modal-button-secondary" id="cancelStatusUpdate">Cancel</button>
+            <button class="modal-button modal-button-primary" id="updateStatusConfirm">Update Status</button>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-button modal-button-primary" id="updateStatusConfirm">Update Status</button>
-        <button class="modal-button modal-button-secondary" id="cancelStatusUpdate">Cancel</button>
       </div>
     </div>
   </div>

@@ -15,9 +15,91 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize modal overlay
     if (modalOverlay) {
         modalOverlay.style.display = 'none';
-        modalOverlay.classList.remove('active');
+        modalOverlay.style.visibility = 'hidden';
     }
     document.body.style.overflow = 'auto';
+  
+    // Modal handling functions
+    window.showModal = function(modal) {
+        if (!modal) return;
+        
+        const modalOverlay = document.getElementById('modalOverlay');
+        if (!modalOverlay) return;
+
+        // Reset any existing modals
+        document.querySelectorAll('.modal.active').forEach(m => {
+            m.classList.remove('active');
+        });
+
+        // Show modal overlay first
+        modalOverlay.style.display = 'flex';
+        modalOverlay.style.visibility = 'visible';
+        // Force reflow
+        modalOverlay.offsetHeight;
+        modalOverlay.classList.add('active');
+        
+        // Show modal
+        modal.style.display = 'block';
+        // Force reflow
+        modal.offsetHeight;
+        modal.classList.add('active');
+        
+        // Prevent body scrolling
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeModal = function(modal) {
+        if (!modal) return;
+        
+        const modalOverlay = document.getElementById('modalOverlay');
+        if (!modalOverlay) return;
+        
+        // Remove active classes
+        modal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+        
+        // Hide modal after transition
+        setTimeout(() => {
+            modal.style.display = 'none';
+            hideOverlayIfNoModal();
+        }, 300);
+        
+        // Restore body scrolling
+        document.body.style.overflow = '';
+    };
+
+    function hideOverlayIfNoModal() {
+        const modalOverlay = document.getElementById('modalOverlay');
+        if (!modalOverlay) return;
+        
+        const hasActiveModal = document.querySelector('.modal.active');
+        if (!hasActiveModal) {
+            modalOverlay.style.display = 'none';
+            modalOverlay.style.visibility = 'hidden';
+        }
+    }
+
+    // Close modal when clicking outside
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (event) => {
+            if (event.target === modalOverlay) {
+                const openModal = document.querySelector('.modal.active');
+                if (openModal) {
+                    closeModal(openModal);
+                    // Reset edit button state if status modal is closed
+                    if (openModal === statusModal && editButton) {
+                        isEditing = false;
+                        editButton.innerHTML = '<i class="fas fa-edit"></i> Edit Order';
+                        editButton.classList.remove("edit-button-cancel");
+                        editButton.classList.add("edit-button-edit");
+                        if (updateStatusButton) {
+                            updateStatusButton.style.display = "none";
+                        }
+                    }
+                }
+            }
+        });
+    }
   
     // Edit button click handler
     if (editButton) {
@@ -34,16 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 // Show the status modal
                 if (statusModal) {
-                    statusModal.style.display = "block";
-                    if (modalOverlay) {
-                        modalOverlay.style.display = "flex";
-                        modalOverlay.style.visibility = "visible";
-                        setTimeout(() => {
-                            statusModal.classList.add("active");
-                            modalOverlay.classList.add("active");
-                        }, 10);
-                    }
-                    document.body.style.overflow = "hidden";
+                    showModal(statusModal);
                 }
             } else {
                 // Switch back to view mode
@@ -63,16 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (updateStatusButton) {
         updateStatusButton.addEventListener("click", () => {
             if (statusModal) {
-                statusModal.style.display = "block";
-                if (modalOverlay) {
-                    modalOverlay.style.display = "flex";
-                    modalOverlay.style.visibility = "visible";
-                    setTimeout(() => {
-                        statusModal.classList.add("active");
-                        modalOverlay.classList.add("active");
-                    }, 10);
-                }
-                document.body.style.overflow = "hidden";
+                showModal(statusModal);
             }
         });
     }
@@ -125,61 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
             alert(`Order status updated to: ${newStatus}${message ? "\nMessage: " + message : ""}`);
         });
-    }
-  
-    // Close modal when clicking outside
-    if (modalOverlay) {
-        modalOverlay.addEventListener("click", (event) => {
-            if (event.target === modalOverlay) {
-                const openModal = document.querySelector('.modal.active, .modal-container.active');
-                if (openModal) {
-                    closeModal(openModal);
-                    // Reset edit button state if status modal is closed
-                    if (openModal === statusModal && editButton) {
-                        isEditing = false;
-                        editButton.innerHTML = '<i class="fas fa-edit"></i> Edit Order';
-                        editButton.classList.remove("edit-button-cancel");
-                        editButton.classList.add("edit-button-edit");
-                        if (updateStatusButton) {
-                            updateStatusButton.style.display = "none";
-                        }
-                    }
-                }
-            }
-        });
-    }
-  
-    function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove("active");
-            if (modalOverlay) {
-                modalOverlay.classList.remove("active");
-                setTimeout(() => {
-                    modal.style.display = "none";
-                    modalOverlay.style.display = "none";
-                    modalOverlay.style.visibility = "hidden";
-                    hideOverlayIfNoModal();
-                }, 300);
-            }
-        }
-    }
-  
-    function hideOverlayIfNoModal() {
-        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
-            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
-        if (modalOverlay) {
-            if (!anyOpen) {
-                modalOverlay.style.display = 'none';
-                modalOverlay.style.visibility = 'hidden';
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                modalOverlay.style.display = 'flex';
-                modalOverlay.style.visibility = 'visible';
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
     }
   
     function getOrderIdFromUrl() {
@@ -375,4 +384,3 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load order details when the page loads
     loadOrderDetails();
 });
-  

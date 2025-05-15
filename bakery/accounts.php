@@ -196,7 +196,7 @@ $result = mysqli_query($conn, $sql);
         </div>
 
         <!-- Customer Details Modal -->
-        <div class="modal" id="customerDetailsModal" style="display: none;">
+        <div class="modal" id="customerDetailsModal">
             <div class="modal-container">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -240,158 +240,132 @@ $result = mysqli_query($conn, $sql);
   </div>
 
   <!-- Modal Overlay (single, shared) -->
-  <div class="modal-overlay" id="modalOverlay"></div>
-
-  <!-- Add Account Modal -->
-  <div class="modal" id="addAccountModal" style="display: none;">
-    <div class="modal-container">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">Add New Account</h3>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" id="name" class="form-textarea" style="min-height: auto;">
+  <div class="modal-overlay" id="modalOverlay">
+    <!-- Customer Details Modal -->
+    <div class="modal" id="customerDetailsModal">
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Customer Details</h3>
+            <button class="close-modal" id="closeCustomerDetails">&times;</button>
           </div>
-          <div class="form-group">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" id="email" class="form-textarea" style="min-height: auto;">
-          </div>
-          <div class="form-group">
-            <label for="role" class="form-label">Role</label>
-            <select id="role" class="form-select">
-              <option>Customer</option>
-              <option>Staff</option>
-              <option>Admin</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" class="form-textarea" style="min-height: auto;">
-          </div>
-          <div class="form-group">
-            <label for="confirm-password" class="form-label">Confirm Password</label>
-            <input type="password" id="confirm-password" class="form-textarea" style="min-height: auto;">
-          </div>
-          <div class="form-group" style="display: flex; align-items: center;">
-            <input type="checkbox" id="active" style="margin-right: 0.5rem;" checked>
-            <label for="active" class="form-label" style="margin-bottom: 0;">Active Account</label>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-button modal-button-primary" id="saveAccount">
-          Add Account
-        </button>
-        <button class="modal-button modal-button-secondary" id="cancelAccount">
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- View/Edit Account Modal -->
-  <div class="modal" id="viewAccountModal" style="display: none;">
-    <div class="modal-container">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">Account Details</h3>
-          <div class="customer-avatar" id="accountAvatar">JD</div>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="view-name" class="form-label">Full Name</label>
-            <input type="text" id="view-name" class="form-textarea" style="min-height: auto;">
-          </div>
-          <div class="form-group">
-            <label for="view-email" class="form-label">Email Address</label>
-            <input type="email" id="view-email" class="form-textarea" style="min-height: auto;">
-          </div>
-          <div class="form-group">
-            <label for="view-role" class="form-label">Role</label>
-            <select id="view-role" class="form-select">
-              <option>Customer</option>
-              <option>Staff</option>
-              <option>Admin</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="view-status" class="form-label">Status</label>
-            <select id="view-status" class="form-select">
-              <option>Active</option>
-              <option>Inactive</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Last Login</label>
-            <p class="order-info-value" id="lastLogin">Apr 9, 2025 10:30 AM</p>
-          </div>
-          <div class="form-group">
-            <div class="flex items-center justify-between">
-              <span class="form-label">Reset Password</span>
-              <button class="text-pink-600 hover:text-pink-800 text-sm font-medium" id="resetPasswordBtn">
-                Send Reset Link
-              </button>
+          <div class="modal-body">
+            <div class="customer-info">
+              <div class="info-group">
+                <label>Phone Number</label>
+                <p id="customerPhone">Loading...</p>
+              </div>
+              <div class="info-group">
+                <label>Birthday</label>
+                <p id="customerBirthday">Loading...</p>
+              </div>
+              <div class="info-group">
+                <label>Address</label>
+                <p id="customerAddress">Loading...</p>
+              </div>
+              <div class="info-group">
+                <label>Payment Method</label>
+                <p id="customerPayment">Loading...</p>
+              </div>
+              <div class="info-group">
+                <label>Customer Since</label>
+                <p id="customerCreatedAt">Loading...</p>
+              </div>
             </div>
           </div>
+          <div class="modal-footer">
+            <button class="modal-button modal-button-secondary" id="closeCustomerDetailsBtn">
+              Close
+            </button>
+          </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="modal-button modal-button-primary" id="saveChanges">
-          Save Changes
-        </button>
-        <button class="modal-button modal-button-secondary" id="closeAccount">
-          Cancel
-        </button>
+    </div>
+
+    <!-- Add Account Modal -->
+    <div class="modal" id="addAccountModal">
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Add New Account</h3>
+            <button class="close-modal" id="closeAccount">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="addAccountForm">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+              <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                  <option value="customer">Customer</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-button modal-button-secondary" id="cancelAccount">Cancel</button>
+            <button class="modal-button modal-button-primary" id="saveAccount">Save</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Account Edit Modal -->
-  <div class="modal" id="accountEditModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Edit Account</h2>
-        <button class="close-modal" id="closeEditModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="accountEditForm">
-          <input type="hidden" id="editUserId">
-          <div class="form-group">
-            <label for="editFirstName">First Name</label>
-            <input type="text" id="editFirstName" required>
+    <!-- Edit Account Modal -->
+    <div class="modal" id="accountEditModal">
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Edit Account</h3>
+            <button class="close-modal" id="closeEditModal">&times;</button>
           </div>
-          <div class="form-group">
-            <label for="editLastName">Last Name</label>
-            <input type="text" id="editLastName" required>
+          <div class="modal-body">
+            <form id="accountEditForm">
+              <input type="hidden" id="editUserId">
+              <div class="form-group">
+                <label for="editFirstName">First Name</label>
+                <input type="text" id="editFirstName" name="firstName" required>
+              </div>
+              <div class="form-group">
+                <label for="editLastName">Last Name</label>
+                <input type="text" id="editLastName" name="lastName" required>
+              </div>
+              <div class="form-group">
+                <label for="editEmail">Email</label>
+                <input type="email" id="editEmail" name="email" required>
+              </div>
+              <div class="form-group">
+                <label for="editPhone">Phone</label>
+                <input type="tel" id="editPhone" name="phone">
+              </div>
+              <div class="form-group">
+                <label for="editAddress">Address</label>
+                <textarea id="editAddress" name="address"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="editStatus">Status</label>
+                <select id="editStatus" name="status" required>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </form>
           </div>
-          <div class="form-group">
-            <label for="editEmail">Email</label>
-            <input type="email" id="editEmail" required>
+          <div class="modal-footer">
+            <button class="modal-button modal-button-secondary" id="cancelEdit">Cancel</button>
+            <button class="modal-button modal-button-primary" id="saveChanges">Save Changes</button>
           </div>
-          <div class="form-group">
-            <label for="editPhone">Phone</label>
-            <input type="tel" id="editPhone">
-          </div>
-          <div class="form-group">
-            <label for="editAddress">Address</label>
-            <textarea id="editAddress"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="editStatus">Status</label>
-            <select id="editStatus" required>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-          <div class="form-actions">
-            <button type="button" class="cancel-button" id="cancelEdit">Cancel</button>
-            <button type="submit" class="submit-button">Save Changes</button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>

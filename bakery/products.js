@@ -1,5 +1,14 @@
+console.log('products.js loaded');
 document.addEventListener('DOMContentLoaded', function() {
-    var modalOverlay = document.getElementById('modalOverlay');
+    console.log('DOM fully loaded and parsed');
+    const modalOverlay = document.getElementById('modalOverlay');
+    
+    // Initialize modal overlay
+    if (modalOverlay) {
+        modalOverlay.style.display = 'none';
+        modalOverlay.style.visibility = 'hidden';
+    }
+
     // DOM Elements
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -13,104 +22,140 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeEditProduct = document.getElementById('closeEditProduct');
     const cancelEditProduct = document.getElementById('cancelEditProduct');
     const productsTableBody = document.getElementById('productsTableBody');
+    const productCheckboxes = document.querySelectorAll('.product-checkbox');
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+    const clearSelection = document.getElementById('clearSelection');
+    const sortBy = document.getElementById('sortBy');
 
     // Guard: Only run if main elements exist
-    if (!addProductBtn || !productModal || !modalOverlay) {
-        console.warn('Products JS: Required elements not found. Script will not run.');
-        return;
+    if (!addProductBtn) {
+        console.warn('Products JS: Add Product button not found.');
     }
+    if (!productModal) {
+        console.warn('Products JS: Add Product modal not found.');
+    }
+    if (!modalOverlay) {
+        console.warn('Products JS: Modal overlay not found.');
+    }
+    // Don't return early: allow partial functionality if some elements are missing.
 
     // Debug logging for all main DOM elements
-    console.log('searchInput:', searchInput);
-    console.log('categoryFilter:', categoryFilter);
-    console.log('availabilityFilter:', availabilityFilter);
-    console.log('selectAllCheckbox:', selectAllCheckbox);
-    console.log('productModal:', productModal);
-    console.log('editProductModal:', editProductModal);
-    console.log('addProductBtn:', addProductBtn);
-    console.log('closeProductModal:', closeProductModal);
-    console.log('cancelProduct:', cancelProduct);
-    console.log('closeEditProduct:', closeEditProduct);
-    console.log('cancelEditProduct:', cancelEditProduct);
-    console.log('productsTableBody:', productsTableBody);
-
-    if (modalOverlay) {
-        modalOverlay.style.display = 'none';
-        modalOverlay.classList.remove('active');
-    }
-    document.body.style.overflow = 'auto';
+    if (searchInput) console.log('searchInput:', searchInput);
+    else console.warn('searchInput not found');
+    if (categoryFilter) console.log('categoryFilter:', categoryFilter);
+    else console.warn('categoryFilter not found');
+    if (availabilityFilter) console.log('availabilityFilter:', availabilityFilter);
+    else console.warn('availabilityFilter not found');
+    if (selectAllCheckbox) console.log('selectAllCheckbox:', selectAllCheckbox);
+    else console.warn('selectAllCheckbox not found');
+    if (productModal) console.log('productModal:', productModal);
+    else console.warn('productModal not found');
+    if (editProductModal) console.log('editProductModal:', editProductModal);
+    else console.warn('editProductModal not found');
+    if (addProductBtn) console.log('addProductBtn:', addProductBtn);
+    else console.warn('addProductBtn not found');
+    if (closeProductModal) console.log('closeProductModal:', closeProductModal);
+    else console.warn('closeProductModal not found');
+    if (cancelProduct) console.log('cancelProduct:', cancelProduct);
+    else console.warn('cancelProduct not found');
+    if (closeEditProduct) console.log('closeEditProduct:', closeEditProduct);
+    else console.warn('closeEditProduct not found');
+    if (cancelEditProduct) console.log('cancelEditProduct:', cancelEditProduct);
+    else console.warn('cancelEditProduct not found');
+    if (productsTableBody) console.log('productsTableBody:', productsTableBody);
+    else console.warn('productsTableBody not found');
 
     // Event Listeners (all guarded)
     if (searchInput) searchInput.addEventListener('input', filterProducts);
     if (categoryFilter) categoryFilter.addEventListener('change', filterProducts);
     if (availabilityFilter) availabilityFilter.addEventListener('change', filterProducts);
     if (selectAllCheckbox) selectAllCheckbox.addEventListener('change', toggleSelectAll);
-    if (addProductBtn) addProductBtn.addEventListener('click', showAddProductModal);
-    if (closeProductModal) closeProductModal.addEventListener('click', () => closeModal(productModal));
-    if (cancelProduct) cancelProduct.addEventListener('click', () => closeModal(productModal));
-    if (closeEditProduct) closeEditProduct.addEventListener('click', () => closeModal(editProductModal));
-    if (cancelEditProduct) cancelEditProduct.addEventListener('click', () => closeModal(editProductModal));
-    if (productsTableBody) {
-        productsTableBody.addEventListener('click', function(e) {
-            const target = e.target.closest('.action-button');
-            if (!target) return;
-            const productId = target.getAttribute('data-product-id');
-            if (target.classList.contains('edit-button')) {
-                showEditProductModal(productId);
-            } else if (target.classList.contains('delete-button')) {
-                if (confirm('Are you sure you want to delete this product?')) {
-                    deleteProduct(productId);
-                }
+    if (addProductBtn) addProductBtn.addEventListener('click', () => showModal(productModal));
+    if (closeProductModal) closeProductModal.addEventListener('click', () => closeModal());
+    if (cancelProduct) cancelProduct.addEventListener('click', () => closeModal());
+    if (closeEditProduct) closeEditProduct.addEventListener('click', () => closeModal());
+    if (cancelEditProduct) cancelEditProduct.addEventListener('click', () => closeModal());
+
+    // Close modal when clicking outside
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                closeModal();
             }
         });
+    }
+
+    // Close modal when clicking close button
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            closeModal();
+        });
+    });
+
+    // Modal handling functions
+    window.showModal = function(modal) {
+        if (!modal) return;
+        
+        // Reset any existing modals
+        const allModals = document.querySelectorAll('.modal');
+        allModals.forEach(m => {
+            m.classList.remove('active');
+            m.style.display = 'none';
+        });
+
+        // Show the modal overlay
+        if (modalOverlay) {
+            modalOverlay.style.display = 'flex';
+            modalOverlay.style.visibility = 'visible';
+            setTimeout(() => {
+                modalOverlay.classList.add('active');
+            }, 10);
+        }
+
+        // Show the specific modal
+        modal.style.display = 'block';
+        setTimeout(() => {
+            modal.classList.add('active');
+        }, 10);
+
+        // Prevent body scrolling
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeModal = function() {
+        const activeModal = document.querySelector('.modal.active');
+        if (activeModal) {
+            activeModal.classList.remove('active');
+            setTimeout(() => {
+                activeModal.style.display = 'none';
+                hideOverlayIfNoModal();
+            }, 300);
+        }
+
+        // Restore body scrolling
+        document.body.style.overflow = '';
+    };
+
+    function hideOverlayIfNoModal() {
+        const activeModals = document.querySelectorAll('.modal.active');
+        if (activeModals.length === 0 && modalOverlay) {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+                modalOverlay.style.display = 'none';
+                modalOverlay.style.visibility = 'hidden';
+            }, 300);
+        }
     }
 
     function showAddProductModal() {
         console.log('Add Product button clicked!');
-        if (productModal) {
-            productModal.style.display = 'block';
-            if (modalOverlay) {
-                modalOverlay.style.display = 'flex';
-                modalOverlay.style.visibility = 'visible';
-                setTimeout(() => {
-                    productModal.classList.add('active');
-                    modalOverlay.classList.add('active');
-                }, 10);
-            }
-            document.body.style.overflow = 'hidden';
+        if (!productModal) {
+            console.error('productModal not found!');
+            return;
         }
-    }
-
-    // Filter products based on search input and filters
-    function filterProducts() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const selectedCategory = categoryFilter.value;
-        const selectedAvailability = availabilityFilter.value;
-        
-        const rows = document.querySelectorAll('#productsTableBody tr');
-        
-        rows.forEach(row => {
-            const name = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
-            const category = row.querySelector('td:nth-child(5)')?.textContent || '';
-            const availability = row.querySelector('.status-badge')?.textContent || '';
-            
-            const matchesSearch = name.includes(searchTerm);
-            const matchesCategory = !selectedCategory || category === selectedCategory;
-            const matchesAvailability = !selectedAvailability || availability === selectedAvailability;
-            
-            row.style.display = matchesSearch && matchesCategory && matchesAvailability ? '' : 'none';
-        });
-
-        updatePagination();
-    }
-
-    // Toggle select all checkboxes
-    function toggleSelectAll() {
-        const checkboxes = document.querySelectorAll('.product-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
-        });
-        updateBulkActions();
+        showModal(productModal);
     }
 
     function showEditProductModal(productId) {
@@ -125,55 +170,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (input) input.value = product[field];
                     });
                     
-                    editProductModal.style.display = 'block';
-                    if (modalOverlay) {
-                        modalOverlay.style.display = 'flex';
-                        modalOverlay.style.visibility = 'visible';
-                        setTimeout(() => {
-                            editProductModal.classList.add('active');
-                            modalOverlay.classList.add('active');
-                        }, 10);
-                    }
-                    document.body.style.overflow = 'hidden';
+                    showModal(editProductModal);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Failed to load product details');
             });
-    }
-
-    function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove('active');
-            if (modalOverlay) {
-                modalOverlay.classList.remove('active');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    modalOverlay.style.display = 'none';
-                    modalOverlay.style.visibility = 'hidden';
-                    hideOverlayIfNoModal();
-                }, 300);
-            }
-        }
-    }
-
-    function hideOverlayIfNoModal() {
-        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
-            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
-        if (modalOverlay) {
-            if (!anyOpen) {
-                modalOverlay.style.display = 'none';
-                modalOverlay.style.visibility = 'hidden';
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                modalOverlay.style.display = 'flex';
-                modalOverlay.style.visibility = 'visible';
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
     }
 
     function deleteProduct(productId) {
@@ -202,15 +205,47 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Filter products based on search input and filters
+    function filterProducts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value;
+        const selectedAvailability = availabilityFilter.value;
+        
+        const rows = document.querySelectorAll('#productsTableBody tr');
+        
+        rows.forEach(row => {
+            const name = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+            const category = row.querySelector('td:nth-child(5)')?.textContent || '';
+            const availability = row.querySelector('.status-badge')?.textContent || '';
+            
+            const matchesSearch = name.includes(searchTerm);
+            const matchesCategory = !selectedCategory || category === selectedCategory;
+            const matchesAvailability = !selectedAvailability || availability === selectedAvailability;
+            
+            row.style.display = matchesSearch && matchesCategory && matchesAvailability ? '' : 'none';
+        });
+
+        updatePagination();
+    }
+
+    // Toggle select all checkboxes
+    function toggleSelectAll() {
+        const isChecked = selectAllCheckbox.checked;
+        productCheckboxes.forEach(checkbox => {
+            if (checkbox !== selectAllCheckbox) {
+                checkbox.checked = isChecked;
+            }
+        });
+        updateBulkActions();
+    }
+
     // Update bulk actions visibility
     function updateBulkActions() {
-        const bulkActions = document.getElementById('bulkActions');
         const selectedCount = document.querySelectorAll('.product-checkbox:checked').length;
         
         if (bulkActions) {
             bulkActions.style.display = selectedCount > 0 ? 'flex' : 'none';
-            const countSpan = document.getElementById('selectedCount');
-            if (countSpan) countSpan.textContent = selectedCount;
+            if (selectedCountSpan) selectedCountSpan.textContent = selectedCount;
         }
     }
 
@@ -255,16 +290,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add event listener for bulk action buttons
-    document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+    productCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateBulkActions);
     });
 
     // Add event listener for clear selection button
-    const clearSelectionBtn = document.getElementById('clearSelection');
-    if (clearSelectionBtn) {
-        clearSelectionBtn.addEventListener('click', () => {
+    if (clearSelection) {
+        clearSelection.addEventListener('click', () => {
             if (selectAllCheckbox) selectAllCheckbox.checked = false;
-            document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+            productCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;
             });
             updateBulkActions();

@@ -209,57 +209,52 @@ $result = mysqli_query($conn, $sql);
   </div>
 
   <!-- Modal Overlay (single, shared) -->
-  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal-overlay" id="modalOverlay">
+    <!-- View Inquiry Modal -->
+    <div class="modal" id="inquiryModal">
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="inquirySubject">Wedding Cake Inquiry</h3>
+            <span class="status-badge status-new" id="inquiryStatusBadge">New</span>
+          </div>
+          <div class="modal-body">
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <div id="inquiryCustomer" style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900);">Jennifer Smith</div>
+                <div id="inquiryDate" style="font-size: 0.75rem; color: var(--gray-500);">Apr 9, 2025</div>
+              </div>
+              <p id="inquiryMessage" style="font-size: 0.875rem; color: var(--gray-700); white-space: pre-line;">I'm interested in ordering a 3-tier wedding cake for my upcoming wedding on June 15th. Do you offer tastings? I'd like to discuss design options and flavors. My fiancé and I are thinking of a semi-naked cake with fresh flowers. Please let me know what information you need from me to get started.</p>
+            </div>
 
-  <!-- View Inquiry Modal -->
-  <div class="modal" id="inquiryModal" style="display: none;">
-    <div class="modal-container">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title" id="inquirySubject">Wedding Cake Inquiry</h3>
-          <span class="status-badge status-new" id="inquiryStatusBadge">New</span>
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; font-size: 0.875rem; color: var(--gray-600);">
+                <i class="fas fa-envelope" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
+                <span id="inquiryEmail">jennifer.smith@example.com</span>
+              </div>
+              <div style="display: flex; align-items: center; font-size: 0.875rem; color: var(--gray-600);">
+                <i class="fas fa-phone" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
+                <span id="inquiryPhone">+1 (555) 123-4567</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+              <label for="reply" style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
+                Reply
+              </label>
+              <textarea
+                id="replyText"
+                rows="4"
+                class="form-textarea"
+                placeholder="Type your reply here..."
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-button modal-button-secondary" id="closeInquiry">Cancel</button>
+            <button class="modal-button modal-button-primary" id="sendReply">Send Reply</button>
+          </div>
         </div>
-        <div class="modal-body">
-          <div class="bg-gray-50 p-3 rounded-lg">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-              <div id="inquiryCustomer" style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900);">Jennifer Smith</div>
-              <div id="inquiryDate" style="font-size: 0.75rem; color: var(--gray-500);">Apr 9, 2025</div>
-            </div>
-            <p id="inquiryMessage" style="font-size: 0.875rem; color: var(--gray-700); white-space: pre-line;">I'm interested in ordering a 3-tier wedding cake for my upcoming wedding on June 15th. Do you offer tastings? I'd like to discuss design options and flavors. My fiancé and I are thinking of a semi-naked cake with fresh flowers. Please let me know what information you need from me to get started.</p>
-          </div>
-
-          <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; font-size: 0.875rem; color: var(--gray-600);">
-              <i class="fas fa-envelope" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
-              <span id="inquiryEmail">jennifer.smith@example.com</span>
-            </div>
-            <div style="display: flex; align-items: center; font-size: 0.875rem; color: var(--gray-600);">
-              <i class="fas fa-phone" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
-              <span id="inquiryPhone">+1 (555) 123-4567</span>
-            </div>
-          </div>
-
-          <div style="margin-top: 1rem;">
-            <label for="reply" style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
-              Reply
-            </label>
-            <textarea
-              id="replyText"
-              rows="4"
-              class="form-textarea"
-              placeholder="Type your reply here..."
-            ></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-button modal-button-primary" id="sendReply">
-          <i class="fas fa-reply mr-2"></i>
-          Send Reply
-        </button>
-        <button class="modal-button modal-button-secondary" id="closeInquiry">
-          Close
-        </button>
       </div>
     </div>
   </div>
