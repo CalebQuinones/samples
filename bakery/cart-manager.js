@@ -162,9 +162,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners for "Add to order" buttons
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-to-order')) {
-            const productId = e.target.dataset.productId;
-            const quantityElement = e.target.closest('.product-card').querySelector('.quantity');
-            const quantity = parseInt(quantityElement.textContent);
+            e.stopPropagation(); // Prevent bubbling to product card
+            const productCard = e.target.closest('.product-card');
+            if (!productCard) return;
+            const productId = parseInt(productCard.getAttribute('data-id'), 10);
+            const quantityElem = productCard.querySelector('.quantity');
+            const quantity = quantityElem ? parseInt(quantityElem.textContent, 10) : 1;
             addToCart(productId, quantity);
         }
     });
@@ -326,4 +329,4 @@ function loadCart() {
         window.cart = []
     }
     window.updateCartUI()
-} 
+}

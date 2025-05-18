@@ -337,5 +337,26 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     }
 })
-  
-  
+
+// Remove duplicate addToCart event listeners and logic to prevent double add
+
+// Only this should be used for add-to-order:
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('add-to-order')) {
+        e.stopPropagation(); // Prevent bubbling to product card
+        const productCard = e.target.closest('.product-card');
+        if (!productCard) return;
+        const productId = parseInt(productCard.getAttribute('data-id'), 10);
+        const quantityElem = productCard.querySelector('.quantity');
+        const quantity = quantityElem ? parseInt(quantityElem.textContent, 10) : 1;
+        window.addToCart(productId, quantity);
+    }
+});
+
+// This file is NOT being used on your current MenuSection.php page.
+// The script tag in your HTML is:
+// <script src="cart-persistence.js"></script>
+// But your main menu page is: c:\xampp\htdocs\bakery\samples\bakery\copy of website\MenuSection.php
+// and it does NOT use cart-persistence.js for cart logic.
+// Instead, it uses its own cart logic (see addToCart, updateCartUI, etc. in the MenuSection.php script).
+

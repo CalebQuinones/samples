@@ -837,6 +837,8 @@ document.addEventListener("DOMContentLoaded", () => {
       productModal.classList.add("active")
     }
 
+
+
     // Add click event to product cards to open the modal
     const productCards = document.querySelectorAll(".product-card")
     console.log("Found", productCards.length, "product cards")
