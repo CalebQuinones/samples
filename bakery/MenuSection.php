@@ -1,309 +1,9 @@
 <!DOCTYPE html>
 <?php
-// Start the session
 session_start();
-
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bakerydb";
-
-// Create connection
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+include 'config.php';
 ?>
-<script>
-window.isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-window.userId = <?php echo isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 'null'; ?>;
 
-// Initialize cart from localStorage or create empty array
-window.cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-// Function to save cart to localStorage
-function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(window.cart));
-}
-
-// Function to update cart UI
-function updateCartUI() {
-    const cartPopupItems = document.getElementById('cartPopupItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const cartCount = document.querySelector('.cart-count');
-    
-    if (!cartPopupItems || !cartTotal || !cartCount) return;
-    
-    // Update cart count
-    const totalItems = window.cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.textContent = totalItems;
-    
-    // Update cart items
-    cartPopupItems.innerHTML = '';
-    let total = 0;
-    
-    window.cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        
-        cartPopupItems.innerHTML += `
-            <div class="cart-popup-item" data-id="${item.id}">
-                <div class="cart-item-image">
-                    <img src="${item.image}" alt="${item.name}">
-                </div>
-                <div class="cart-item-details">
-                    <h4>${item.name}</h4>
-                    <p>Php ${item.price.toLocaleString()} × ${item.quantity}</p>
-                </div>
-                <div class="cart-item-actions">
-                    <button class="cart-minus">-</button>
-                    <span class="cart-quantity">${item.quantity}</span>
-                    <button class="cart-plus">+</button>
-                    <button class="cart-item-remove">×</button>
-                </div>
-            </div>
-        `;
-    });
-    
-    // Update total
-    cartTotal.textContent = `Php ${total.toLocaleString()}`;
-    
-    // Update checkout items if checkout modal is open
-    const orderItemsList = document.getElementById('orderItemsList');
-    if (orderItemsList) {
-        orderItemsList.innerHTML = '';
-        window.cart.forEach(item => {
-            orderItemsList.innerHTML += `
-                <div class="cart-item">
-                    <div class="item-image">
-                        <img src="${item.image}" alt="${item.name}">
-                    </div>
-                    <div class="item-details">
-                        <h4>${item.name}</h4>
-                        <p>Php ${item.price.toLocaleString()} × ${item.quantity}</p>
-                    </div>
-                </div>
-            `;
-        });
-    }
-}
-
-// Function to add item to cart
-function addToCart(productId, quantity = 1) {
-    const product = window.products.find(p => p.id === productId);
-    if (!product) return;
-    
-    const existingItem = window.cart.find(item => item.id === productId);
-    if (existingItem) {
-        existingItem.quantity += quantity;
-    } else {
-        window.cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            quantity: quantity
-        });
-    }
-    
-    saveCart();
-    updateCartUI();
-}
-
-// Function to remove item from cart
-function removeFromCart(productId) {
-    window.cart = window.cart.filter(item => item.id !== productId);
-    saveCart();
-    updateCartUI();
-}
-
-// Function to update cart quantity
-function updateCartQuantity(productId, quantity) {
-    const item = window.cart.find(item => item.id === productId);
-    if (item) {
-        item.quantity = quantity;
-        saveCart();
-        updateCartUI();
-    }
-}
-
-// Function to calculate total
-function calculateTotal() {
-    return window.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-}
-</script>
-<script>
-// Debug logging
-console.log('Script starting...');
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
-    
-    // Initialize products array
-    window.products = [];
-    <?php
-    // Get products from database
-    $sql = "SELECT * FROM products ORDER BY created_at DESC";
-    $result = mysqli_query($conn, $sql);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "window.products.push({
-                id: '" . $row['product_id'] . "',
-                name: '" . addslashes($row['name']) . "',
-                price: " . $row['price'] . ",
-                image: '" . $row['image'] . "'
-            });\n";
-        }
-    }
-    ?>
-    console.log('Products loaded:', window.products);
-
-    // Cart elements
-    const cartIcon = document.getElementById('cartIcon');
-    const cartPopup = document.getElementById('cartPopup');
-    const closeCart = document.getElementById('closeCart');
-    const shopMoreBtn = document.getElementById('shopMoreBtn');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const checkoutModal = document.getElementById('checkoutModal');
-    const closeCheckout = document.getElementById('closeCheckout');
-    const backToCart = document.querySelector('.back-to-cart');
-    const cartPopupItems = document.getElementById('cartPopupItems');
-
-    // Open cart popup
-    cartIcon.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        modalOverlay.style.display = 'block';
-        cartPopup.style.display = 'block';
-        void cartPopup.offsetWidth;
-        modalOverlay.classList.add('active');
-        cartPopup.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        updateCartUI();
-    });
-
-    function closeCartPopup() {
-        cartPopup.classList.remove('active');
-        modalOverlay.classList.remove('active');
-        setTimeout(() => {
-            cartPopup.style.display = 'none';
-            modalOverlay.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }, 300);
-    }
-
-    closeCart.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeCartPopup();
-    });
-
-    shopMoreBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeCartPopup();
-    });
-
-    // Checkout button opens checkout modal
-    checkoutBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!window.cart || window.cart.length === 0) {
-            alert('Your cart is empty. Please add items before checking out.');
-            return;
-        }
-        cartPopup.classList.remove('active');
-        cartPopup.style.display = 'none';
-        checkoutModal.style.display = 'block';
-        setTimeout(() => { checkoutModal.classList.add('active'); }, 10);
-        modalOverlay.style.display = 'block';
-        modalOverlay.classList.add('active');
-        updateCartUI(); // Update checkout items
-    });
-
-    // Close checkout modal
-    closeCheckout.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        checkoutModal.classList.remove('active');
-        modalOverlay.classList.remove('active');
-        setTimeout(() => {
-            checkoutModal.style.display = 'none';
-            modalOverlay.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }, 300);
-    });
-
-    // Back to cart from checkout
-    if (backToCart) {
-        backToCart.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            checkoutModal.classList.remove('active');
-            setTimeout(() => { checkoutModal.style.display = 'none'; }, 300);
-            cartPopup.style.display = 'block';
-            setTimeout(() => { cartPopup.classList.add('active'); }, 10);
-            modalOverlay.style.display = 'block';
-            modalOverlay.classList.add('active');
-        });
-    }
-
-    // Close cart or checkout when clicking outside
-    modalOverlay.addEventListener('click', function(e) {
-        if (e.target === modalOverlay) {
-            if (cartPopup.classList.contains('active')) closeCartPopup();
-            if (checkoutModal.classList.contains('active')) {
-                checkoutModal.classList.remove('active');
-                setTimeout(() => {
-                    checkoutModal.style.display = 'none';
-                    modalOverlay.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }, 300);
-            }
-        }
-    });
-
-    // Event delegation for cart popup items
-    if (cartPopupItems) {
-        cartPopupItems.addEventListener('click', function(e) {
-            const cartItem = e.target.closest('.cart-popup-item');
-            if (!cartItem) return;
-
-            const productId = cartItem.dataset.id;
-
-            // Handle remove button click
-            if (e.target.closest('.cart-item-remove')) {
-                removeFromCart(productId);
-            }
-
-            // Handle quantity buttons
-            if (e.target.classList.contains('cart-plus')) {
-                const quantityElement = cartItem.querySelector('.cart-quantity');
-                const currentQuantity = parseInt(quantityElement.textContent);
-                updateCartQuantity(productId, currentQuantity + 1);
-            }
-
-            if (e.target.classList.contains('cart-minus')) {
-                const quantityElement = cartItem.querySelector('.cart-quantity');
-                const currentQuantity = parseInt(quantityElement.textContent);
-                if (currentQuantity > 1) {
-                    updateCartQuantity(productId, currentQuantity - 1);
-                } else {
-                    removeFromCart(productId);
-                }
-            }
-        });
-    }
-
-    // Initialize cart UI
-    updateCartUI();
-});
-</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -321,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Menu3.css">
     <link rel="stylesheet" href="order-confirmation.css">
-    <script src="cart-manager.js"></script>
+    <script src="cart-persistence.js"></script>
     <script src="product-popup.js"></script>
 </head>
 <body>
@@ -745,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if ($result && mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
-                    echo '<div class="product-card" data-product-id="' . $row['product_id'] . '">';
+                    echo '<div class="product-card" data-id="' . $row['product_id'] . '">';
                     echo '<div class="product-image" style="background-image: url(\'' . $row['image'] . '\')"></div>';
                     echo '<div class="product-details">';
                     echo '<h3 class="product-name">' . $row['name'] . '</h3>';
@@ -897,120 +597,481 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 });
   </script>
-  <script>
-// Payment form handling
+<script>
 document.addEventListener('DOMContentLoaded', function() {
-    const paymentForm = document.getElementById('paymentForm');
-    const orderConfirmationModal = document.getElementById('orderConfirmationModal');
-    const confirmationOrderId = document.getElementById('confirmationOrderId');
-    const confirmationOrderDate = document.getElementById('confirmationOrderDate');
-    const checkStatusBtn = document.getElementById('checkStatusBtn');
+    // Custom Cake Modal logic
+    const customOrderBtn = document.getElementById('customOrderBtn');
+    const customCakeModal = document.getElementById('customCakeModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const orderOptions = document.querySelectorAll('.order-option');
+    const startCustomizingBtn = document.querySelector('.start-customizing-btn');
+    const chooseLaterBtn = document.querySelector('.choose-later-btn');
+    const photoUploadModal = document.getElementById('photoUploadModal');
+    const closePhotoModal = document.getElementById('closePhotoModal');
 
-    if (paymentForm) {
-        paymentForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            try {
-                // Get form values
-                const email = document.getElementById('email').value.trim();
-                const fullname = document.getElementById('fullname').value.trim();
-                const address = document.getElementById('address').value.trim();
-                const deliveryDate = document.getElementById('deliveryDate').value;
-                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-                const deliveryOption = document.querySelector('input[name="deliveryOption"]:checked')?.value;
-                
-                // Validate form values
-                if (!email || !fullname || !address || !deliveryDate || !paymentMethod || !deliveryOption) {
-                    alert('Please fill in all required fields');
-                    return;
-                }
-                
-                // Create order data
-                const orderData = {
-                    customer: {
-                        email,
-                        fullname,
-                        address,
-                        deliveryDate,
-                        paymentMethod,
-                        deliveryMethod: deliveryOption
-                    },
-                    items: window.cart,
-                    total: calculateTotal(),
-                    orderDate: new Date().toISOString()
-                };
+    // Helper to open a modal with overlay
+    function openModal(modal) {
+        modalOverlay.style.display = 'block';
+        modal.style.display = 'block';
+        void modalOverlay.offsetWidth;
+        void modal.offsetWidth;
+        modalOverlay.classList.add('active');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 
-                // Send order to server
-                const response = await fetch('process_order.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(orderData)
-                });
+    // Helper to close all modals
+    function closeAllModals() {
+        [customCakeModal, photoUploadModal].forEach(m => {
+            if (m) m.classList.remove('active');
+        });
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+            [customCakeModal, photoUploadModal].forEach(m => {
+                if (m) m.style.display = 'none';
+            });
+            modalOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
 
-                if (!response.ok) {
-                    throw new Error('Failed to process order');
-                }
+    // Open custom order modal
+    if (customOrderBtn && customCakeModal) {
+        customOrderBtn.addEventListener('click', function() {
+            openModal(customCakeModal);
+        });
+    }
 
-                const result = await response.json();
+    // Close modals
+    if (closeModal) closeModal.addEventListener('click', closeAllModals);
+    if (closePhotoModal) closePhotoModal.addEventListener('click', closeAllModals);
 
-                if (result.success) {
-                    const orderId = result.orderId;
-                    // Fetch real order data from the database
-                    let realOrderId = orderId;
-                    let realOrderDate = '';
-                    try {
-                        const orderResponse = await fetch('get_order.php?id=' + orderId);
-                        const orderData = await orderResponse.json();
-                        if (orderData.success && orderData.order) {
-                            realOrderId = orderData.order.order_id;
-                            realOrderDate = new Date(orderData.order.created_at).toLocaleDateString();
-                        }
-                    } catch (e) {
-                        // fallback: use generated orderId and today's date
-                        realOrderDate = new Date().toLocaleDateString();
-                    }
-                    // Show order confirmation with real data
-                    if (orderConfirmationModal) {
-                        if (confirmationOrderId) confirmationOrderId.textContent = 'ORD-' + realOrderId;
-                        if (confirmationOrderDate) confirmationOrderDate.textContent = realOrderDate;
-                        orderConfirmationModal.style.display = 'block';
-                        setTimeout(() => { orderConfirmationModal.classList.add('active'); }, 10);
-                        // Clear cart
-                        window.cart = [];
-                        saveCart();
-                        updateCartUI();
-                        // Close checkout modal
-                        const checkoutModal = document.getElementById('checkoutModal');
-                        const modalOverlay = document.getElementById('modalOverlay');
-                        if (checkoutModal && modalOverlay) {
-                            checkoutModal.classList.remove('active');
-                            modalOverlay.classList.remove('active');
-                            setTimeout(() => {
-                                checkoutModal.style.display = 'none';
-                                modalOverlay.style.display = 'none';
-                                document.body.style.overflow = 'auto';
-                            }, 300);
-                        }
-                    }
-                } else {
-                    throw new Error(result.message || 'Failed to process order');
-                }
+    // Overlay click closes modals (only if overlay itself is clicked)
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) closeAllModals();
+        });
+    }
 
-                // Handle check status button
-                if (checkStatusBtn) {
-                    checkStatusBtn.addEventListener('click', function() {
-                        window.location.href = 'account.php#my-orders';
-                    });
-                }
+    // Option selection logic
+    orderOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            orderOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            // Update button text
+            const title = this.querySelector('h3')?.textContent?.trim();
+            if (startCustomizingBtn) {
+                startCustomizingBtn.textContent = (title === 'Customize Online') ? 'START CUSTOMIZING' : 'UPLOAD PHOTO';
+            }
+        });
+    });
 
-            } catch (error) {
-                console.error('Error processing order:', error);
-                alert(error.message || 'There was an error processing your order. Please try again.');
+    // Start customizing button logic
+    if (startCustomizingBtn) {
+        startCustomizingBtn.addEventListener('click', function() {
+            const selected = document.querySelector('.order-option.selected');
+            const title = selected?.querySelector('h3')?.textContent?.trim();
+            if (title === 'Customize Online') {
+                // Redirect or show a message
+                alert('Redirecting to cake customization page...');
+                // window.location.href = 'cake-customizer.html';
+                closeAllModals();
+            } else if (title === 'Upload a Photo') {
+                // Close custom modal, open photo upload modal
+                customCakeModal.classList.remove('active');
+                setTimeout(() => {
+                    customCakeModal.style.display = 'none';
+                    openModal(photoUploadModal);
+                }, 300);
+            } else {
+                // Default: open customize
+                alert('Redirecting to cake customization page...');
+                // window.location.href = 'cake-customizer.html';
+                closeAllModals();
             }
         });
     }
+
+    // Fix: Choose Later button should just close the modal and overlay
+    if (chooseLaterBtn) {
+        chooseLaterBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeAllModals();
+        });
+    }
+});
+  </script>
+<script>
+window.isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+window.userId = <?php echo isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 'null'; ?>;
+window.userRole = <?php echo isset($_SESSION['role']) ? json_encode($_SESSION['role']) : 'null'; ?>;
+  </script>
+<script>
+// Debug logging
+console.log('Script starting...');
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
+    
+    // Initialize products array
+    window.products = [];
+    <?php
+    // Get products from database
+    $sql = "SELECT * FROM products ORDER BY created_at DESC";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "window.products.push({
+                id: '" . $row['product_id'] . "',
+                name: '" . addslashes($row['name']) . "',
+                price: " . $row['price'] . ",
+                image: '" . $row['image'] . "'
+            });\n";
+        }
+    }
+    ?>
+    console.log('Products loaded:', window.products);
+
+    // Cart elements
+    const cartIcon = document.getElementById('cartIcon');
+    const cartPopup = document.getElementById('cartPopup');
+    const closeCart = document.getElementById('closeCart');
+    const shopMoreBtn = document.getElementById('shopMoreBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const checkoutModal = document.getElementById('checkoutModal');
+    const closeCheckout = document.getElementById('closeCheckout');
+    const backToCart = document.querySelector('.back-to-cart');
+    const cartPopupItems = document.getElementById('cartPopupItems');
+
+    // Open cart popup
+    if (cartIcon && cartPopup && modalOverlay) {
+        cartIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            modalOverlay.style.display = 'block';
+            cartPopup.style.display = 'block';
+            void cartPopup.offsetWidth;
+            modalOverlay.classList.add('active');
+            cartPopup.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            updateCartUI();
+        });
+    }
+
+    function closeCartPopup() {
+        cartPopup.classList.remove('active');
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+            cartPopup.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
+
+    if (closeCart) {
+        closeCart.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCartPopup();
+        });
+    }
+
+    if (shopMoreBtn) {
+        shopMoreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCartPopup();
+        });
+    }
+
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!window.cart || window.cart.length === 0) {
+                alert('Your cart is empty. Please add items before checking out.');
+                return;
+            }
+            cartPopup.classList.remove('active');
+            cartPopup.style.display = 'none';
+            checkoutModal.style.display = 'block';
+            setTimeout(() => { checkoutModal.classList.add('active'); }, 10);
+            modalOverlay.style.display = 'block';
+            modalOverlay.classList.add('active');
+            updateCartUI(); // Update checkout items
+        });
+    }
+
+    // Back to cart from checkout
+    if (backToCart) {
+        backToCart.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            checkoutModal.classList.remove('active');
+            setTimeout(() => { checkoutModal.style.display = 'none'; }, 300);
+            cartPopup.style.display = 'block';
+            setTimeout(() => { cartPopup.classList.add('active'); }, 10);
+            modalOverlay.style.display = 'block';
+            modalOverlay.classList.add('active');
+        });
+    }
+
+    // Close cart or checkout when clicking outside
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                if (cartPopup.classList.contains('active')) closeCartPopup();
+                if (checkoutModal.classList.contains('active')) {
+                    checkoutModal.classList.remove('active');
+                    setTimeout(() => {
+                        checkoutModal.style.display = 'none';
+                        modalOverlay.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }, 300);
+                }
+            }
+        });
+    }
+
+    // Event delegation for cart popup items
+    if (cartPopupItems) {
+        cartPopupItems.addEventListener('click', function(e) {
+            const cartItem = e.target.closest('.cart-popup-item');
+            if (!cartItem) return;
+
+            const productId = cartItem.dataset.id;
+
+            // Handle remove button click
+            if (e.target.closest('.cart-item-remove')) {
+                removeFromCart(productId);
+            }
+
+            // Handle quantity buttons
+            if (e.target.classList.contains('cart-plus')) {
+                const quantityElement = cartItem.querySelector('.cart-quantity');
+                const currentQuantity = parseInt(quantityElement.textContent);
+                updateCartQuantity(productId, currentQuantity + 1);
+            }
+
+            if (e.target.classList.contains('cart-minus')) {
+                const quantityElement = cartItem.querySelector('.cart-quantity');
+                const currentQuantity = parseInt(quantityElement.textContent);
+                if (currentQuantity > 1) {
+                    updateCartQuantity(productId, currentQuantity - 1);
+                } else {
+                    removeFromCart(productId);
+                }
+            }
+        });
+    }
+
+    // Add to cart from product card
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-to-order')) {
+            e.stopPropagation(); // Prevent triggering product card click (modal)
+            const productCard = e.target.closest('.product-card');
+            if (!productCard) return;
+            const productId = productCard.getAttribute('data-id');
+            // Get the quantity from the sibling .quantity element
+            const quantityElem = productCard.querySelector('.quantity');
+            // FIX: Always parseInt and ensure only 1 add per click
+            const quantity = quantityElem ? parseInt(quantityElem.textContent, 10) : 1;
+            // Prevent double add: only call addToCart here, not in any other handler for this button
+            addToCart(productId, quantity);
+            alert('Added to cart!');
+        }
+    });
+
+    // Product card click: open modal only if not clicking on .add-to-order or .quantity-btn
+    const productCards = document.querySelectorAll('.product-card');
+    const productModal = document.getElementById('productModal');
+    const productDetailImage = document.getElementById('productDetailImage');
+    const productDetailTitle = document.getElementById('productDetailTitle');
+    const productDetailSubtitle = document.getElementById('productDetailSubtitle');
+    const productDetailDescription = document.getElementById('productDetailDescription');
+    const productDetailPrice = document.getElementById('productDetailPrice');
+    const productDetailAvailability = document.getElementById('productDetailAvailability');
+    const productDetailAddToCart = document.getElementById('productDetailAddToCart');
+    const backToMenu = document.getElementById('backToMenu');
+
+    productCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Prevent modal if clicking on add-to-order or quantity buttons
+            if (
+                e.target.classList.contains('add-to-order') ||
+                e.target.classList.contains('quantity-btn') ||
+                e.target.closest('.add-to-order') ||
+                e.target.closest('.quantity-btn')
+            ) {
+                return;
+            }
+            const productId = this.getAttribute('data-id');
+            const product = window.products.find(p => p.id == productId);
+            if (!product) return;
+
+            // Fill modal content
+            productDetailImage.src = product.image;
+            productDetailTitle.textContent = product.name;
+            productDetailSubtitle.textContent = product.subtitle || '';
+            productDetailDescription.textContent = product.description || 'No description available.';
+            productDetailPrice.textContent = `Php ${product.price.toLocaleString()}`;
+            productDetailAvailability.textContent = product.availability ? 'In Stock' : 'Out of Stock';
+
+            // Reset modal quantity to 1
+            const modalQtyElem = document.querySelector('.product-detail-quantity-value');
+            if (modalQtyElem) modalQtyElem.textContent = '1';
+
+            // Set product id for modal add-to-cart button
+            if (productDetailAddToCart) productDetailAddToCart.setAttribute('data-product-id', product.id);
+
+            // Show modal
+            productModal.style.display = 'flex';
+            setTimeout(() => productModal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    // Modal add to cart: use modal quantity
+    if (productDetailAddToCart) {
+        productDetailAddToCart.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const productId = this.getAttribute('data-product-id');
+            const qtyElem = document.querySelector('.product-detail-quantity-value');
+            const quantity = qtyElem ? parseInt(qtyElem.textContent) : 1;
+            addToCart(productId, quantity);
+            alert('Added to cart!');
+            // Close modal
+            productModal.classList.remove('active');
+            setTimeout(() => {
+                productModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        });
+    }
+
+    // Close modal and go back to menu
+    if (backToMenu) {
+        backToMenu.addEventListener('click', function(e) {
+            e.preventDefault();
+            productModal.classList.remove('active');
+            setTimeout(() => {
+                productModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        });
+    }
+});
+  </script>
+<!-- Add this after your checkout modal and before </body> -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Checkout form submission
+    const paymentForm = document.getElementById('paymentForm');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // --- Prevent admin from placing orders ---
+            if (window.userRole === 'admin') {
+                alert('Admin accounts cannot place orders. Please log in as a customer.');
+                return;
+            }
+
+            // Gather form data
+            const email = document.getElementById('email').value.trim();
+            const fullname = document.getElementById('fullname').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || '';
+            const deliveryOption = document.querySelector('input[name="deliveryOption"]:checked')?.value || '';
+            const cart = window.cart || [];
+
+            // Basic validation
+            if (!email || !fullname || !address || !deliveryDate || !paymentMethod || cart.length === 0) {
+                alert('Please fill in all required fields and add at least one item to your cart.');
+                return;
+            }
+
+            // Calculate total (in case backend expects it)
+            let total = 0;
+            cart.forEach(item => {
+                total += (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1);
+            });
+
+            // --- Ensure user_id is sent and matches logged-in user ---
+            const user_id = window.userId !== undefined && window.userId !== null ? window.userId : null;
+
+            // Prepare order data (with both flat and nested for backend compatibility)
+            const orderData = {
+                user_id, // <-- always send user_id
+                email,
+                fullname,
+                address,
+                deliveryDate,
+                paymentMethod,
+                deliveryOption,
+                cart: cart,
+                total: total,
+                customer: {
+                    email,
+                    fullname,
+                    address,
+                    deliveryDate,
+                    paymentMethod,
+                    deliveryMethod: deliveryOption
+                },
+                items: cart
+            };
+
+            fetch('process_order.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Clear cart
+                    window.cart = [];
+                    localStorage.removeItem('cart');
+                    if (typeof updateCartUI === 'function') updateCartUI();
+
+                    // Show confirmation modal
+                    document.getElementById('orderConfirmationModal').style.display = 'block';
+                    document.getElementById('orderConfirmationModal').classList.add('active');
+                    document.getElementById('confirmationOrderId').textContent = result.order_id || result.orderId || 'N/A';
+                    document.getElementById('confirmationOrderDate').textContent = result.order_date || new Date().toLocaleDateString();
+
+                    // Hide checkout modal
+                    document.getElementById('checkoutModal').classList.remove('active');
+                    setTimeout(() => {
+                        document.getElementById('checkoutModal').style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }, 300);
+                } else {
+                    alert(result.message || 'Order failed. Please try again.');
+                }
+            })
+            .catch(err => {
+                alert('Order failed. Please try again.');
+                console.error(err);
+            });
+        });
+    }
+
+    // Close confirmation modal on button click
+    const checkStatusBtn = document.getElementById('checkStatusBtn');
+    if (checkStatusBtn) {
+        checkStatusBtn.addEventListener('click', function() {
+            // Redirect to account.php#myorders
+            window.location.href = 'account.php#myorders';
+        });
+    }
+
+    // ...existing code...
 });
 </script>
 </body>
