@@ -1,9 +1,78 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Notifications system
-  setupNotificationSystem()
+  setupNotificationSystem();
+  setupCalendar();
+  setupLogout();
+  initDatabaseConnectionCheck();
 
-  // Calendar functionality
-  setupCalendar()
+  // Add notification triggers for recent orders table
+  const orderRows = document.querySelectorAll(".recent-orders table tbody tr");
+  orderRows.forEach((row) => {
+    row.addEventListener("click", () => {
+      const orderId = row.querySelector(".order-id").textContent;
+      const customerName = row.querySelector("td:nth-child(2)").textContent;
+      const status = row.querySelector(".status-badge").textContent;
+
+      if (window.bakeryNotifications) {
+        window.bakeryNotifications.addNotification(
+          "Order Selected",
+          `You selected ${orderId} for ${customerName} (${status})`,
+        );
+      }
+    });
+
+    // Make rows look clickable
+    row.style.cursor = "pointer";
+  });
+
+  // Add notification triggers for inquiry items
+  const inquiryItems = document.querySelectorAll(".inquiry-item");
+  inquiryItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      const title = item.querySelector(".inquiry-title").textContent;
+      const customer = item.querySelector(".inquiry-customer").textContent;
+
+      if (window.bakeryNotifications) {
+        window.bakeryNotifications.addNotification("Inquiry Selected", `You selected "${title}" ${customer}`);
+      }
+    });
+
+    // Make inquiry items look clickable
+    item.style.cursor = "pointer";
+  });
+
+  // Add notification triggers for stats cards
+  const statsCards = document.querySelectorAll(".stats-card");
+  statsCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const label = card.querySelector(".stats-card-label").textContent;
+      const value = card.querySelector(".stats-card-value").textContent;
+
+      if (window.bakeryNotifications) {
+        window.bakeryNotifications.addNotification("Dashboard Stat", `${label}: ${value}`);
+      }
+    });
+
+    // Make stats cards look clickable
+    card.style.cursor = "pointer";
+  });
+
+  // Profile dropdown toggle
+  const profileButton = document.getElementById('profileButton');
+  const profileDropdown = document.getElementById('profileDropdown');
+  
+  if (profileButton && profileDropdown) {
+    profileButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.remove('show');
+      }
+    });
+  }
 })
 
 function setupNotificationSystem() {
@@ -65,8 +134,7 @@ function setupNotificationSystem() {
   // Fetch notifications from database
   async function fetchNotifications() {
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch(`/api/notifications?since=${lastFetchTime}`)
+      const response = await fetch(`api/notifications.php?since=${lastFetchTime}`)
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`)
@@ -101,12 +169,9 @@ function setupNotificationSystem() {
   // Mark notifications as seen (viewed but not necessarily read)
   async function markNotificationsAsSeen() {
     try {
-      // Replace with your actual API endpoint
-      await fetch("/api/notifications/seen", {
+      await fetch("api/notifications.php?action=seen", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       })
     } catch (error) {
       console.error("Error marking notifications as seen:", error)
@@ -116,12 +181,9 @@ function setupNotificationSystem() {
   // Mark a notification as read
   async function markAsRead(id) {
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch("/api/notifications/read", {
+      const response = await fetch("api/notifications.php?action=read", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       })
 
@@ -144,7 +206,6 @@ function setupNotificationSystem() {
   // Mark all notifications as read
   async function markAllAsRead() {
     try {
-      // Replace with your actual API endpoint
       const response = await fetch("/api/notifications/read-all", {
         method: "POST",
         headers: {
@@ -263,12 +324,9 @@ function setupNotificationSystem() {
   // Add a new notification (client-side function that also sends to server)
   async function addNotification(title, message) {
     try {
-      // Send notification to server
-      const response = await fetch("/api/notifications/add", {
+      const response = await fetch("api/notifications.php?action=add", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, message }),
       })
 
@@ -320,8 +378,39 @@ function setupNotificationSystem() {
   }
 }
 
+function setupLogout() {
+  const logoutButton = document.getElementById('logoutButton');
+  
+  if (logoutButton) {
+    logoutButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      if (confirm('Are you sure you want to logout?')) {
+        // Show notification
+        if (window.bakeryNotifications) {
+          window.bakeryNotifications.addNotification(
+            "Logging Out",
+            "You are being logged out..."
+          );
+        }
+        
+        // Small delay to show the notification before redirecting
+        setTimeout(() => {
+          window.location.href = 'logout.php';
+        }, 1000);
+      }
+    });
+  }
+}
+
+// Add setupLogout to DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+  setupNotificationSystem()
+  setupCalendar()
+  setupLogout()
+})
+
 async function setupCalendar() {
-  // Calendar functionality
   const calendarGrid = document.getElementById("calendarGrid")
   const currentMonthElement = document.getElementById("currentMonth")
   const prevMonthButton = document.getElementById("prevMonth")
@@ -337,16 +426,30 @@ async function setupCalendar() {
         calendarGrid.classList.add("loading")
         
         const response = await fetch(`calendar.php?month=${currentDate.getMonth() + 1}&year=${currentDate.getFullYear()}`)
+
+        const contentType = response.headers.get("content-type") || ""
         if (!response.ok) {
           throw new Error('Failed to fetch order data')
         }
-        return await response.json()
+        if (!contentType.includes("application/json")) {
+          const text = await response.text()
+          // Show only the first line of the error for clarity
+          const firstLine = text.split('\n')[0]
+          throw new Error("Server did not return JSON. First line: " + firstLine)
+        }
+
+        const data = await response.json()
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received')
+        }
+
+        return data
       } catch (error) {
         console.error('Error fetching calendar data:', error)
         if (window.bakeryNotifications) {
           window.bakeryNotifications.addNotification(
             "Calendar Error",
-            "Failed to load calendar data. Please try again."
+            `Failed to load calendar data: ${error.message}`
           )
         }
         return []
@@ -356,101 +459,76 @@ async function setupCalendar() {
       }
     }
 
-    let orderData = await fetchOrderData()
-
     async function updateCalendar() {
       if (isLoading) return
 
-      // Update month display
       currentMonthElement.textContent = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-
-      // Clear existing calendar
       calendarGrid.innerHTML = ""
 
       const year = currentDate.getFullYear()
       const month = currentDate.getMonth()
-
-      // Get first day of month and number of days
       const firstDay = new Date(year, month, 1).getDay()
       const daysInMonth = new Date(year, month + 1, 0).getDate()
 
-      // Fetch new order data for the current month
-      orderData = await fetchOrderData()
+      const orderData = await fetchOrderData()
 
-      // Add empty cells for days before the first day of the month
+      // Fill empty cells before the first day
       for (let i = 0; i < firstDay; i++) {
         const emptyCell = document.createElement("div")
         emptyCell.className = "calendar-cell empty"
         calendarGrid.appendChild(emptyCell)
       }
 
-      // Add cells for each day of the month
+      // Fill days
       for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-        const ordersForDay = orderData.filter((order) => order.date === dateStr)
-
         const cell = document.createElement("div")
         cell.className = "calendar-cell"
 
+        // Add day number with order count
         const dateHeader = document.createElement("div")
-        dateHeader.className = "calendar-date"
+        dateHeader.className = "date-header"
+        
+        const dayNumber = document.createElement("span")
+        dayNumber.textContent = day
 
-        const dateNumber = document.createElement("span")
-        dateNumber.className = "calendar-date-number"
-        dateNumber.textContent = day
-        dateHeader.appendChild(dateNumber)
-
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+        const ordersForDay = orderData.filter(order => order.date === dateStr)
+        
         if (ordersForDay.length > 0) {
-          const dateBadge = document.createElement("span")
-          dateBadge.className = "calendar-date-badge"
-          dateBadge.textContent = ordersForDay.length
-          dateHeader.appendChild(dateBadge)
+          const orderCount = document.createElement("span")
+          orderCount.className = "order-count"
+          orderCount.textContent = ordersForDay.length
+          dateHeader.appendChild(dayNumber)
+          dateHeader.appendChild(orderCount)
+        } else {
+          dateHeader.appendChild(dayNumber)
         }
 
         cell.appendChild(dateHeader)
 
+        // Add order items
         if (ordersForDay.length > 0) {
-          const eventsContainer = document.createElement("div")
-          eventsContainer.className = "calendar-events"
+          const ordersList = document.createElement("div")
+          ordersList.className = "orders-list"
 
-          ordersForDay.forEach((order) => {
-            const event = document.createElement("a")
-            event.className = `calendar-event status-${order.status.toLowerCase().replace(" ", "-")}`
-            event.href = `order-details.php?id=${order.id}`
+          ordersForDay.forEach(order => {
+            const orderItem = document.createElement("div")
+            orderItem.className = `order-item ${order.status.toLowerCase()}`
 
-            const eventTitle = document.createElement("div")
-            eventTitle.className = "calendar-event-title"
-            eventTitle.textContent = order.products
+            const productName = document.createElement("div")
+            productName.className = "product-name"
+            productName.textContent = order.products
 
-            const eventDetails = document.createElement("div")
-            eventDetails.className = "calendar-event-details"
+            const customerName = document.createElement("div")
+            customerName.className = "customer-name"
+            customerName.textContent = order.customer
 
-            const eventCustomer = document.createElement("span")
-            eventCustomer.className = "calendar-event-customer"
-            eventCustomer.textContent = order.customer
-
-            eventDetails.appendChild(eventCustomer)
-            event.appendChild(eventTitle)
-            event.appendChild(eventDetails)
-
-            // Add click event to show notification when clicking on calendar event
-            event.addEventListener("click", (e) => {
-              if (window.bakeryNotifications) {
-                window.bakeryNotifications.addNotification(
-                  "Order Details",
-                  `Viewing details for ${order.id}: ${order.products} for ${order.customer}`,
-                )
-              }
-              // Navigate to the order details page after a short delay
-              setTimeout(() => {
-                window.location.href = event.href
-              }, 300)
-            })
-
-            eventsContainer.appendChild(event)
+            orderItem.appendChild(productName)
+            orderItem.appendChild(customerName)
+            ordersList.appendChild(orderItem)
           })
 
-          cell.appendChild(eventsContainer)
+          cell.appendChild(ordersList)
         }
 
         calendarGrid.appendChild(cell)
@@ -496,61 +574,6 @@ async function setupCalendar() {
   }
 }
 
-// Add event listeners for table rows to trigger notifications
-document.addEventListener("DOMContentLoaded", () => {
-  // Add notification triggers for recent orders table
-  const orderRows = document.querySelectorAll(".recent-orders table tbody tr")
-  orderRows.forEach((row) => {
-    row.addEventListener("click", () => {
-      const orderId = row.querySelector(".order-id").textContent
-      const customerName = row.querySelector("td:nth-child(2)").textContent
-      const status = row.querySelector(".status-badge").textContent
-
-      if (window.bakeryNotifications) {
-        window.bakeryNotifications.addNotification(
-          "Order Selected",
-          `You selected ${orderId} for ${customerName} (${status})`,
-        )
-      }
-    })
-
-    // Make rows look clickable
-    row.style.cursor = "pointer"
-  })
-
-  // Add notification triggers for inquiry items
-  const inquiryItems = document.querySelectorAll(".inquiry-item")
-  inquiryItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      const title = item.querySelector(".inquiry-title").textContent
-      const customer = item.querySelector(".inquiry-customer").textContent
-
-      if (window.bakeryNotifications) {
-        window.bakeryNotifications.addNotification("Inquiry Selected", `You selected "${title}" ${customer}`)
-      }
-    })
-
-    // Make inquiry items look clickable
-    item.style.cursor = "pointer"
-  })
-
-  // Add notification triggers for stats cards
-  const statsCards = document.querySelectorAll(".stats-card")
-  statsCards.forEach((card) => {
-    card.addEventListener("click", () => {
-      const label = card.querySelector(".stats-card-label").textContent
-      const value = card.querySelector(".stats-card-value").textContent
-
-      if (window.bakeryNotifications) {
-        window.bakeryNotifications.addNotification("Dashboard Stat", `${label}: ${value}`)
-      }
-    })
-
-    // Make stats cards look clickable
-    card.style.cursor = "pointer"
-  })
-})
-
 // Function to initialize database connection check
 function initDatabaseConnectionCheck() {
   // Check database connection on page load
@@ -563,8 +586,7 @@ function initDatabaseConnectionCheck() {
 // Function to check database connection
 async function checkDatabaseConnection() {
   try {
-    // Replace with your actual API endpoint
-    const response = await fetch("/api/database/status")
+    const response = await fetch("api/database.php")
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`)
@@ -613,6 +635,3 @@ async function checkDatabaseConnection() {
     }
   }
 }
-
-// Start database connection check
-document.addEventListener("DOMContentLoaded", initDatabaseConnectionCheck)

@@ -234,8 +234,8 @@ if (!$result) {
                                     <a class='action-button edit-button' title='Edit Order' href='order-details.php?id=$orderId'>
                                         <i class='fas fa-pen'></i>
                                     </a>
-                                    <button class='action-button delete-button' title='Delete Order' data-order-id='$orderId'>
-                                        <i class='fas fa-trash'></i>
+                                    <button class='action-button archive-button' title='Archive Order' data-order-id='$orderId'>
+                                        <i class='fas fa-archive'></i>
                                     </button>
                                 </div>
                             </td>";

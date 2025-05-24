@@ -164,8 +164,8 @@ $result = mysqli_query($conn, $sql);
                                 <button class='action-button view-button' data-id='" . $row['ID'] . "' title='View'>
                                     <i class='fas fa-eye'></i>
                                 </button>
-                                <button class='action-button delete-button' data-id='" . $row['ID'] . "' title='Delete'>
-                                    <i class='fas fa-trash'></i>
+                                <button class='action-button delete-button' data-id='" . $row['ID'] . "' title='Archive'>
+                                    <i class='fas fa-archive'></i>
                                 </button>
                               </div></td>";
                         echo "</tr>";

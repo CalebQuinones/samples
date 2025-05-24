@@ -188,12 +188,9 @@
               <div class="order-card-content">
                 <div class="customer-info-item">
                   <i class="fas fa-map-marker-alt customer-info-icon"></i>
-                  <div>
+                  <div class="shipping-address-container">
                     <p class="customer-name" id="shippingName">...</p>
-                    <p class="customer-info-text" id="shippingAddress1">...</p>
-                    <p class="customer-info-text" id="shippingAddress2">...</p>
-                    <p class="customer-info-text" id="shippingCity">...</p>
-                    <p class="customer-info-text" id="shippingCountry">...</p>
+                    <p class="customer-info-text" id="shippingAddress">...</p>
                   </div>
                 </div>
               </div>
@@ -253,13 +250,14 @@
       <div class="modal-container">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 class="modal-title">Update Order Status</h3>
+            <h3 class="modal-title">Update Order</h3>
             <button class="close-modal" id="closeStatusModal">&times;</button>
           </div>
           <div class="modal-body">
-            <form id="statusUpdateForm">
+            <form id="orderUpdateForm">
+              <!-- Status Update Section -->
               <div class="form-group">
-                <label for="status">Status</label>
+                <label for="status">Order Status</label>
                 <select id="status" name="status" required>
                   <option value="pending">Pending</option>
                   <option value="processing">Processing</option>
@@ -268,15 +266,25 @@
                   <option value="cancelled">Cancelled</option>
                 </select>
               </div>
+              <!-- Payment Update Section -->
+              <div class="form-group">
+                <label for="paymentStatus">Payment Status</label>
+                <select id="paymentStatus" name="paymentStatus" required>
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Refunded">Refunded</option>
+                </select>
+              </div>
               <div class="form-group">
                 <label for="message">Message to Customer (Optional)</label>
-                <textarea id="message" name="message" rows="3" placeholder="Add a message to notify the customer about this status update..."></textarea>
+                <textarea id="message" name="message" rows="3" placeholder="Add a message to notify the customer about this update..."></textarea>
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button class="modal-button modal-button-secondary" id="cancelStatusUpdate">Cancel</button>
-            <button class="modal-button modal-button-primary" id="updateStatusConfirm">Update Status</button>
+            <button class="modal-button modal-button-primary" id="updateStatusConfirm">Update Order</button>
           </div>
         </div>
       </div>

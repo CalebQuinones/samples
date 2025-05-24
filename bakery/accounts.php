@@ -179,8 +179,8 @@ $result = mysqli_query($conn, $sql);
                                         <i class='fas fa-pen'></i>
                                     </button>";
                         if ($role !== 'admin') {
-                            echo "<button class='action-button delete-button' title='Delete Account' onclick='confirmDeleteAccount($userId)'>
-                                    <i class='fas fa-trash'></i>
+                            echo "<button class='action-button archive-button' title='Archive Account' onclick='confirmArchiveAccount($userId)'>
+                                    <i class='fas fa-archive'></i>
                                   </button>";
                         }
                         echo "</div></td>";
@@ -193,47 +193,6 @@ $result = mysqli_query($conn, $sql);
               </tbody>
             </table>
           </div>
-        </div>
-
-        <!-- Customer Details Modal -->
-        <div class="modal" id="customerDetailsModal">
-            <div class="modal-container">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">Customer Details</h3>
-                        <button class="close-modal" id="closeCustomerDetails">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="customer-info">
-                            <div class="info-group">
-                                <label>Phone Number</label>
-                                <p id="customerPhone">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Birthday</label>
-                                <p id="customerBirthday">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Address</label>
-                                <p id="customerAddress">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Payment Method</label>
-                                <p id="customerPayment">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Customer Since</label>
-                                <p id="customerCreatedAt">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="modal-button modal-button-secondary" id="closeCustomerDetailsBtn">
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
       </div>
     </main>

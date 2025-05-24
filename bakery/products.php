@@ -99,8 +99,8 @@ $result = mysqli_query($conn, $sql);
               Mark as In Stock
             </button>
             <button class="bulk-button bulk-button-cancel">
-              <i class="fas fa-trash"></i>
-              Delete Products
+              <i class="fas fa-box-archive"></i>
+              Archive Products
             </button>
             <button class="bulk-button bulk-button-clear" id="clearSelection">
               Clear Selection
@@ -182,11 +182,11 @@ $result = mysqli_query($conn, $sql);
                         echo "<td><span class='status-badge $availabilityClass'>$availability</span></td>";
                         echo "<td>
                                 <div class='action-buttons'>
-                                    <button class='action-button edit-button' title='Edit Product' data-product-id='$productId'>
+                                    <button class='action-button edit-button' onclick='showEditProductModal(\"$productId\")' title='Edit Product'>
                                         <i class='fas fa-pen'></i>
                                     </button>
-                                    <button class='action-button delete-button' title='Delete Product' data-product-id='$productId'>
-                                        <i class='fas fa-trash'></i>
+                                    <button class='action-button archive-button' onclick='archiveProduct(\"$productId\")' title='Archive Product'>
+                                        <i class='fas fa-box-archive'></i>
                                     </button>
                                 </div>
                             </td>";
@@ -231,103 +231,103 @@ $result = mysqli_query($conn, $sql);
   </div>
 
   <!-- Modal Overlay (single, shared) -->
-  <div class="modal-overlay" id="modalOverlay">
+  <div class="modal-overlay" id="modalOverlay" style="display: none;">
     <!-- Add Product Modal -->
-    <div class="modal" id="productModal">
-      <div class="modal-container">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 class="modal-title">Add New Product</h3>
-            <button class="close-modal" id="closeProductModal">&times;</button>
-          </div>
-          <div class="modal-body">
-            <form id="addProductForm">
-              <div class="form-group">
-                <label for="productName">Product Name</label>
-                <input type="text" id="productName" name="name" required>
-              </div>
-              <div class="form-group">
-                <label for="productCategory">Category</label>
-                <select id="productCategory" name="category" required>
-                  <option value="cakes">Cakes</option>
-                  <option value="breads">Breads</option>
-                  <option value="pastries">Pastries</option>
-                  <option value="cookies">Cookies</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="productPrice">Price</label>
-                <input type="number" id="productPrice" name="price" step="0.01" required>
-              </div>
-              <div class="form-group">
-                <label for="productImage">Product Image</label>
-                <input type="file" id="productImage" name="image" accept="image/*">
-              </div>
-              <div class="form-group">
-                <label for="productDescription">Description</label>
-                <textarea id="productDescription" name="description" rows="3"></textarea>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="modal-button modal-button-secondary" id="cancelProduct">Cancel</button>
-            <button class="modal-button modal-button-primary" id="saveProduct">Save</button>
-          </div>
+    <div class="modal" id="productModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Add New Product</h3>
+                    <button type="button" class="close-modal" id="closeProductModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProductForm">
+                      <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" name="name" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="productCategory">Category</label>
+                        <select id="productCategory" name="category" required>
+                          <option value="cakes">Cakes</option>
+                          <option value="breads">Breads</option>
+                          <option value="pastries">Pastries</option>
+                          <option value="cookies">Cookies</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="productPrice">Price</label>
+                        <input type="number" id="productPrice" name="price" step="0.01" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="productImage">Product Image</label>
+                        <input type="file" id="productImage" name="image" accept="image/*">
+                      </div>
+                      <div class="form-group">
+                        <label for="productDescription">Description</label>
+                        <textarea id="productDescription" name="description" rows="3"></textarea>
+                      </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-button modal-button-secondary" id="cancelProduct">Cancel</button>
+                    <button type="submit" class="modal-button modal-button-primary" id="saveProduct">Save</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Edit Product Modal -->
-    <div class="modal" id="editProductModal">
-      <div class="modal-container">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 class="modal-title">Edit Product</h3>
-            <button class="close-modal" id="closeEditProduct">&times;</button>
-          </div>
-          <div class="modal-body">
-            <form id="editProductForm">
-              <input type="hidden" id="editProductId">
-              <div class="form-group">
-                <label for="editProductName">Product Name</label>
-                <input type="text" id="editProductName" name="name" required>
-              </div>
-              <div class="form-group">
-                <label for="editProductCategory">Category</label>
-                <select id="editProductCategory" name="category" required>
-                  <option value="cakes">Cakes</option>
-                  <option value="breads">Breads</option>
-                  <option value="pastries">Pastries</option>
-                  <option value="cookies">Cookies</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="editProductPrice">Price</label>
-                <input type="number" id="editProductPrice" name="price" step="0.01" required>
-              </div>
-              <div class="form-group">
-                <label for="editProductImage">Product Image</label>
-                <input type="file" id="editProductImage" name="image" accept="image/*">
-              </div>
-              <div class="form-group">
-                <label for="editProductDescription">Description</label>
-                <textarea id="editProductDescription" name="description" rows="3"></textarea>
-              </div>
-              <div class="form-group">
-                <label for="editProductStatus">Status</label>
-                <select id="editProductStatus" name="status" required>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="modal-button modal-button-secondary" id="cancelEditProduct">Cancel</button>
-            <button class="modal-button modal-button-primary" id="saveEditProduct">Save Changes</button>
-          </div>
+    <div class="modal" id="editProductModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Edit Product</h3>
+                    <button class="close-modal" id="closeEditProduct">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProductForm">
+                      <input type="hidden" id="editProductId">
+                      <div class="form-group">
+                        <label for="editProductName">Product Name</label>
+                        <input type="text" id="editProductName" name="name" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="editProductCategory">Category</label>
+                        <select id="editProductCategory" name="category" required>
+                          <option value="cakes">Cakes</option>
+                          <option value="breads">Breads</option>
+                          <option value="pastries">Pastries</option>
+                          <option value="cookies">Cookies</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="editProductPrice">Price</label>
+                        <input type="number" id="editProductPrice" name="price" step="0.01" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="editProductImage">Product Image</label>
+                        <input type="file" id="editProductImage" name="image" accept="image/*">
+                      </div>
+                      <div class="form-group">
+                        <label for="editProductDescription">Description</label>
+                        <textarea id="editProductDescription" name="description" rows="3"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label for="editProductStatus">Status</label>
+                        <select id="editProductStatus" name="status" required>
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+                      </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-button modal-button-secondary" id="cancelEditProduct">Cancel</button>
+                    <button class="modal-button modal-button-primary" id="saveEditProduct">Save Changes</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
   </div>
 

@@ -126,15 +126,15 @@ document.addEventListener("DOMContentLoaded", function() {
             if (target.classList.contains('view-button')) {
                 showInquiryDetails(inquiryId);
             } else if (target.classList.contains('delete-button')) {
-                if (confirm('Are you sure you want to delete this inquiry?')) {
-                    deleteInquiry(inquiryId);
+                if (confirm('Are you sure you want to archive this inquiry?')) {
+                    archiveInquiry(inquiryId);
                 }
             }
         });
     }
 
-    function deleteInquiry(inquiryId) {
-        fetch('delete_inquiry.php', {
+    function archiveInquiry(inquiryId) {
+        fetch('archive_inquiry.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: inquiryId })
@@ -147,12 +147,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     row.remove();
                 }
             } else {
-                alert('Error deleting inquiry: ' + data.message);
+                alert('Error archiving inquiry: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while deleting the inquiry');
+            alert('An error occurred while archiving the inquiry');
         });
     }
 

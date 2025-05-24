@@ -54,9 +54,9 @@ function showEditModal(userId) {
         .catch(error => console.error('Error:', error));
 }
 
-function confirmDeleteAccount(userId) {
-    if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
-        fetch('delete_account.php', {
+function confirmArchiveAccount(userId) {
+    if (confirm('Are you sure you want to archive this account? The user will no longer be able to access their account.')) {
+        fetch('archive_account.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ function confirmDeleteAccount(userId) {
             if (data.success) {
                 location.reload();
             } else {
-                alert(data.message || 'Error deleting account');
+                alert(data.message || 'Error archiving account');
             }
         })
         .catch(error => console.error('Error:', error));
@@ -84,21 +84,15 @@ window.showModal = function(modal) {
 
     // Reset any existing modals
     const allModals = document.querySelectorAll('.modal');
-    allModals.forEach(m => {
-        m.classList.remove('active');
-        m.style.display = 'none';
-    });
+    allModals.forEach(m => m.style.display = 'none');
 
-    // Show the modal overlay
+    // Show and center the modal
     modalOverlay.style.display = 'flex';
-    modalOverlay.style.visibility = 'visible';
+    modal.style.display = 'block';
+    
+    // Trigger reflow and add active classes
     setTimeout(() => {
         modalOverlay.classList.add('active');
-    }, 10);
-
-    // Show the specific modal
-    modal.style.display = 'block';
-    setTimeout(() => {
         modal.classList.add('active');
     }, 10);
 

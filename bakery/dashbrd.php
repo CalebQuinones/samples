@@ -149,8 +149,16 @@ $recentInquiries = mysqli_query($conn, $sql);
               </div>
             </div>
             <div class="user-profile">
-              <img src="placeholder.svg" alt="Admin">
-              <span class="md:inline hidden">Admin User</span>
+              <button id="profileButton" class="profile-button">
+                <img src="placeholder.svg" alt="Admin">
+                <span class="md:inline hidden">Admin User</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="profile-dropdown" id="profileDropdown">
+                <ul>
+                  <li><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
