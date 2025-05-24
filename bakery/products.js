@@ -1,24 +1,41 @@
+// Define global variables at the top
+let productCheckboxes;
+let searchInput;
+let categoryFilter;
+let availabilityFilter;
+let selectAllCheckbox;
+let bulkActions;
+let selectedCount;
+
 console.log('products.js loaded');
 
 // Define core modal functions at the top level
 function showModal(modal) {
+    console.log('showModal called', modal); // Debug line
     const modalOverlay = document.getElementById('modalOverlay');
-    if (!modal || !modalOverlay) return;
+    if (!modal || !modalOverlay) {
+        console.error('Modal or overlay not found');
+        return;
+    }
     
-    modalOverlay.style.display = 'flex';
+    // Reset any existing styles
     modal.style.display = 'block';
+    modalOverlay.style.display = 'flex';
     
     // Force reflow
-    void modal.offsetWidth;
+    void modal.offsetHeight;
     
-    document.body.style.overflow = 'hidden';
+    // Add active classes
     modalOverlay.classList.add('active');
     modal.classList.add('active');
+    
+    document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
     const modalOverlay = document.getElementById('modalOverlay');
     const activeModal = document.querySelector('.modal.active');
+    
     if (!modalOverlay || !activeModal) return;
     
     modalOverlay.classList.remove('active');
@@ -34,27 +51,32 @@ function closeModal() {
 // Make functions available globally
 window.showModal = showModal;
 window.closeModal = closeModal;
-window.showEditProductModal = function(productId) {
+
+// Make these functions available globally at the top of the file
+function showEditProductModal(productId) {
     const editProductModal = document.getElementById('editProductModal');
     if (!editProductModal) return;
     
     fetch(`get_product.php?id=${productId}`)
         .then(response => response.json())
         .then(product => {
-            // Populate form fields
-            document.getElementById('editProductId').value = product.product_id;
-            document.getElementById('editProductName').value = product.name;
-            document.getElementById('editProductCategory').value = product.category;
-            document.getElementById('editProductPrice').value = product.price;
-            document.getElementById('editProductDescription').value = product.description;
-            document.getElementById('editProductStatus').value = product.status;
+            const form = document.getElementById('editProductForm');
+            if (!form) return;
+            
+            // Update hidden ID field and other form fields
+            form.querySelector('#editProductId').value = product.product_id;
+            form.querySelector('#editProductName').value = product.name;
+            form.querySelector('#editProductCategory').value = product.category;
+            form.querySelector('#editProductPrice').value = product.price;
+            form.querySelector('#editProductDescription').value = product.description;
+            form.querySelector('#editProductStatus').value = product.status;
             
             showModal(editProductModal);
         })
         .catch(error => console.error('Error:', error));
-};
+}
 
-window.archiveProduct = function(productId) {
+function archiveProduct(productId) {
     if (!confirm('Are you sure you want to archive this product?')) return;
     
     fetch('archive_product.php', {
@@ -73,7 +95,11 @@ window.archiveProduct = function(productId) {
         }
     })
     .catch(error => console.error('Error:', error));
-};
+}
+
+// Explicitly make functions available to the global scope
+window.showEditProductModal = showEditProductModal;
+window.archiveProduct = archiveProduct;
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
@@ -84,6 +110,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const productModal = document.getElementById('productModal');
     const editProductModal = document.getElementById('editProductModal');
     const addProductBtn = document.getElementById('addProductButton');
+
+    // Initialize these values instead of redeclaring with let
+    productCheckboxes = document.querySelectorAll('.product-checkbox');
+    searchInput = document.getElementById('searchInput');
+    categoryFilter = document.getElementById('categoryFilter');
+    availabilityFilter = document.getElementById('availabilityFilter');
+    selectAllCheckbox = document.getElementById('selectAll');
+    bulkActions = document.getElementById('bulkActions');
+    selectedCount = document.getElementById('selectedCount');
+    const clearSelectionBtn = document.getElementById('clearSelection');
 
     // Log modal-related elements
     console.log('Modal elements:', {
@@ -96,30 +132,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize modal overlay
     if (modalOverlay) {
         modalOverlay.style.display = 'none';
-        modalOverlay.style.visibility = 'hidden';
+        modalOverlay.style.visibility = 'visible';
     }
 
-    // Add Product button event listener with proper modal handling
+    // Add Product Button - open modal
     if (addProductBtn && productModal) {
         addProductBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Add Product button clicked');
-            if (!productModal) {
-                console.error('Product modal not found');
-                return;
+            showModal(productModal);
+        });
+    }
+
+    // Modal close buttons
+    document.querySelectorAll('.close-modal, .modal-button-secondary').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal();
+        });
+    });
+
+    // Overlay click closes modal
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
             }
-            showModal(productModal);
         });
     }
 
-    // Cleanup existing event listeners and add new ones
-    if (addProductBtn && productModal) {
-        addProductBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+    // Prevent modal content clicks from closing the modal
+    document.querySelectorAll('.modal-content').forEach(content => {
+        content.addEventListener('click', (e) => {
             e.stopPropagation();
-            showModal(productModal);
         });
-    }
+    });
 
     // DOM Elements - Add missing productModal
     const closeProductModal = document.getElementById('closeProductModal');
@@ -160,39 +206,11 @@ document.addEventListener('DOMContentLoaded', function() {
         else console.warn(`${id} not found`);
     });
 
-    // Initialize global variables
-    let productCheckboxes = document.querySelectorAll('.product-checkbox');
-    let searchInput = document.getElementById('searchInput');
-    let categoryFilter = document.getElementById('categoryFilter');
-    let availabilityFilter = document.getElementById('availabilityFilter');
-    let selectAllCheckbox = document.getElementById('selectAll');
-    let bulkActions = document.getElementById('bulkActions');
-    let selectedCount = document.getElementById('selectedCount');
-
-    // Event Listeners (all guarded)
-    if (searchInput) searchInput.addEventListener('input', filterProducts);
-    if (categoryFilter) categoryFilter.addEventListener('change', filterProducts);
-    if (availabilityFilter) availabilityFilter.addEventListener('change', filterProducts);
-    if (selectAllCheckbox) selectAllCheckbox.addEventListener('change', toggleSelectAll);
-    if (addProductBtn && productModal) {
-        addProductBtn.addEventListener('click', () => {
-            console.log('Opening add product modal');
-            showModal(productModal);
-        });
-    }
-    if (closeProductModal) closeProductModal.addEventListener('click', () => closeModal());
-    if (cancelProduct) cancelProduct.addEventListener('click', () => closeModal());
-    if (closeEditProduct) closeEditProduct.addEventListener('click', () => closeModal());
-    if (cancelEditProduct) cancelEditProduct.addEventListener('click', () => closeModal());
-
-    // Initialize productCheckboxes after DOM is loaded
-    productCheckboxes = document.querySelectorAll('.product-checkbox');
-
-    // Initialize state
+    // Move currentPage inside DOMContentLoaded scope
     let currentPage = 1;
     const itemsPerPage = 8;
 
-    // Improved filter function
+    // Improved filter function (scoped)
     function filterProducts() {
         if (!productsTableBody) return;
 
@@ -221,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateBulkActions();
     }
 
-    // Improved pagination
+    // Improved pagination (scoped)
     function updatePagination(totalItems) {
         if (!paginationNav) return;
 
@@ -229,12 +247,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const startIndex = totalItems > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
         const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems);
 
-        // Update count displays
         document.getElementById('totalItems')?.textContent = totalItems;
         document.getElementById('startIndex')?.textContent = startIndex;
         document.getElementById('endIndex')?.textContent = endIndex;
 
-        // Generate pagination buttons
         let paginationHTML = `
             <button class="pagination-button pagination-button-prev" ${currentPage === 1 ? 'disabled' : ''}>
                 <i class="fas fa-chevron-left"></i>
@@ -255,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         paginationNav.innerHTML = paginationHTML;
 
-        // Add click handlers for pagination
+        // Pagination click handlers
         paginationNav.querySelectorAll('.pagination-button').forEach(button => {
             button.addEventListener('click', (e) => {
                 const page = e.target.dataset.page;
@@ -283,51 +299,84 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Bulk action events
         selectAllCheckbox?.addEventListener('change', toggleSelectAll);
-        clearSelection?.addEventListener('click', clearSelection);
+        clearSelectionBtn?.addEventListener('click', clearSelection);
     }
 
+    // Form submissions
+    const addProductForm = document.getElementById('addProductForm');
+    const editProductForm = document.getElementById('editProductForm');
+    const saveProductBtn = document.getElementById('saveProduct');
+    const saveEditProductBtn = document.getElementById('saveEditProduct');
+
+    if (addProductForm && saveProductBtn) {
+        saveProductBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const formData = new FormData(addProductForm);
+            
+            fetch('add_product.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal();
+                    addProductForm.reset();
+                    // Optionally refresh the page or update the table
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+
+    if (editProductForm && saveEditProductBtn) {
+        saveEditProductBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const formData = new FormData(editProductForm);
+            
+            fetch('update_product.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if (data.success) {
+                    closeModal();
+                    editProductForm.reset();
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }); // Added missing closing bracket
+    }
+
+    // Debug click handlers
+    document.querySelectorAll('.edit-button, .action-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Button clicked', e.target);
+            const productId = this.closest('tr')?.dataset.productId;
+            if (productId) {
+                console.log('Product ID:', productId);
+                showEditProductModal(productId);
+            }
+        });
+    });
+    
     // Initialize the page
     initializeEventListeners();
     filterProducts();
+
+    // Initialize product checkbox event listeners
+    productCheckboxes = document.querySelectorAll('.product-checkbox');
+    productCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
 });
 
-// Define these before DOMContentLoaded
-let productCheckboxes;
-let searchInput;
-let categoryFilter;
-let availabilityFilter;
-let selectAllCheckbox;
-let bulkActions;
-let selectedCount;
-
-function filterProducts() {
-    if (!searchInput || !categoryFilter || !availabilityFilter) return;
-    
-    const searchTerm = searchInput.value.toLowerCase();
-    const selectedCategory = categoryFilter.value;
-    const selectedAvailability = availabilityFilter.value;
-    
-    const rows = document.querySelectorAll('#productsTableBody tr');
-    
-    rows.forEach(row => {
-        const name = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
-        const category = row.querySelector('td:nth-child(5)')?.textContent || '';
-        const availability = row.querySelector('.status-badge')?.textContent || '';
-        
-        const matchesSearch = name.includes(searchTerm);
-        const matchesCategory = !selectedCategory || category === selectedCategory;
-        const matchesAvailability = !selectedAvailability || availability === selectedAvailability;
-        
-        row.style.display = matchesSearch && matchesCategory && matchesAvailability ? '' : 'none';
-    });
-
-    updatePagination();
-}
-
-// Toggle select all checkboxes
+// Keep only one copy of these functions outside DOMContentLoaded
 function toggleSelectAll() {
     if (!selectAllCheckbox || !productCheckboxes) return;
-    
     const isChecked = selectAllCheckbox.checked;
     productCheckboxes.forEach(checkbox => {
         if (checkbox !== selectAllCheckbox) {
@@ -337,10 +386,8 @@ function toggleSelectAll() {
     updateBulkActions();
 }
 
-// Update bulk actions visibility
 function updateBulkActions() {
     const checkedCount = document.querySelectorAll('.product-checkbox:checked').length;
-    
     if (bulkActions) {
         bulkActions.style.display = checkedCount > 0 ? 'flex' : 'none';
         if (selectedCount) {
@@ -349,74 +396,10 @@ function updateBulkActions() {
     }
 }
 
-// Update pagination
-function updatePagination() {
-    const visibleRows = document.querySelectorAll('#productsTableBody tr:not([style*="display: none"])');
-    const totalItems = visibleRows.length;
-    const itemsPerPage = 8;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
-    // Update counts
-    const elements = ['totalItems', 'startIndex', 'endIndex'].map(id => document.getElementById(id));
-    if (elements[0]) elements[0].textContent = totalItems;
-    if (elements[1]) elements[1].textContent = totalItems > 0 ? '1' : '0';
-    if (elements[2]) elements[2].textContent = Math.min(itemsPerPage, totalItems);
-    
-    // Update pagination buttons
-    const paginationNav = document.getElementById('paginationNav');
-    if (!paginationNav) return;
-    
-    const currentPage = 1; // You can make this dynamic if needed
-    
-    let paginationHTML = `
-        <button class="pagination-button pagination-button-prev" ${currentPage === 1 ? 'disabled' : ''}>
-            <i class="fas fa-chevron-left"></i>
-        </button>
-    `;
-    
-    for (let i = 1; i <= totalPages; i++) {
-        paginationHTML += `
-            <button class="pagination-button ${i === currentPage ? 'active' : ''}">${i}</button>
-        `;
-    }
-    
-    paginationHTML += `
-        <button class="pagination-button pagination-button-next" ${currentPage === totalPages ? 'disabled' : ''}>
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    `;
-    
-    paginationNav.innerHTML = paginationHTML;
-}
-
-// Add event listener for bulk action buttons
-productCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', updateBulkActions);
-});
-
-// Add event listener for clear selection button
-if (clearSelection) {
-    clearSelection.addEventListener('click', () => {
-        if (selectAllCheckbox) selectAllCheckbox.checked = false;
-        productCheckboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        updateBulkActions();
+function clearSelection() {
+    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+    productCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
     });
+    updateBulkActions();
 }
-
-// Add event listeners for edit and archive buttons
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.edit-button')) {
-        const productId = e.target.closest('tr')?.dataset.productId;
-        if (productId) showEditProductModal(productId);
-    }
-    if (e.target.closest('.archive-button')) {
-        const productId = e.target.closest('tr')?.dataset.productId;
-        if (productId) archiveProduct(productId);
-    }
-});
-
-// Initial setup
-updatePagination();
-updateBulkActions();

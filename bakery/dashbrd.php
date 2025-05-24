@@ -59,6 +59,7 @@ $recentInquiries = mysqli_query($conn, $sql);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="notification-styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -103,6 +104,12 @@ $recentInquiries = mysqli_query($conn, $sql);
             <a href="inquiries.php">
               <i class="fas fa-comment-dots"></i>
               Inquiries
+            </a>
+          </li>
+          <li>
+            <a href="sales.php" id="salesSidebarLink">
+              <i class="fas fa-chart-line"></i>
+              Sales
             </a>
           </li>
         </ul>
@@ -150,7 +157,6 @@ $recentInquiries = mysqli_query($conn, $sql);
             </div>
             <div class="user-profile">
               <button id="profileButton" class="profile-button">
-                <img src="placeholder.svg" alt="Admin">
                 <span class="md:inline hidden">Admin User</span>
                 <i class="fas fa-chevron-down"></i>
               </button>
@@ -324,8 +330,24 @@ $recentInquiries = mysqli_query($conn, $sql);
     </main>
   </div>
 
-  <!-- Side Popup Container for Notifications -->
-  <div id="sidePopupContainer"></div>
+  <!-- Logout Modal -->
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title">Confirm Logout</h2>
+          <button class="close-modal" id="closeLogoutModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to logout?</p>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-button modal-button-secondary" id="cancelLogout">Cancel</button>
+          <button class="modal-button modal-button-primary" id="confirmLogout">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="dasbrd.js"></script>
 </body>

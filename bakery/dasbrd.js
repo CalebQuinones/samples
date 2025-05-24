@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupNotificationSystem();
   setupCalendar();
   setupLogout();
-  initDatabaseConnectionCheck();
 
   // Add notification triggers for recent orders table
   const orderRows = document.querySelectorAll(".recent-orders table tbody tr");
@@ -380,35 +379,73 @@ function setupNotificationSystem() {
 
 function setupLogout() {
   const logoutButton = document.getElementById('logoutButton');
+  const logoutModal = document.getElementById('logoutModal');
   
-  if (logoutButton) {
-    logoutButton.addEventListener('click', (e) => {
+  if (!logoutModal || !logoutButton) {
+    console.warn('Logout modal elements not found');
+    return;
+  }
+
+  const closeLogoutModal = document.getElementById('closeLogoutModal');
+  const cancelLogout = document.getElementById('cancelLogout');
+  const confirmLogout = document.getElementById('confirmLogout');
+  const modalBox = logoutModal.querySelector('.modal');
+
+  const showModal = () => {
+    logoutModal.classList.add('active');
+    if (modalBox) modalBox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const hideModal = () => {
+    logoutModal.classList.remove('active');
+    if (modalBox) modalBox.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  // Show modal
+  logoutButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showModal();
+  });
+
+  // Close modal handlers
+  [closeLogoutModal, cancelLogout].forEach(element => {
+    if (element) {
+      element.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideModal();
+      });
+    }
+  });
+
+  // Confirm logout handler
+  if (confirmLogout) {
+    confirmLogout.addEventListener('click', async (e) => {
       e.preventDefault();
+      hideModal();
       
-      if (confirm('Are you sure you want to logout?')) {
-        // Show notification
-        if (window.bakeryNotifications) {
-          window.bakeryNotifications.addNotification(
-            "Logging Out",
-            "You are being logged out..."
-          );
-        }
-        
-        // Small delay to show the notification before redirecting
-        setTimeout(() => {
-          window.location.href = 'logout.php';
-        }, 1000);
+      if (window.bakeryNotifications) {
+        await window.bakeryNotifications.addNotification(
+          "Logging Out",
+          "You are being logged out..."
+        );
       }
+      
+      setTimeout(() => {
+        window.location.href = 'logout.php';
+      }, 1000);
     });
   }
-}
 
-// Add setupLogout to DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  setupNotificationSystem()
-  setupCalendar()
-  setupLogout()
-})
+  // Close modal when clicking outside
+  logoutModal.addEventListener('click', (e) => {
+    if (e.target === logoutModal) {
+      hideModal();
+    }
+  });
+}
 
 async function setupCalendar() {
   const calendarGrid = document.getElementById("calendarGrid")
@@ -462,73 +499,74 @@ async function setupCalendar() {
     async function updateCalendar() {
       if (isLoading) return
 
-      currentMonthElement.textContent = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+      // Clear the grid first
       calendarGrid.innerHTML = ""
 
+      currentMonthElement.textContent = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+      
       const year = currentDate.getFullYear()
       const month = currentDate.getMonth()
       const firstDay = new Date(year, month, 1).getDay()
       const daysInMonth = new Date(year, month + 1, 0).getDate()
+      const totalCells = firstDay + daysInMonth
 
       const orderData = await fetchOrderData()
 
-      // Fill empty cells before the first day
-      for (let i = 0; i < firstDay; i++) {
-        const emptyCell = document.createElement("div")
-        emptyCell.className = "calendar-cell empty"
-        calendarGrid.appendChild(emptyCell)
-      }
-
-      // Fill days
-      for (let day = 1; day <= daysInMonth; day++) {
+      // Create all necessary cells in one loop
+      for (let i = 0; i < totalCells; i++) {
         const cell = document.createElement("div")
         cell.className = "calendar-cell"
 
-        // Add day number with order count
-        const dateHeader = document.createElement("div")
-        dateHeader.className = "date-header"
-        
-        const dayNumber = document.createElement("span")
-        dayNumber.textContent = day
-
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-        const ordersForDay = orderData.filter(order => order.date === dateStr)
-        
-        if (ordersForDay.length > 0) {
-          const orderCount = document.createElement("span")
-          orderCount.className = "order-count"
-          orderCount.textContent = ordersForDay.length
-          dateHeader.appendChild(dayNumber)
-          dateHeader.appendChild(orderCount)
+        if (i < firstDay) {
+          // Empty cells before first day of month
+          cell.classList.add("empty")
         } else {
-          dateHeader.appendChild(dayNumber)
-        }
+          const day = i - firstDay + 1
+          const dateHeader = document.createElement("div")
+          dateHeader.className = "date-header"
+          
+          const dayNumber = document.createElement("span")
+          dayNumber.textContent = day
 
-        cell.appendChild(dateHeader)
+          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+          const ordersForDay = orderData.filter(order => order.date === dateStr)
+          
+          if (ordersForDay.length > 0) {
+            const orderCount = document.createElement("span")
+            orderCount.className = "order-count"
+            orderCount.textContent = ordersForDay.length
+            dateHeader.appendChild(dayNumber)
+            dateHeader.appendChild(orderCount)
+          } else {
+            dateHeader.appendChild(dayNumber)
+          }
 
-        // Add order items
-        if (ordersForDay.length > 0) {
-          const ordersList = document.createElement("div")
-          ordersList.className = "orders-list"
+          cell.appendChild(dateHeader)
 
-          ordersForDay.forEach(order => {
-            const orderItem = document.createElement("div")
-            orderItem.className = `order-item ${order.status.toLowerCase()}`
+          // Add order items if any exist
+          if (ordersForDay.length > 0) {
+            const ordersList = document.createElement("div")
+            ordersList.className = "orders-list"
 
-            const productName = document.createElement("div")
-            productName.className = "product-name"
-            productName.textContent = order.products
+            ordersForDay.forEach(order => {
+              const orderItem = document.createElement("div")
+              orderItem.className = `order-item ${order.status.toLowerCase()}`
 
-            const customerName = document.createElement("div")
-            customerName.className = "customer-name"
-            customerName.textContent = order.customer
+              const productName = document.createElement("div")
+              productName.className = "product-name"
+              productName.textContent = order.products
 
-            orderItem.appendChild(productName)
-            orderItem.appendChild(customerName)
-            ordersList.appendChild(orderItem)
-          })
+              const customerName = document.createElement("div")
+              customerName.className = "customer-name"
+              customerName.textContent = order.customer
 
-          cell.appendChild(ordersList)
+              orderItem.appendChild(productName)
+              orderItem.appendChild(customerName)
+              ordersList.appendChild(orderItem)
+            })
+
+            cell.appendChild(ordersList)
+          }
         }
 
         calendarGrid.appendChild(cell)
@@ -538,100 +576,21 @@ async function setupCalendar() {
     // Initialize calendar
     updateCalendar()
 
-    // Previous month button
+    // Add event listeners for navigation buttons
     if (prevMonthButton) {
       prevMonthButton.addEventListener("click", () => {
         if (isLoading) return
         currentDate.setMonth(currentDate.getMonth() - 1)
         updateCalendar()
-
-        // Show notification when changing month
-        if (window.bakeryNotifications) {
-          window.bakeryNotifications.addNotification(
-            "Calendar Updated",
-            `Viewing calendar for ${currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`,
-          )
-        }
       })
     }
 
-    // Next month button
     if (nextMonthButton) {
       nextMonthButton.addEventListener("click", () => {
         if (isLoading) return
         currentDate.setMonth(currentDate.getMonth() + 1)
         updateCalendar()
-
-        // Show notification when changing month
-        if (window.bakeryNotifications) {
-          window.bakeryNotifications.addNotification(
-            "Calendar Updated",
-            `Viewing calendar for ${currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`,
-          )
-        }
       })
-    }
-  }
-}
-
-// Function to initialize database connection check
-function initDatabaseConnectionCheck() {
-  // Check database connection on page load
-  checkDatabaseConnection()
-
-  // Check connection every 2 minutes
-  setInterval(checkDatabaseConnection, 120000)
-}
-
-// Function to check database connection
-async function checkDatabaseConnection() {
-  try {
-    const response = await fetch("api/database.php")
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`)
-    }
-
-    const data = await response.json()
-
-    if (data.connected) {
-      console.log("Database connection: OK")
-
-      // If we were previously disconnected, show reconnection notification
-      if (window.wasDisconnected) {
-        if (window.bakeryNotifications) {
-          window.bakeryNotifications.addNotification(
-            "Database Connected",
-            "Connection to the database has been restored. Your data is now up-to-date.",
-          )
-        }
-        window.wasDisconnected = false
-
-        // Refresh notifications to get any we missed while disconnected
-        if (window.bakeryNotifications) {
-          window.bakeryNotifications.fetchNotifications()
-        }
-      }
-    } else {
-      console.error("Database connection: Failed")
-      window.wasDisconnected = true
-
-      if (window.bakeryNotifications) {
-        window.bakeryNotifications.addNotification(
-          "Database Disconnected",
-          "Connection to the database has been lost. Some features may be unavailable.",
-        )
-      }
-    }
-  } catch (error) {
-    console.error("Error checking database connection:", error)
-    window.wasDisconnected = true
-
-    if (window.bakeryNotifications) {
-      window.bakeryNotifications.addNotification(
-        "Database Error",
-        "Unable to connect to the database. Please check your connection.",
-      )
     }
   }
 }

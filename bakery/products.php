@@ -20,6 +20,7 @@ $result = mysqli_query($conn, $sql);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Products - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -63,6 +64,12 @@ $result = mysqli_query($conn, $sql);
             <a href="inquiries.php">
               <i class="fas fa-comment-dots"></i>
               <span>Inquiries</span>
+            </a>
+          </li>
+          <li>
+            <a href="sales.php" id="salesSidebarLink">
+              <i class="fas fa-chart-line"></i>
+              Sales
             </a>
           </li>
         </ul>
@@ -182,10 +189,10 @@ $result = mysqli_query($conn, $sql);
                         echo "<td><span class='status-badge $availabilityClass'>$availability</span></td>";
                         echo "<td>
                                 <div class='action-buttons'>
-                                    <button class='action-button edit-button' onclick='showEditProductModal(\"$productId\")' title='Edit Product'>
+                                    <button class='action-button edit-button' data-product-id='$productId' title='Edit Product'>
                                         <i class='fas fa-pen'></i>
                                     </button>
-                                    <button class='action-button archive-button' onclick='archiveProduct(\"$productId\")' title='Archive Product'>
+                                    <button class='action-button archive-button' data-product-id='$productId' title='Archive Product'>
                                         <i class='fas fa-box-archive'></i>
                                     </button>
                                 </div>
@@ -232,8 +239,7 @@ $result = mysqli_query($conn, $sql);
 
   <!-- Modal Overlay (single, shared) -->
   <div class="modal-overlay" id="modalOverlay" style="display: none;">
-    <!-- Add Product Modal -->
-    <div class="modal" id="productModal" style="display: none;">
+    <div class="modal" id="productModal">
         <div class="modal-container">
             <div class="modal-content">
                 <div class="modal-header">
@@ -278,7 +284,7 @@ $result = mysqli_query($conn, $sql);
     </div>
 
     <!-- Edit Product Modal -->
-    <div class="modal" id="editProductModal" style="display: none;">
+    <div class="modal" id="editProductModal">
         <div class="modal-container">
             <div class="modal-content">
                 <div class="modal-header">

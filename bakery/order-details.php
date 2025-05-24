@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Details - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -79,9 +80,6 @@
             <div class="order-card">
               <div class="order-card-header">
                 <h2 class="order-card-title">Order Information</h2>
-                <button class="update-status-button" id="updateStatusButton" style="display: none;">
-                  Update Status
-                </button>
               </div>
               <div class="order-card-content">
                 <div class="order-info-grid">
@@ -143,7 +141,7 @@
                   <tbody id="orderItemsBody">
                     <tr><td colspan="4">Loading...</td></tr>
                   </tbody>
-                  <tfoot id="orderItemsFooter">
+                  <tfoot id="orderItemsFooter" style="background-color: var(--pink-50);">
                   </tfoot>
                 </table>
               </div>
@@ -256,9 +254,9 @@
           <div class="modal-body">
             <form id="orderUpdateForm">
               <!-- Status Update Section -->
-              <div class="form-group">
+              <div class="form-group" class="form-select">
                 <label for="status">Order Status</label>
-                <select id="status" name="status" required>
+                <select id="status" class="form-select" name="status" required>
                   <option value="pending">Pending</option>
                   <option value="processing">Processing</option>
                   <option value="shipped">Shipped</option>
@@ -267,9 +265,9 @@
                 </select>
               </div>
               <!-- Payment Update Section -->
-              <div class="form-group">
+              <div class="form-group" >
                 <label for="paymentStatus">Payment Status</label>
-                <select id="paymentStatus" name="paymentStatus" required>
+                <select id="paymentStatus" class="form-select" name="paymentStatus" required>
                   <option value="Pending">Pending</option>
                   <option value="Paid">Paid</option>
                   <option value="Failed">Failed</option>
@@ -278,7 +276,7 @@
               </div>
               <div class="form-group">
                 <label for="message">Message to Customer (Optional)</label>
-                <textarea id="message" name="message" rows="3" placeholder="Add a message to notify the customer about this update..."></textarea>
+                <textarea id="message" name="message" rows="3" style= "width: 450px; height: 120px; border: 1px solid var(--pink-200); border-radius: 0.375rem; padding: 0.5rem 0.75rem;" placeholder="Add a message to notify the customer about this update..."></textarea>
               </div>
             </form>
           </div>

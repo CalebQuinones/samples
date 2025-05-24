@@ -32,9 +32,13 @@ function showEditModal(userId) {
         .then(response => response.json())
         .then(account => {
             const accountEditModal = document.getElementById('accountEditModal');
-            if (!accountEditModal) return;
+            if (!accountEditModal) {
+                console.error('Edit modal not found');
+                return;
+            }
 
-            const fields = {
+            // Fill in the form fields
+            Object.entries({
                 'editUserId': account.user_id,
                 'editFirstName': account.Fname,
                 'editLastName': account.Lname,
@@ -42,16 +46,17 @@ function showEditModal(userId) {
                 'editPhone': account.phone || '',
                 'editAddress': account.address || '',
                 'editStatus': account.status
-            };
-
-            Object.entries(fields).forEach(([id, value]) => {
+            }).forEach(([id, value]) => {
                 const element = document.getElementById(id);
                 if (element) element.value = value;
             });
 
             window.showModal(accountEditModal);
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error fetching account details:', error);
+            alert('Failed to load account details. Please try again.');
+        });
 }
 
 function confirmArchiveAccount(userId) {
@@ -77,67 +82,60 @@ function confirmArchiveAccount(userId) {
 
 // Global modal functions
 window.showModal = function(modal) {
-    if (!modal) return;
+    if (!modal) {
+        console.error('Modal not found');
+        return;
+    }
     
     const modalOverlay = document.getElementById('modalOverlay');
-    if (!modalOverlay) return;
-
-    // Reset any existing modals
-    const allModals = document.querySelectorAll('.modal');
-    allModals.forEach(m => m.style.display = 'none');
-
-    // Show and center the modal
-    modalOverlay.style.display = 'flex';
-    modal.style.display = 'block';
+    const bulkActions = document.getElementById('bulkActions');
     
-    // Trigger reflow and add active classes
-    setTimeout(() => {
-        modalOverlay.classList.add('active');
-        modal.classList.add('active');
-    }, 10);
+    if (!modalOverlay) {
+        console.error('Modal overlay not found');
+        return;
+    }
 
-    // Prevent body scrolling
+    // Hide all modals and bulk actions first
+    document.querySelectorAll('.modal').forEach(m => {
+        m.style.display = 'none';
+        m.classList.remove('active');
+    });
+    if (bulkActions) bulkActions.style.display = 'none';
+    
+    // Show the specific modal and overlay
+    modal.style.display = 'block';
+    modalOverlay.style.display = 'flex';
+    
+    // Trigger reflow
+    void modal.offsetHeight;
+    
+    // Add active classes
+    modal.classList.add('active');
+    modalOverlay.classList.add('active');
+    
     document.body.style.overflow = 'hidden';
 };
 
 window.closeModal = function() {
-    const activeModal = document.querySelector('.modal.active');
-    if (activeModal) {
-        activeModal.classList.remove('active');
-        setTimeout(() => {
-            activeModal.style.display = 'none';
-            hideOverlayIfNoModal();
-        }, 300);
-    }
-
-    // Restore body scrolling
+    const modalOverlay = document.getElementById('modalOverlay');
+    const activeModals = document.querySelectorAll('.modal.active');
+    
+    if (modalOverlay) modalOverlay.classList.remove('active');
+    activeModals.forEach(modal => modal.classList.remove('active'));
+    
+    setTimeout(() => {
+        if (modalOverlay) modalOverlay.style.display = 'none';
+        activeModals.forEach(modal => modal.style.display = 'none');
+        // Update bulk actions visibility after modal closes
+        updateBulkActions();
+    }, 300);
+    
     document.body.style.overflow = '';
 };
-
-function hideOverlayIfNoModal() {
-    const modalOverlay = document.getElementById('modalOverlay');
-    if (!modalOverlay) return;
-    
-    const activeModals = document.querySelectorAll('.modal.active');
-    if (activeModals.length === 0) {
-        modalOverlay.classList.remove('active');
-        setTimeout(() => {
-            modalOverlay.style.display = 'none';
-            modalOverlay.style.visibility = 'hidden';
-        }, 300);
-    }
-}
 
 document.addEventListener("DOMContentLoaded", function() {
     console.log("accounts.js loaded");
     console.log("DOM fully loaded");
-
-    // Initialize modal overlay
-    const modalOverlay = document.getElementById('modalOverlay');
-    if (modalOverlay) {
-        modalOverlay.style.display = 'none';
-        modalOverlay.style.visibility = 'hidden';
-    }
 
     // DOM Elements
     const accountsTableBody = document.getElementById("accountsTableBody");
@@ -207,6 +205,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Close modal when clicking outside
+    const modalOverlay = document.getElementById('modalOverlay');
     if (modalOverlay) {
         modalOverlay.addEventListener('click', function(e) {
             if (e.target === modalOverlay) {
@@ -219,6 +218,37 @@ document.addEventListener("DOMContentLoaded", function() {
     const closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(button => {
         button.addEventListener('click', () => window.closeModal());
+    });
+
+    // Modal close buttons
+    const allCloseButtons = document.querySelectorAll('.close-modal, .modal-button-secondary');
+    allCloseButtons.forEach(button => {
+        button.addEventListener('click', window.closeModal);
+    });
+
+    // Edit buttons event delegation
+    document.addEventListener('click', function(e) {
+        const editButton = e.target.closest('.edit-button');
+        if (editButton && !editButton.id) { // Ignore the Add Account button
+            const userId = editButton.closest('tr').querySelector('.account-checkbox').dataset.id;
+            showEditModal(userId);
+        }
+    });
+
+    // View buttons event delegation
+    document.addEventListener('click', function(e) {
+        const viewButton = e.target.closest('.view-button');
+        if (viewButton) {
+            const userId = viewButton.closest('tr').querySelector('.account-checkbox').dataset.id;
+            showCustomerDetails(userId);
+        }
+    });
+
+    // ESC key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            window.closeModal();
+        }
     });
 
     // Update bulk actions visibility

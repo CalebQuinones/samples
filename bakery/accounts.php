@@ -20,7 +20,9 @@ $result = mysqli_query($conn, $sql);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accounts - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 <body>
   <div class="container">
@@ -63,6 +65,12 @@ $result = mysqli_query($conn, $sql);
             <a href="inquiries.php">
               <i class="fas fa-comment-dots"></i>
               <span>Inquiries</span>
+            </a>
+          </li>
+          <li>
+            <a href="sales.php" id="salesSidebarLink">
+              <i class="fas fa-chart-line"></i>
+              Sales
             </a>
           </li>
         </ul>
@@ -171,17 +179,17 @@ $result = mysqli_query($conn, $sql);
                         echo "<td><span class='status-badge $statusClass'>" . ucfirst($status) . "</span></td>";
                         echo "<td>$createdAt</td>";
                         echo "<td>
-                                <div class='action-buttons'>
-                                    <button class='action-button view-button' title='View Details' onclick='showCustomerDetails($userId)'>
-                                        <i class='fas fa-eye'></i>
-                                    </button>
-                                    <button class='action-button edit-button' title='Edit Account' onclick='showEditModal($userId)'>
-                                        <i class='fas fa-pen'></i>
-                                    </button>";
+                                <div class='action-buttons'>";
                         if ($role !== 'admin') {
-                            echo "<button class='action-button archive-button' title='Archive Account' onclick='confirmArchiveAccount($userId)'>
+                            echo "<button class='action-button view-button' title='View Details' onclick='showCustomerDetails($userId)'>
+                                    <i class='fas fa-eye'></i>
+                                </button>
+                                <button class='action-button edit-button' title='Edit Account' onclick='showEditModal($userId)'>
+                                    <i class='fas fa-pen'></i>
+                                </button>
+                                <button class='action-button archive-button' title='Archive Account' onclick='confirmArchiveAccount($userId)'>
                                     <i class='fas fa-archive'></i>
-                                  </button>";
+                                </button>";
                         }
                         echo "</div></td>";
                         echo "</tr>";
@@ -232,10 +240,10 @@ $result = mysqli_query($conn, $sql);
               </div>
             </div>
           </div>
+          
           <div class="modal-footer">
-            <button class="modal-button modal-button-secondary" id="closeCustomerDetailsBtn">
-              Close
-            </button>
+            <button class="modal-button" id="cancelModal">Cancel</button>
+            <button class="modal-button modal-button-primary" id="saveChanges">Save Changes</button>
           </div>
         </div>
       </div>
@@ -264,11 +272,24 @@ $result = mysqli_query($conn, $sql);
                 <input type="email" id="email" name="email" required>
               </div>
               <div class="form-group">
-                <label for="role">Role</label>
-                <select id="role" name="role" required>
-                  <option value="customer">Customer</option>
-                  <option value="admin">Admin</option>
-                </select>
+                  <label for="role" class="form-label">Role</label>
+                  <select id="role" class="form-select">
+                      <option>Customer</option>
+                      <option>Staff</option>
+                      <option>Admin</option>
+                  </select>
+              </div>
+              <div class="form-group">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" id="password" class="form-textarea" style="min-height: auto;">
+              </div>
+              <div class="form-group">
+                  <label for="confirm-password" class="form-label">Confirm Password</label>
+                  <input type="password" id="confirm-password" class="form-textarea" style="min-height: auto;">
+              </div>
+              <div class="form-group" style="display: flex; align-items: center;">
+                  <input type="checkbox" id="active" style="margin-right: 0.5rem;" checked="">
+                  <label for="active" class="form-label" style="margin-bottom: 0;">Active Account</label>
               </div>
             </form>
           </div>
@@ -289,31 +310,9 @@ $result = mysqli_query($conn, $sql);
             <button class="close-modal" id="closeEditModal">&times;</button>
           </div>
           <div class="modal-body">
-            <form id="accountEditForm">
-              <input type="hidden" id="editUserId">
-              <div class="form-group">
-                <label for="editFirstName">First Name</label>
-                <input type="text" id="editFirstName" name="firstName" required>
-              </div>
-              <div class="form-group">
-                <label for="editLastName">Last Name</label>
-                <input type="text" id="editLastName" name="lastName" required>
-              </div>
-              <div class="form-group">
-                <label for="editEmail">Email</label>
-                <input type="email" id="editEmail" name="email" required>
-              </div>
-              <div class="form-group">
-                <label for="editPhone">Phone</label>
-                <input type="tel" id="editPhone" name="phone">
-              </div>
-              <div class="form-group">
-                <label for="editAddress">Address</label>
-                <textarea id="editAddress" name="address"></textarea>
-              </div>
-              <div class="form-group">
+              <div id="form-group">
                 <label for="editStatus">Status</label>
-                <select id="editStatus" name="status" required>
+                <select id="editStatus"  class="form-select" name="status" required>
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>

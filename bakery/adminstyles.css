@@ -453,28 +453,41 @@ body {
 }
 
 .user-profile span {
-  margin-left: 0.5rem;
+  margin-left: 1rem;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--gray-700);
 }
 
+
 /* Profile button and dropdown */
 .profile-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: none;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  min-width: 7rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: var(--pink-100);
+  color: var(--pink-600);
   border: none;
   cursor: pointer;
-  color: #333;
+  position: relative;
+  white-space: nowrap;
 }
 
-.profile-button img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+.profile-button > span:first-child {
+  font-weight: 600;
+}
+
+.profile-button > span:nth-child(2) {
+  color: var(--gray-700);
+  font-size: 0.875rem;
+}
+
+.profile-button i {
+  margin-left: 0.25rem;
 }
 
 .profile-dropdown {
@@ -484,9 +497,11 @@ body {
   min-width: 200px;
   background: white;
   border-radius: 0.5rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--pink-200);
   display: none;
   z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .profile-dropdown.show {
@@ -499,22 +514,46 @@ body {
   margin: 0;
 }
 
+.profile-dropdown ul li {
+  padding: 0;
+}
+
 .profile-dropdown ul li a {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  color: #333;
+  color: var(--gray-700);
   text-decoration: none;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .profile-dropdown ul li a:hover {
-  background-color: #f5f5f5;
+  background-color: var(--pink-50);
+  color: var(--pink-600);
 }
 
 .profile-dropdown ul li a i {
   width: 16px;
+  font-size: 1rem;
+  color: var(--gray-500);
+}
+
+.profile-dropdown ul li a:hover i {
+  color: var(--pink-600);
+}
+
+/* Logout specific styling */
+.profile-dropdown ul li.logout a {
+  color: var(--red-800);
+}
+
+.profile-dropdown ul li.logout a:hover {
+  background-color: var(--red-100);
+}
+
+.profile-dropdown ul li.logout a i {
+  color: var(--red-800);
 }
 
 /* Content area */
@@ -679,7 +718,7 @@ body {
 
 .calendar-days {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   background-color: var(--pink-50);
   border-bottom: 1px solid var(--pink-200);
 }
@@ -694,24 +733,62 @@ body {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .calendar-cell {
-  min-height: 100px;
+  height: 6rem;
   border: 1px solid var(--pink-100);
   padding: 0.5rem;
   position: relative;
+  overflow: hidden; /* Hide overflow initially */
 }
 
-.calendar-cell.empty {
-  background-color: rgba(252, 231, 243, 0.3);
+.calendar-cell:hover {
+  overflow-y: auto; /* Show scrollbar on hover */
+  scrollbar-width: thin;
+  scrollbar-color: var(--pink-300) transparent;
+}
+
+.calendar-cell::-webkit-scrollbar {
+  width: 4px;
+}
+
+.calendar-cell::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.calendar-cell::-webkit-scrollbar-thumb {
+  background-color: var(--pink-300);
+  border-radius: 4px;
+}
+
+/* Orders list within calendar cells */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: calc(100% - 2rem); /* Account for date header */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
+}
+
+.orders-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.orders-list::-webkit-scrollbar-thumb {
+  background-color: var(--pink-300);
+  border-radius: 4px;
 }
 
 .date-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
   margin-bottom: 0.5rem;
 }
 
@@ -862,13 +939,35 @@ tbody tr:hover {
   color: var(--gray-900);
 }
 
+/* Status styles */
 .status-badge {
   display: inline-flex;
-  padding: 0 0.5rem;
-  font-size: 0.75rem;
-  line-height: 1.25rem;
-  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  padding: 0rem 0.5rem;
   border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-in-progress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-pending {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 /* Recent inquiries */
@@ -1488,672 +1587,4 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
-}
-
-.customer-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  background-color: var(--pink-100);
-  color: var(--pink-600);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-}
-
-.customer-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--gray-900);
-}
-
-.customer-since {
-  font-size: 0.875rem;
-  color: var(--gray-500);
-}
-
-.customer-info {
-  margin-top: 0.75rem;
-}
-
-.customer-info-item {
-  display: flex;
-  margin-bottom: 0.75rem;
-}
-
-.customer-info-icon {
-  color: var(--gray-400);
-  margin-right: 0.5rem;
-}
-
-.customer-info-text {
-  font-size: 0.875rem;
-  color: var(--gray-700);
-}
-
-.customer-info .info-group label {
-    font-weight: bold;
-    margin-bottom: 4px;
-    color: #333;
-    display: block;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal {
-  display: none;
-  position: relative;
-  width: 90%;
-  max-width: 500px;
-  margin: auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.modal.active {
-  display: block;
-}
-
-.modal-container {
-  padding: 20px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--gray-200);
-}
-
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--gray-900);
-}
-
-.modal-body {
-  margin-bottom: 1.5rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--gray-200);
-}
-
-.modal-button {
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.modal-button-primary {
-  background-color: var(--pink-600);
-  color: white;
-  border: none;
-}
-
-.modal-button-primary:hover {
-  background-color: var(--pink-700);
-}
-
-.modal-button-secondary {
-  background-color: white;
-  color: var(--gray-700);
-  border: 1px solid var(--gray-300);
-}
-
-.modal-button-secondary:hover {
-  background-color: var(--gray-50);
-}
-
-.close-modal {
-  background: none;
-  border: none;
-  color: var(--gray-500);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.25rem;
-  line-height: 1;
-}
-
-.close-modal:hover {
-  color: var(--gray-700);
-}
-
-/* Utilities */
-.hidden {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .sm\:hidden {
-    display: none;
-  }
-
-  .sm\:block {
-    display: block;
-  }
-
-  .sm\:flex {
-    display: flex;
-  }
-}
-
-@media (min-width: 768px) {
-  .md\:hidden {
-    display: none;
-  }
-
-  .md\:inline {
-    display: inline;
-  }
-}
-
-/* Actions column styling */
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.actions a,
-.actions button {
-  color: var(--gray-500);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.actions a:hover,
-.actions button:hover {
-  background-color: var(--pink-100);
-  color: var(--pink-600);
-}
-
-.edit-button {
-  color: var(--blue-800);
-}
-
-.delete-button {
-  color: var(--red-800);
-}
-
-/* No results message */
-.no-results {
-  text-align: center;
-  padding: 2rem;
-  color: var(--gray-500);
-  font-style: italic;
-}
-
-/* Add these styles for the account page */
-
-/* Ensure the form inputs have consistent styling */
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--pink-200);
-  border-radius: 0.375rem;
-  outline: none;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
-  border-color: transparent;
-  box-shadow: 0 0 0 2px var(--pink-500);
-}
-
-/* Style for the reset password button */
-#resetPasswordBtn {
-  background: none;
-  border: none;
-  color: var(--pink-600);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-#resetPasswordBtn:hover {
-  color: var(--pink-800);
-  text-decoration: underline;
-}
-
-.flex {
-  display: flex;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.text-sm {
-  font-size: 0.875rem;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-.text-pink-600 {
-  color: var(--pink-600);
-}
-
-.hover\:text-pink-800:hover {
-  color: var(--pink-800);
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.action-button {
-    background-color: #fdf2f8;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #666;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.action-button:hover {
-    background-color: #fbcfe8;
-    color: #9d174d;
-}
-
-.action-button i {
-    font-size: 14px;
-}
-
-.edit-button {
-    color: #666;
-}
-
-.delete-button {
-    color: #666;
-}
-
-.edit-button:hover {
-    color: #9d174d;
-}
-
-.delete-button:hover {
-    color: #9d174d;
-}
-
-/* Product Page Specific Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-    display: flex;
-}
-
-.modal {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    transform: scale(0.7);
-    opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    max-width: 500px;
-    width: 90%;
-    display: none;
-}
-
-.modal.active {
-    transform: scale(1);
-    opacity: 1;
-    display: block;
-}
-
-.modal-container {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    width: 100%;
-    max-width: 600px;
-}
-
-/* Product Form Styles */
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--gray-700);
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--pink-200);
-    border-radius: 0.375rem;
-    outline: none;
-}
-
-.form-textarea {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--pink-200);
-  border-radius: 0.375rem;
-  resize: vertical;
-  min-height: 6rem;
-  outline: none;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    border-color: var(--pink-500);
-    box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.1);
-}
-
-/* Product Image Cell */
-.product-image {
-    width: 50px;
-    height: 50px;
-    overflow: hidden;
-    border-radius: 4px;
-}
-
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.action-button.archive-button {
-    color: #6b7280;
-}
-
-.action-button.archive-button:hover {
-    color: #4b5563;
-    background-color: #f3f4f6;
-}
-
-/* Profile button and dropdown */
-.profile-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #333;
-}
-
-.profile-button img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-}
-
-.profile-dropdown {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  min-width: 200px;
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  display: none;
-  z-index: 1000;
-}
-
-.profile-dropdown.show {
-  display: block;
-}
-
-.profile-dropdown ul {
-  list-style: none;
-  padding: 0.5rem 0;
-  margin: 0;
-}
-
-.profile-dropdown ul li a {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: #333;
-  text-decoration: none;
-  transition: background-color 0.2s;
-}
-
-.profile-dropdown ul li a:hover {
-  background-color: #f5f5f5;
-}
-
-.profile-dropdown ul li a i {
-  width: 16px;
-}
-
-/* Calendar Styles */
-.calendar-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--pink-200);
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-}
-
-.calendar-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--pink-200);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.calendar-title {
-  font-size: 1.125rem;
-  font-weight: bold;
-  color: var(--pink-600);
-  font-family: "Madimi One", sans-serif;
-}
-
-.calendar-nav {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.calendar-nav-button {
-  padding: 0.25rem;
-  border-radius: 9999px;
-  background: none;
-  border: none;
-  color: var(--pink-600);
-  cursor: pointer;
-}
-
-.calendar-nav-button:hover {
-  background-color: var(--pink-100);
-}
-
-.calendar-month {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--gray-700);
-}
-
-.calendar-legend {
-  padding: 0.5rem 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  border-bottom: 1px solid var(--pink-100);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-}
-
-.legend-color {
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 9999px;
-  margin-right: 0.25rem;
-}
-
-.legend-completed { background-color: var(--green-100); }
-.legend-in-progress { background-color: var(--yellow-100); }
-.legend-pending { background-color: var(--blue-100); }
-.legend-cancelled { background-color: var(--red-100); }
-
-.legend-label {
-  font-size: 0.75rem;
-  color: var(--gray-600);
-}
-
-.calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  background-color: var(--pink-50);
-  border-bottom: 1px solid var(--pink-200);
-}
-
-.calendar-day-name {
-  padding: 0.5rem;
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--gray-500);
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-}
-
-.calendar-cell {
-  min-height: 100px;
-  border: 1px solid var(--pink-100);
-  padding: 0.5rem;
-  position: relative;
-}
-
-.calendar-cell.empty {
-  background-color: rgba(252, 231, 243, 0.3);
-}
-
-.date-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.order-count {
-  background: var(--pink-100);
-  border-radius: 9999px;
-  padding: 0.125rem 0.5rem;
-  font-size: 0.75rem;
-  color: var(--pink-600);
-}
-
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  max-height: calc(100% - 2rem);
-  overflow-y: auto;
-}
-
-.order-item {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.order-item.completed { background-color: var(--green-100); }
-.order-item.in-progress { background-color: var(--yellow-100); }
-.order-item.pending { background-color: var(--blue-100); }
-.order-item.cancelled { background-color: var(--red-100); }
-
-.order-item:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.product-name {
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.customer-name {
-  color: var(--gray-600);
-  font-size: 0.7rem;
-}
-
-/* Calendar Loading State */
-.calendar-grid.loading {
-  opacity: 0.5;
-  pointer-events: none;
 }
