@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="figma2.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    
     <link rel="stylesheet" href="order-confirmation.css">
     <script src="cart-manager.js"></script>
 </head>
@@ -235,16 +236,16 @@
             </div>
             <div class="hero-image">
                 <img src="behindcake.png" class="behind" id="likod">
-                <img src="maincake.png" class="maincake">
+                
             </div>
             <div class="event-bar">
-              <nav class="event-nav">
-                  <a href="#birthday" data-cake="maincake.png" class="active">Birthday</a>
-                  <a href="#wedding" data-cake="weddingcaku.png">Wedding</a>
-                  <a href="#shower" data-cake="showercaku.png">Shower</a>
-                  <a href="#events" data-cake="occasionscaku.png">Events</a>
-                  <a href="#corporate" data-cake="corporatecaku.png">Corporate</a>
-              </nav>
+              <div class="cake-carousel">
+        <img src="maincake.png" alt="Birthday Cake" class="cake-image">
+        <img src="weddingcaku.png" alt="Wedding Cake" class="cake-image">
+        <img src="showercaku.png" alt="Shower Cake" class="cake-image">
+        <img src="occasionscaku.png" alt="Events Cake" class="cake-image">
+        <img src="corporatecaku.png" alt="Corporate Cake" class="cake-image">
+    </div>
           </div>
         </div>
     </section>
