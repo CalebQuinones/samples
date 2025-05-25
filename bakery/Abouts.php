@@ -344,8 +344,8 @@
                     <h1>Indulge in our custom <br>
                          creations today</h1>
                     <p>Your occasion will be much more special!</p>
-                   <button class="btn"><i class="animation"></i>ORDER NOW!!<i class="animation"></i> 
-        </button>
+                   <a href="MenuSection.php">"<button class="btn"><i class="animation"></i>ORDER NOW!!<i class="animation"></i> 
+        </button></a>
                 </div>
             </section>
 

@@ -1,0 +1,485 @@
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    margin-bottom: 0.25rem;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--pink-200);
+  border-radius: 0.375rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.5rem;
+  outline: none;
+}
+
+.customer-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: var(--pink-100);
+  color: var(--pink-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.customer-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+
+.customer-since {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+.customer-info {
+  margin-top: 0.75rem;
+}
+
+.customer-info-item {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.customer-info-icon {
+  color: var(--gray-400);
+  margin-right: 0.5rem;
+}
+
+.customer-info-text {
+  font-size: 0.875rem;
+  color: var(--gray-700);
+}
+
+.customer-info .info-group label {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #333;
+    display: block;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    overflow-y: auto; /* allow scroll if modal is tall */
+}
+
+.modal {
+    background: white;
+    border-radius: 8px;
+    width: 95%;
+    max-width: 500px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.3s ease;
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18); /* add shadow for visibility */
+}
+
+/* Remove duplicate/conflicting rules and ensure correct display */
+.modal-overlay.active {
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    opacity: 1;
+    transform: scale(1);
+    display: block;
+}
+
+
+.modal-container {
+    position: relative;
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.modal.active,
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal.active {
+    transform: scale(1) translateY(0);
+}
+
+.modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    padding: 24px;
+}
+
+.info-group {
+    margin-bottom: 20px;
+}
+
+.info-group label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.info-group input,
+.info-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.info-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.5l4-4H4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.profile-initials {
+    width: 40px;
+    height: 40px;
+    background-color: #fce7f3;
+    color: #db2777;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: -48px;
+    margin-bottom: 16px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  font-family: "Madimi One", sans-serif;
+}
+
+.modal-body {
+  margin-bottom: 1.5rem;
+  padding: 0 1rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--gray-50);
+    border-radius: 0 0 0.375rem 0.375rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+@media (min-width: 640px) {
+    .modal-footer {
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+@media (min-width: 640px) {
+    .modal-button {
+        width: auto;
+    }
+}
+
+.modal-button {
+    display: inline-flex;
+    justify-content: center;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-button-primary {
+    background-color: #db2777;
+    color: white;
+}
+
+.modal-button-primary:hover {
+  background-color: var(--pink-700);
+}
+
+.modal-button-secondary {
+  background-color: white;
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+}
+
+.modal-button-secondary:hover {
+  background-color: var(--gray-50);
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: var(--gray-500);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.close-modal:hover {
+  color: var(--gray-700);
+}
+
+/* Utilities */
+.hidden {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .sm\:hidden {
+    display: none;
+  }
+
+  .sm\:block {
+    display: block;
+  }
+
+  .sm\:flex {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:hidden {
+    display: none;
+  }
+
+  .md\:inline {
+    display: inline;
+  }
+}
+
+/* Actions column styling */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions a,
+.actions button {
+  color: var(--gray-500);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.actions a:hover,
+.actions button:hover {
+  background-color: var(--pink-100);
+  color: var(--pink-600);
+}
+
+.edit-button {
+  color: var(--pink-600);
+}
+
+.delete-button {
+  color: var(--red-800);
+}
+
+/* No results message */
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+/* Add these styles for the account page */
+
+/* Ensure the form inputs have consistent styling */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--pink-200);
+  border-radius: 0.375rem;
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--pink-500);
+}
+
+/* Style for the reset password button */
+#resetPasswordBtn {
+  background: none;
+  border: none;
+  color: var(--pink-600);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#resetPasswordBtn:hover {
+  color: var(--pink-800);
+  text-decoration: underline;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-pink-600 {
+  color: var(--pink-600);
+}
+
+.hover\:text-pink-800:hover {
+  color: var(--pink-800);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    background: #fdf2f8;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.action-button:hover {
+    background-color: #fdf2f8;
+}
+
+.action-button i {
+    font-size: 14px;
+    color: #525252;
+}
+
+.action-button:hover i {
+    color: #db2777;
+}
+
+/* Status styles */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-in-progress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-pending {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Add to adminstyles.css or adminstyles2.css */
+.total-sales-display {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 10px 0;
+}
+.chart-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+

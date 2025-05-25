@@ -1,46 +1,98 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var modalOverlay = document.getElementById('modalOverlay');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('inquiryModal');
+    
+    // Initialize modal overlay
     if (modalOverlay) {
         modalOverlay.style.display = 'none';
-        modalOverlay.classList.remove('active');
+        modalOverlay.style.visibility = 'hidden';
     }
-    document.body.style.overflow = 'auto';
 
-    // View Inquiry Modal
-    const inquiryModal = document.getElementById('inquiryModal');
-    const closeInquiry = document.getElementById('closeInquiry');
-    const sendReply = document.getElementById('sendReply');
-    const inquiriesTableBody = document.getElementById('inquiriesTableBody');
-
-    // Add event listeners for action buttons
-    if (inquiriesTableBody) {
-        inquiriesTableBody.addEventListener('click', function(e) {
-            const target = e.target.closest('.action-button');
-            if (!target) return;
-
-            const inquiryId = target.getAttribute('data-id');
-            
-            if (target.classList.contains('view-button')) {
-                showInquiryDetails(inquiryId);
-            } else if (target.classList.contains('delete-button')) {
-                if (confirm('Are you sure you want to delete this inquiry?')) {
-                    deleteInquiry(inquiryId);
-                }
-            }
+    // Show modal function
+    window.showModal = function(modal) {
+        if (!modal) return;
+        
+        // Reset any existing modals
+        document.querySelectorAll('.modal.active').forEach(m => {
+            m.classList.remove('active');
         });
+        
+        // Show modal overlay first
+        if (modalOverlay) {
+            modalOverlay.style.display = 'flex';
+            modalOverlay.style.visibility = 'visible';
+            // Force reflow
+            modalOverlay.offsetHeight;
+            modalOverlay.classList.add('active');
+        }
+        
+        // Show modal
+        modal.style.display = 'block';
+        // Force reflow
+        modal.offsetHeight;
+        modal.classList.add('active');
+        
+        // Prevent body scrolling
+        document.body.style.overflow = 'hidden';
+    };
+
+    // Close modal function
+    window.closeModal = function(modal) {
+        if (!modal || !modalOverlay) return;
+        
+        // Remove active classes
+        modal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+        
+        // Hide modal after transition
+        setTimeout(() => {
+            modal.style.display = 'none';
+            hideOverlayIfNoModal();
+        }, 300);
+        
+        // Restore body scrolling
+        document.body.style.overflow = '';
+    };
+
+    // Hide overlay if no modals are active
+    function hideOverlayIfNoModal() {
+        if (!modalOverlay) return;
+        
+        const hasActiveModal = document.querySelector('.modal.active');
+        if (!hasActiveModal) {
+            modalOverlay.style.display = 'none';
+            modalOverlay.style.visibility = 'hidden';
+        }
     }
 
     // Close modal when clicking outside
     if (modalOverlay) {
         modalOverlay.addEventListener('click', function(e) {
             if (e.target === modalOverlay) {
-                const openModal = document.querySelector('.modal.active, .modal-container.active');
-                if (openModal) {
-                    closeModal(openModal);
+                const activeModal = document.querySelector('.modal.active');
+                if (activeModal) {
+                    closeModal(activeModal);
                 }
             }
         });
     }
+
+    // Close modal when clicking close button
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal);
+            }
+        });
+    });
+
+    // View Inquiry Modal
+    const inquiryModal = document.getElementById('inquiryModal');
+    const closeInquiry = document.getElementById('closeInquiry');
+    const sendReply = document.getElementById('sendReply');
+    const inquiriesTableBody = document.getElementById('inquiriesTableBody');
 
     function showInquiryDetails(inquiryId) {
         fetch(`get_inquiry.php?id=${inquiryId}`)
@@ -54,16 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById('inquiryPhone').textContent = data.Pnum;
                 
                 if (inquiryModal) {
-                    inquiryModal.style.display = 'block';
-                    if (modalOverlay) {
-                        modalOverlay.style.display = 'flex';
-                        modalOverlay.style.visibility = 'visible';
-                        setTimeout(() => {
-                            inquiryModal.classList.add('active');
-                            modalOverlay.classList.add('active');
-                        }, 10);
-                        document.body.style.overflow = 'hidden';
-                    }
+                    showModal(inquiryModal);
                 }
             })
             .catch(error => {
@@ -72,23 +115,26 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
-    function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove('active');
-            if (modalOverlay) {
-                modalOverlay.classList.remove('active');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    modalOverlay.style.display = 'none';
-                    modalOverlay.style.visibility = 'hidden';
-                    hideOverlayIfNoModal();
-                }, 300);
+    // Add event listeners for action buttons
+    if (inquiriesTableBody) {
+        inquiriesTableBody.addEventListener('click', function(e) {
+            const target = e.target.closest('.action-button');
+            if (!target) return;
+
+            const inquiryId = target.getAttribute('data-id');
+            
+            if (target.classList.contains('view-button')) {
+                showInquiryDetails(inquiryId);
+            } else if (target.classList.contains('delete-button')) {
+                if (confirm('Are you sure you want to archive this inquiry?')) {
+                    archiveInquiry(inquiryId);
+                }
             }
-        }
+        });
     }
 
-    function deleteInquiry(inquiryId) {
-        fetch('delete_inquiry.php', {
+    function archiveInquiry(inquiryId) {
+        fetch('archive_inquiry.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: inquiryId })
@@ -101,18 +147,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     row.remove();
                 }
             } else {
-                alert('Error deleting inquiry: ' + data.message);
+                alert('Error archiving inquiry: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while deleting the inquiry');
+            alert('An error occurred while archiving the inquiry');
         });
-    }
-
-    // Modal close event listeners
-    if (closeInquiry) {
-        closeInquiry.addEventListener('click', () => closeModal(inquiryModal));
     }
 
     // Send reply event listener
@@ -128,23 +169,4 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-
-    function hideOverlayIfNoModal() {
-        const anyOpen = Array.from(document.querySelectorAll('.modal, .modal-container'))
-            .some(m => m.classList.contains('active') || m.style.display === 'block' || m.style.display === 'flex');
-        if (modalOverlay) {
-            if (!anyOpen) {
-                modalOverlay.style.display = 'none';
-                modalOverlay.style.visibility = 'hidden';
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                modalOverlay.style.display = 'flex';
-                modalOverlay.style.visibility = 'visible';
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-    }
 });
-  

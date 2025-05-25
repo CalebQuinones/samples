@@ -443,6 +443,7 @@ body {
 .user-profile {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 .user-profile img {
@@ -452,10 +453,107 @@ body {
 }
 
 .user-profile span {
-  margin-left: 0.5rem;
+  margin-left: 1rem;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--gray-700);
+}
+
+
+/* Profile button and dropdown */
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  min-width: 7rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: var(--pink-100);
+  color: var(--pink-600);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+
+.profile-button > span:first-child {
+  font-weight: 600;
+}
+
+.profile-button > span:nth-child(2) {
+  color: var(--gray-700);
+  font-size: 0.875rem;
+}
+
+.profile-button i {
+  margin-left: 0.25rem;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--pink-200);
+  display: none;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.profile-dropdown.show {
+  display: block;
+}
+
+.profile-dropdown ul {
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+}
+
+.profile-dropdown ul li {
+  padding: 0;
+}
+
+.profile-dropdown ul li a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--gray-700);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.profile-dropdown ul li a:hover {
+  background-color: var(--pink-50);
+  color: var(--pink-600);
+}
+
+.profile-dropdown ul li a i {
+  width: 16px;
+  font-size: 1rem;
+  color: var(--gray-500);
+}
+
+.profile-dropdown ul li a:hover i {
+  color: var(--pink-600);
+}
+
+/* Logout specific styling */
+.profile-dropdown ul li.logout a {
+  color: var(--red-800);
+}
+
+.profile-dropdown ul li.logout a:hover {
+  background-color: var(--red-100);
+}
+
+.profile-dropdown ul li.logout a i {
+  color: var(--red-800);
 }
 
 /* Content area */
@@ -552,17 +650,8 @@ body {
   padding: 1rem;
   border-bottom: 1px solid var(--pink-200);
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-@media (min-width: 640px) {
-  .calendar-header {
-    flex-direction: row;
-    align-items: center;
-  }
+  align-items: center;
 }
 
 .calendar-title {
@@ -617,21 +706,10 @@ body {
   margin-right: 0.25rem;
 }
 
-.legend-completed {
-  background-color: var(--green-100);
-}
-
-.legend-in-progress {
-  background-color: var(--yellow-100);
-}
-
-.legend-pending {
-  background-color: var(--blue-100);
-}
-
-.legend-cancelled {
-  background-color: var(--red-100);
-}
+.legend-completed { background-color: var(--green-100); }
+.legend-in-progress { background-color: var(--yellow-100); }
+.legend-pending { background-color: var(--blue-100); }
+.legend-cancelled { background-color: var(--red-100); }
 
 .legend-label {
   font-size: 0.75rem;
@@ -640,7 +718,7 @@ body {
 
 .calendar-days {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   background-color: var(--pink-50);
   border-bottom: 1px solid var(--pink-200);
 }
@@ -655,129 +733,115 @@ body {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .calendar-cell {
   height: 6rem;
   border: 1px solid var(--pink-100);
-  padding: 0.25rem;
-  overflow: hidden;
+  padding: 0.5rem;
+  position: relative;
+  overflow: hidden; /* Hide overflow initially */
 }
 
-.calendar-cell.empty {
-  background-color: rgba(252, 231, 243, 0.3);
+.calendar-cell:hover {
+  overflow-y: auto; /* Show scrollbar on hover */
+  scrollbar-width: thin;
+  scrollbar-color: var(--pink-300) transparent;
 }
 
-.calendar-date {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.25rem;
+.calendar-cell::-webkit-scrollbar {
+  width: 4px;
 }
 
-.calendar-date-number {
-  font-size: 0.875rem;
-  font-weight: 500;
+.calendar-cell::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.calendar-date-badge {
-  font-size: 0.75rem;
-  padding: 0 0.375rem;
-  background-color: var(--pink-100);
-  color: var(--pink-800);
-  border-radius: 9999px;
+.calendar-cell::-webkit-scrollbar-thumb {
+  background-color: var(--pink-300);
+  border-radius: 4px;
 }
 
-.calendar-events {
+/* Orders list within calendar cells */
+.orders-list {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  height: calc(100% - 2rem); /* Account for date header */
   overflow-y: auto;
-  max-height: 3.75rem;
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
 }
 
-.calendar-event {
-  display: block;
-  font-size: 0.75rem;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-  background-color: white;
-  border: 1px solid var(--pink-100);
-  text-decoration: none;
-  color: var(--gray-800);
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
+.orders-list::-webkit-scrollbar {
+  width: 4px;
 }
 
-.calendar-event:hover {
-  background-color: var(--pink-50);
+.orders-list::-webkit-scrollbar-thumb {
+  background-color: var(--pink-300);
+  border-radius: 4px;
 }
 
-.calendar-event::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.order-count {
   background: var(--pink-100);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--pink-600);
 }
 
-.calendar-event:hover::after {
-  opacity: 0.2;
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: calc(100% - 2rem);
+  overflow-y: auto;
 }
 
-.calendar-event:active {
-  transform: scale(0.98);
+.order-item {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.calendar-event-title {
+.order-item.completed { background-color: var(--green-100); }
+.order-item.in-progress { background-color: var(--yellow-100); }
+.order-item.pending { background-color: var(--blue-100); }
+.order-item.cancelled { background-color: var(--red-100); }
+
+.order-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.product-name {
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.calendar-event-details {
-  display: flex;
-  justify-content: space-between;
+.customer-name {
+  color: var(--gray-600);
+  font-size: 0.7rem;
 }
 
-.calendar-event-customer {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--gray-500);
-}
-
-.calendar-event-status {
-  padding: 0 0.25rem;
-  border-radius: 9999px;
-  font-size: 0.625rem;
-}
-
-.status-completed {
-  background-color: var(--green-100);
-  color: var(--green-800);
-}
-
-.status-in-progress {
-  background-color: var(--yellow-100);
-  color: var(--yellow-800);
-}
-
-.status-pending {
-  background-color: var(--blue-100);
-  color: var(--blue-800);
-}
-
-.status-cancelled {
-  background-color: var(--red-100);
-  color: var(--red-800);
+/* Calendar Loading State */
+.calendar-grid.loading {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* Dashboard grid */
@@ -875,13 +939,35 @@ tbody tr:hover {
   color: var(--gray-900);
 }
 
+/* Status styles */
 .status-badge {
   display: inline-flex;
-  padding: 0 0.5rem;
-  font-size: 0.75rem;
-  line-height: 1.25rem;
-  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  padding: 0rem 0.5rem;
   border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-in-progress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-pending {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 /* Recent inquiries */
@@ -1501,612 +1587,4 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
-}
-
-.customer-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  background-color: var(--pink-100);
-  color: var(--pink-600);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-}
-
-.customer-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--gray-900);
-}
-
-.customer-since {
-  font-size: 0.875rem;
-  color: var(--gray-500);
-}
-
-.customer-info {
-  margin-top: 0.75rem;
-}
-
-.customer-info-item {
-  display: flex;
-  margin-bottom: 0.75rem;
-}
-
-.customer-info-icon {
-  color: var(--gray-400);
-  margin-right: 0.5rem;
-}
-
-.customer-info-text {
-  font-size: 0.875rem;
-  color: var(--gray-700);
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 500;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-  visibility: visible;
-}
-
-.modal, .modal-container {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 32rem;
-  margin: 1rem;
-  position: relative;
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  z-index: 1001;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.modal.active, .modal-container.active {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-  visibility: visible;
-}
-
-.modal-content {
-  padding: 1.5rem;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--pink-200);
-}
-
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--gray-800);
-}
-
-.modal-body {
-  margin-bottom: 1.5rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--pink-200);
-}
-
-.modal-button {
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.modal-button-primary {
-  background-color: var(--pink-600);
-  color: white;
-  border: none;
-}
-
-.modal-button-primary:hover {
-  background-color: var(--pink-700);
-}
-
-.modal-button-secondary {
-  background-color: white;
-  color: var(--gray-700);
-  border: 1px solid var(--gray-300);
-}
-
-.modal-button-secondary:hover {
-  background-color: var(--gray-50);
-  border-color: var(--gray-400);
-}
-
-/* Utilities */
-.hidden {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .sm\:hidden {
-    display: none;
-  }
-
-  .sm\:block {
-    display: block;
-  }
-
-  .sm\:flex {
-    display: flex;
-  }
-}
-
-@media (min-width: 768px) {
-  .md\:hidden {
-    display: none;
-  }
-
-  .md\:inline {
-    display: inline;
-  }
-}
-
-/* Actions column styling */
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.actions a,
-.actions button {
-  color: var(--gray-500);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.actions a:hover,
-.actions button:hover {
-  background-color: var(--pink-100);
-  color: var(--pink-600);
-}
-
-.edit-button {
-  color: var(--blue-800);
-}
-
-.delete-button {
-  color: var(--red-800);
-}
-
-/* No results message */
-.no-results {
-  text-align: center;
-  padding: 2rem;
-  color: var(--gray-500);
-  font-style: italic;
-}
-
-/* Add these styles for the account page */
-
-/* Ensure the form inputs have consistent styling */
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--pink-200);
-  border-radius: 0.375rem;
-  outline: none;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
-  border-color: transparent;
-  box-shadow: 0 0 0 2px var(--pink-500);
-}
-
-/* Style for the reset password button */
-#resetPasswordBtn {
-  background: none;
-  border: none;
-  color: var(--pink-600);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-#resetPasswordBtn:hover {
-  color: var(--pink-800);
-  text-decoration: underline;
-}
-
-.flex {
-  display: flex;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.text-sm {
-  font-size: 0.875rem;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-.text-pink-600 {
-  color: var(--pink-600);
-}
-
-.hover\:text-pink-800:hover {
-  color: var(--pink-800);
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.action-button {
-    background-color: #fdf2f8;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #666;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.action-button:hover {
-    background-color: #fbcfe8;
-    color: #9d174d;
-}
-
-.action-button i {
-    font-size: 14px;
-}
-
-.edit-button {
-    color: #666;
-}
-
-.delete-button {
-    color: #666;
-}
-
-.edit-button:hover {
-    color: #9d174d;
-}
-
-.delete-button:hover {
-    color: #9d174d;
-}
-
-/* Account Checkboxes */
-.account-checkbox {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  border: 2px solid #E84B8A;
-  border-radius: 4px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.account-checkbox:checked {
-  background-color: #E84B8A;
-  border-color: #E84B8A;
-}
-
-.account-checkbox:checked::after {
-  content: '✓';
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.account-checkbox:hover {
-  border-color: #D43D7A;
-}
-
-.account-checkbox:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
-}
-
-/* Adjust table header checkbox */
-th .account-checkbox {
-  margin: 0 auto;
-}
-
-/* Adjust table cell checkbox */
-td .account-checkbox {
-  margin: 0 auto;
-}
-
-/* General Checkbox Styles */
-input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  border: 2px solid #E84B8A;
-  border-radius: 4px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-input[type="checkbox"]:checked {
-  background-color: #E84B8A;
-  border-color: #E84B8A;
-}
-
-input[type="checkbox"]:checked::after {
-  content: '✓';
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-input[type="checkbox"]:hover {
-  border-color: #D43D7A;
-}
-
-input[type="checkbox"]:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
-}
-
-/* Adjust table header checkbox */
-th input[type="checkbox"] {
-  margin: 0 auto;
-}
-
-/* Adjust table cell checkbox */
-td input[type="checkbox"] {
-  margin: 0 auto;
-}
-
-/* Account Checkboxes */
-.account-checkbox {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  border: 2px solid #E84B8A;
-  border-radius: 4px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.account-checkbox:checked {
-  background-color: #E84B8A;
-  border-color: #E84B8A;
-}
-
-.account-checkbox:checked::after {
-  content: '✓';
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.account-checkbox:hover {
-  border-color: #D43D7A;
-}
-
-.account-checkbox:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
-}
-
-/* Order Checkboxes */
-.order-checkbox {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  border: 2px solid #E84B8A;
-  border-radius: 4px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.order-checkbox:checked {
-  background-color: #E84B8A;
-  border-color: #E84B8A;
-}
-
-.order-checkbox:checked::after {
-  content: '✓';
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.order-checkbox:hover {
-  border-color: #D43D7A;
-}
-
-.order-checkbox:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
-}
-
-/* Product Checkboxes */
-.product-checkbox {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  border: 2px solid #E84B8A;
-  border-radius: 4px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.product-checkbox:checked {
-  background-color: #E84B8A;
-  border-color: #E84B8A;
-}
-
-.product-checkbox:checked::after {
-  content: '✓';
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.product-checkbox:hover {
-  border-color: #D43D7A;
-}
-
-.product-checkbox:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(232, 75, 138, 0.2);
-}
-
-/* Calendar Loading State */
-.calendar-grid.loading {
-  opacity: 0.6;
-  pointer-events: none;
-  position: relative;
-}
-
-.calendar-grid.loading::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid var(--pink-200);
-  border-top-color: var(--pink-500);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-/* Improved Popup Animations */
-.notification-side-popup.fade-out {
-  animation: fadeOut 0.3s ease-in forwards;
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-}
-
-/* Calendar Event Improvements */
-.calendar-event {
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.calendar-event::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--pink-100);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.calendar-event:hover::after {
-  opacity: 0.2;
-}
-
-.calendar-event:active {
-  transform: scale(0.98);
-}
-
-/* Status Colors */
-.status-processing {
-  background-color: var(--blue-100);
-  color: var(--blue-800);
 }

@@ -150,9 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (target.classList.contains('edit-button')) {
                 openStatusModal(orderId);
-            } else if (target.classList.contains('delete-button')) {
-                if (confirm('Are you sure you want to delete this order?')) {
-                    deleteOrder(orderId);
+            } else if (target.classList.contains('archive-button')) {
+                if (confirm('Are you sure you want to archive this order?')) {
+                    archiveOrder(orderId);
                 }
             }
         });
@@ -384,8 +384,9 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     }
   
-    function deleteOrder(orderId) {
-        fetch('delete_order.php', {
+    // Replace deleteOrder function with archiveOrder
+    function archiveOrder(orderId) {
+        fetch('archive_order.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -400,13 +401,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     row.remove();
                     updateTable();
                 }
+                alert('Order archived successfully!');
             } else {
-                alert('Error deleting order: ' + data.message);
+                alert('Error archiving order: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while deleting the order');
+            alert('An error occurred while archiving the order');
         });
     }
   
@@ -427,4 +429,3 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
 })
-  

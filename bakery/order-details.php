@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Details - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -79,9 +80,6 @@
             <div class="order-card">
               <div class="order-card-header">
                 <h2 class="order-card-title">Order Information</h2>
-                <button class="update-status-button" id="updateStatusButton" style="display: none;">
-                  Update Status
-                </button>
               </div>
               <div class="order-card-content">
                 <div class="order-info-grid">
@@ -143,7 +141,7 @@
                   <tbody id="orderItemsBody">
                     <tr><td colspan="4">Loading...</td></tr>
                   </tbody>
-                  <tfoot id="orderItemsFooter">
+                  <tfoot id="orderItemsFooter" style="background-color: var(--pink-50);">
                   </tfoot>
                 </table>
               </div>
@@ -188,12 +186,9 @@
               <div class="order-card-content">
                 <div class="customer-info-item">
                   <i class="fas fa-map-marker-alt customer-info-icon"></i>
-                  <div>
+                  <div class="shipping-address-container">
                     <p class="customer-name" id="shippingName">...</p>
-                    <p class="customer-info-text" id="shippingAddress1">...</p>
-                    <p class="customer-info-text" id="shippingAddress2">...</p>
-                    <p class="customer-info-text" id="shippingCity">...</p>
-                    <p class="customer-info-text" id="shippingCountry">...</p>
+                    <p class="customer-info-text" id="shippingAddress">...</p>
                   </div>
                 </div>
               </div>
@@ -246,34 +241,50 @@
     </main>
   </div>
 
-  <!-- Status Update Modal -->
-  <div class="modal-overlay" id="statusModal" style="display: none;">
-    <div class="modal-container">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">Update Order Status</h3>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="status" class="form-label">Status</label>
-            <select id="status" class="form-select">
-              <option>Pending</option>
-              <option>In Progress</option>
-              <option>Ready for Pickup</option>
-              <option>Out for Delivery</option>
-              <option>Completed</option>
-              <option>Cancelled</option>
-            </select>
+  <!-- Modal Overlay (single, shared) -->
+  <div class="modal-overlay" id="modalOverlay">
+    <!-- Status Update Modal -->
+    <div class="modal" id="statusModal">
+      <div class="modal-container">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Update Order</h3>
+            <button class="close-modal" id="closeStatusModal">&times;</button>
           </div>
-          <div class="form-group">
-            <label for="message" class="form-label">Message to Customer (Optional)</label>
-            <textarea id="message" class="form-textarea" placeholder="Add a message to notify the customer about this status update..."></textarea>
+          <div class="modal-body">
+            <form id="orderUpdateForm">
+              <!-- Status Update Section -->
+              <div class="form-group" class="form-select">
+                <label for="status">Order Status</label>
+                <select id="status" class="form-select" name="status" required>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <!-- Payment Update Section -->
+              <div class="form-group" >
+                <label for="paymentStatus">Payment Status</label>
+                <select id="paymentStatus" class="form-select" name="paymentStatus" required>
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Refunded">Refunded</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="message">Message to Customer (Optional)</label>
+                <textarea id="message" name="message" rows="3" style= "width: 450px; height: 120px; border: 1px solid var(--pink-200); border-radius: 0.375rem; padding: 0.5rem 0.75rem;" placeholder="Add a message to notify the customer about this update..."></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-button modal-button-secondary" id="cancelStatusUpdate">Cancel</button>
+            <button class="modal-button modal-button-primary" id="updateStatusConfirm">Update Order</button>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-button modal-button-primary" id="updateStatusConfirm">Update Status</button>
-        <button class="modal-button modal-button-secondary" id="cancelStatusUpdate">Cancel</button>
       </div>
     </div>
   </div>
