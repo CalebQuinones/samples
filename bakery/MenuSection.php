@@ -237,41 +237,56 @@ include 'config.php';
        
 
 
+        <?php
+        // Get category counts
+        $category_counts = array();
+        $total_items = 0;
+        
+        $sql = "SELECT category, COUNT(*) as count FROM products GROUP BY category";
+        $result = mysqli_query($conn, $sql);
+        
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $category_counts[strtolower($row['category'])] = $row['count'];
+                $total_items += $row['count'];
+            }
+        }
+        ?>
         <div class="categories">
             <div class="category-card" id="color">
                 <span class="category-icon">📅</span>
                 <span class="category-name">All</span>
-                <span class="category-items">30 Items</span>
+                <span class="category-items"><?php echo $total_items; ?> Items</span>
             </div>
             <div class="category-card">
                 <span class="category-icon">🎂</span>
                 <span class="category-name">Birthday Cakes</span>
-                <span class="category-items">20 Items</span>
+                <span class="category-items"><?php echo isset($category_counts['birthday cakes']) ? $category_counts['birthday cakes'] : 0; ?> Items</span>
             </div>
             <div class="category-card">
                 <span class="category-icon">💝</span>
                 <span class="category-name">Wedding Cakes</span>
-                <span class="category-items">10 Items</span>
+                <span class="category-items"><?php echo isset($category_counts['wedding cakes']) ? $category_counts['wedding cakes'] : 0; ?> Items</span>
             </div>
             <div class="category-card">
                 <span class="category-icon">🚿</span>
                 <span class="category-name">Shower Cakes</span>
-                <span class="category-items">5 Items</span>
+                <span class="category-items"><?php echo isset($category_counts['shower cakes']) ? $category_counts['shower cakes'] : 0; ?> Items</span>
             </div>
             <div class="category-card">
                 <span class="category-icon">🧁</span>
                 <span class="category-name">Cupcakes</span>
-                <span class="category-items">30 Items</span>
+                <span class="category-items"><?php echo isset($category_counts['cupcakes']) ? $category_counts['cupcakes'] : 0; ?> Items</span>
             </div>
             <div class="category-card">
                 <span class="category-icon">🥖</span>
                 <span class="category-name">Breads</span>
-                <span class="category-items">10 Items</span>
+                <span class="category-items"><?php echo isset($category_counts['breads']) ? $category_counts['breads'] : 0; ?> Items</span>
             </div>
             <div class="category-card">
                 <span class="category-icon">🍳</span>
                 <span class="category-name">Celebration</span>
-                <span class="category-items">20 Items</span>
+                <span class="category-items"><?php echo isset($category_counts['celebration']) ? $category_counts['celebration'] : 0; ?> Items</span>
             </div>
         </div>
 
@@ -445,7 +460,14 @@ include 'config.php';
 
             if ($result && mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
-                    echo '<div class="product-card" data-id="' . $row['product_id'] . '">';
+                    // Get category and availability directly from database
+                    $category = strtolower($row['category']);
+                    $availability = strtolower($row['availability']);
+
+                    echo '<div class="product-card" 
+                              data-id="' . $row['product_id'] . '"
+                              data-category="' . $category . '"
+                              data-availability="' . $availability . '">';
                     echo '<div class="product-image" style="background-image: url(\'' . $row['image'] . '\')"></div>';
                     echo '<div class="product-details">';
                     echo '<h3 class="product-name">' . $row['name'] . '</h3>';
@@ -462,7 +484,11 @@ include 'config.php';
                     echo '<span class="quantity">1</span>';
                     echo '<button class="quantity-btn plus" type="button">+</button>';
                     echo '</div>';
-                    echo '<button class="add-to-order" type="button" data-product-id="' . $row['product_id'] . '" data-product-name="' . htmlspecialchars($row['name']) . '" data-product-price="' . $row['price'] . '" data-product-image="' . $row['image'] . '">Add to order</button>';
+                    echo '<button class="add-to-order" type="button" 
+                                  data-product-id="' . $row['product_id'] . '" 
+                                  data-product-name="' . htmlspecialchars($row['name']) . '" 
+                                  data-product-price="' . $row['price'] . '" 
+                                  data-product-image="' . $row['image'] . '">Add to order</button>';
                     echo '</div>';
                     echo '</div>';
                 }
@@ -1072,6 +1098,81 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ...existing code...
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all category cards and product cards
+    const categoryCards = document.querySelectorAll('.category-card');
+    const productCards = document.querySelectorAll('.product-card');
+    const filterAvailability = document.getElementById('filterAvailability');
+    const filterSize = document.getElementById('filterSize');
+    const searchInput = document.querySelector('.search-input');
+
+    // Store original products for reset
+    const originalProducts = Array.from(productCards);
+
+    // Add click event to category cards
+    categoryCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove active class from all cards
+            categoryCards.forEach(c => c.style.backgroundColor = '#F3F4F6');
+            // Add active class to clicked card
+            this.style.backgroundColor = '#FFD7E9';
+
+            const category = this.querySelector('.category-name').textContent.toLowerCase();
+            filterProducts();
+        });
+    });
+
+    // Add change event to filter dropdowns
+    filterAvailability.addEventListener('change', filterProducts);
+    filterSize.addEventListener('change', filterProducts);
+
+    // Add input event to search
+    searchInput.addEventListener('input', filterProducts);
+
+    function filterProducts() {
+        const selectedCategory = Array.from(categoryCards).find(card => 
+            card.style.backgroundColor === 'rgb(255, 215, 233)')?.querySelector('.category-name').textContent.toLowerCase() || 'all';
+        const selectedAvailability = filterAvailability.value.toLowerCase();
+        const selectedSize = filterSize.value.toLowerCase();
+        const searchTerm = searchInput.value.toLowerCase();
+
+        originalProducts.forEach(product => {
+            const productName = product.querySelector('.product-name').textContent.toLowerCase();
+            const productPrice = parseFloat(product.querySelector('.product-price').textContent.replace(/[^0-9.]/g, ''));
+            
+            // Get product category (you'll need to add data-category to your PHP product output)
+            const productCategory = product.getAttribute('data-category')?.toLowerCase() || 'all';
+
+            // Category filter
+            const matchesCategory = selectedCategory === 'all' || productCategory === selectedCategory;
+
+            // Availability filter (you'll need to add data-availability to your PHP product output)
+            const productAvailability = product.getAttribute('data-availability')?.toLowerCase() || 'in stock';
+            const matchesAvailability = selectedAvailability === 'availability' || productAvailability === selectedAvailability;
+
+            // Size/Price filter
+            let matchesSize = true;
+            if (selectedSize !== 'size') {
+                if (selectedSize === 'small') matchesSize = productPrice < 200;
+                else if (selectedSize === 'medium') matchesSize = productPrice >= 200 && productPrice <= 500;
+                else if (selectedSize === 'large') matchesSize = productPrice > 500;
+            }
+
+            // Search filter
+            const matchesSearch = productName.includes(searchTerm);
+
+            // Show/hide product based on all filters
+            if (matchesCategory && matchesAvailability && matchesSize && matchesSearch) {
+                product.style.display = '';
+                product.style.animation = 'fadeIn 0.5s ease-out';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    }
 });
 </script>
 </body>

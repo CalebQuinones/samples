@@ -71,8 +71,8 @@ font-family: Karla;
 font-style: normal;
 font-weight: 800;
 line-height: normal;
-width: 1550px;
-height: 15vh;
+width: 100%;
+height: 15%;
 
 }
 header {
@@ -116,52 +116,38 @@ margin-left: -70px;
 
 .nav-toggle {
 display: none;
-background: none;
-border: none;
-cursor: pointer;
-width: 30px;
-height: 20px;
-position: relative;
-z-index: 20;
 }
 
-.nav-toggle span {
+.nav-toggle-label {
+display: none;
+cursor: pointer;
+padding: 10px;
+z-index: 1002;
+}
+
+.nav-toggle-label span,
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
 display: block;
-width: 25px;
-height: 3px;
-background-color: #525252;
-margin: 5px 0;
-position: absolute;
-left: 0;
+background: #525252;
+height: 2px;
+width: 24px;
+position: relative;
 transition: all 0.3s ease;
 }
 
-.nav-toggle span:nth-child(1) {
-top: 0;
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+content: '';
+position: absolute;
 }
 
-.nav-toggle span:nth-child(2) {
+.nav-toggle-label span::before {
+bottom: 8px;
+}
+
+.nav-toggle-label span::after {
 top: 8px;
-}
-
-.nav-toggle span:nth-child(3) {
-top: 16px;
-}
-
-.nav-toggle.active span:nth-child(1) {
-top: 8px;
-transform: rotate(45deg);
-
-}
-
-.nav-toggle.active span:nth-child(2) {
-opacity: 0;
-}
-
-.nav-toggle.active span:nth-child(3) {
-top: 8px;
-transform: rotate(-45deg);
-
 }
 
 .nav-links ul {
@@ -199,37 +185,162 @@ background-color: #E44888;
 }
 
 @media screen and (max-width: 768px) {
-.nav-toggle {
+.nav-toggle-label {
     display: block;
-}
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
-.nav-links {
+  .nav-links {
+    display: none;
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: var(--white);
     width: 100%;
-    padding: 20px;
+    background: white;
+    padding: 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: none;
-}
+    z-index: 1000;
+  }
 
-.nav-links.active {
+  .nav-toggle:checked ~ .nav-links {
     display: block;
-}
+  }
 
-.nav-links ul {
+  .nav-links ul {
     flex-direction: column;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-links ul li {
+    margin: 0;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .nav-links ul li:last-child {
+    border-bottom: none;
+  }
+
+  .nav-links ul li a {
+    display: block;
+    padding: 15px 20px;
+    font-size: 16px;
+  }
+
+  .nav-links ul li a::after {
+    display: none;
+  }
+
+  .logo {
+    margin-left: 20px;
+  }
+
+  .logo img {
+    width: 60px;
+    height: 60px;
+    right: 40px;
+  }
+
+  .logo span {
+    font-size: 24px;
+    margin-left: -40px;
+  }
+
+  .cart-profile {
+    margin-right: 60px;
+  }
 }
 
-.nav-links ul li {
-    margin: 10px 0;
+@media screen and (max-width: 426px) {
+  .logo img {
+    width: 50px;
+    height: 50px;
+    right: 30px;
+  }
+
+  .logo span {
+    font-size: 20px;
+    margin-left: -30px;
+  }
+
+  .nav-links ul li a {
+    font-size: 14px;
+    padding: 12px 15px;
+  }
+
+  .cart-profile {
+    display: none;
+  }
+  .top-banner{
+    height: 20px;
+  }
+  .cart-profile{
+  }
+  .categories{
+  left: 26px;
+  }
+  
+  /* Search section fixes */
+  .search-section {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+    margin-bottom: -20px;
+    width: 100%;
+    position: relative;
+    left: -20px;
+  }
+
+  .search-container {
+    padding: 15px;
+    margin-bottom: -30px;
+    width: 90%;
+    position: relative;
+  }
+
+  .search-input {
+    font-size: 14px;
+    padding: 10px 35px 10px 15px;
+    width: 100%;
+  }
+
+  .pota {
+    position: absolute;
+    right: 30px;
+    margin-right: -5%;
+    height: 20px;
+    width: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  /* Filter section fixes */
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: -20pxpx;
+    margin-left: 15px;
+    width: 90%;
+  }
+
+  .filter-section span {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .filter-dropdown {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
 }
-}
-
-
-
-
 
 .Menu{
 display: flex;
@@ -2536,10 +2647,7 @@ nav {
   font-size: 30px;
 }
 
-.category-card {
-  min-width: 100px;
-  padding: 15px;
-}
+
 
 .search-input {
   font-size: 14px;
