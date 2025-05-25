@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="figma2.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    
     <link rel="stylesheet" href="order-confirmation.css">
     <script src="cart-manager.js"></script>
 </head>
@@ -415,7 +416,7 @@
             <p class="pp"> 
                 The main goal of our bakery, is to hold a special place in people's hearts. They evoke memories of childhood, family gatherings, and celebrations. The comfort and nostalgia associated with baked goods can make a bakery a cherished destination. This emotional connection is a significant factor in the success of Triple J & Rose's Bakery.
             </p>
-            <a href="Abouts.php"><button class="more-about-us">More About us</button></a>
+            <button class="more-about-us">More About us</button>
         </div>
     </div>
       </section>
