@@ -416,7 +416,7 @@
             <p class="pp"> 
                 The main goal of our bakery, is to hold a special place in people's hearts. They evoke memories of childhood, family gatherings, and celebrations. The comfort and nostalgia associated with baked goods can make a bakery a cherished destination. This emotional connection is a significant factor in the success of Triple J & Rose's Bakery.
             </p>
-            <a href="Abouts.php"><button class="more-about-us">More About us</button></a>
+            <button class="more-about-us">More About us</button>
         </div>
     </div>
       </section>
