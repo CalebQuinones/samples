@@ -236,16 +236,16 @@
             </div>
             <div class="hero-image">
                 <img src="behindcake.png" class="behind" id="likod">
-                
+                <img src="maincake.png" class="maincake">
             </div>
             <div class="event-bar">
-              <div class="cake-carousel">
-        <img src="maincake.png" alt="Birthday Cake" class="cake-image">
-        <img src="weddingcaku.png" alt="Wedding Cake" class="cake-image">
-        <img src="showercaku.png" alt="Shower Cake" class="cake-image">
-        <img src="occasionscaku.png" alt="Events Cake" class="cake-image">
-        <img src="corporatecaku.png" alt="Corporate Cake" class="cake-image">
-    </div>
+              <nav class="event-nav">
+                  <a href="#birthday" data-cake="maincake.png" class="active">Birthday</a>
+                  <a href="#wedding" data-cake="weddingcaku.png">Wedding</a>
+                  <a href="#shower" data-cake="showercaku.png">Shower</a>
+                  <a href="#events" data-cake="occasionscaku.png">Events</a>
+                  <a href="#corporate" data-cake="corporatecaku.png">Corporate</a>
+              </nav>
           </div>
         </div>
     </section>
