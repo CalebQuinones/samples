@@ -8,9 +8,23 @@ if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
     exit;
 }
 
-// Fetch all products
-$sql = "SELECT * FROM products ORDER BY created_at DESC";
-$result = mysqli_query($conn, $sql);
+// Pagination settings
+$records_per_page = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $records_per_page;
+
+// Get total number of records
+$total_sql = "SELECT COUNT(*) as count FROM products";
+$total_result = mysqli_query($conn, $total_sql);
+$total_records = mysqli_fetch_assoc($total_result)['count'];
+$total_pages = ceil($total_records / $records_per_page);
+
+// Fetch products with pagination
+$sql = "SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -124,12 +138,12 @@ $result = mysqli_query($conn, $sql);
           <div class="filter-buttons">
             <select class="filter-select" id="categoryFilter">
               <option value="">All Categories</option>
-              <option value="Wedding Cakes">Wedding Cakes</option>
               <option value="Birthday Cakes">Birthday Cakes</option>
+              <option value="Wedding Cakes">Wedding Cakes</option>
               <option value="Shower Cakes">Shower Cakes</option>
               <option value="Cupcakes">Cupcakes</option>
-              <option value="Celebration">Celebration</option>
               <option value="Breads">Breads</option>
+              <option value="Celebration">Celebration</option>
             </select>
             <select class="filter-select" id="availabilityFilter">
               <option value="">All Status</option>
@@ -210,23 +224,35 @@ $result = mysqli_query($conn, $sql);
           <!-- Pagination -->
           <div class="pagination">
             <div class="pagination-mobile">
-              <button class="pagination-button pagination-button-prev" id="prevPageMobile" disabled>
+              <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
+                <i class="fas fa-chevron-left"></i>
                 Previous
               </button>
-              <button class="pagination-button pagination-button-next" id="nextPageMobile">
+              <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
                 Next
+                <i class="fas fa-chevron-right"></i>
               </button>
             </div>
             <div class="pagination-desktop">
               <div class="pagination-info">
-                Showing <span id="startIndex">1</span> to <span id="endIndex">8</span> of <span id="totalItems">12</span> results
+                Showing <span><?php echo min(($page-1) * $records_per_page + 1, $total_records); ?></span> to 
+                <span><?php echo min($page * $records_per_page, $total_records); ?></span> of 
+                <span><?php echo $total_records; ?></span> products
               </div>
-              <div class="pagination-nav" id="paginationNav">
-                <button class="pagination-button pagination-button-prev" id="prevPage" disabled>
+              <div class="pagination-nav">
+                <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
                   <i class="fas fa-chevron-left"></i>
                 </button>
-                <!-- Page buttons will be added by JavaScript -->
-                <button class="pagination-button pagination-button-next" id="nextPage">
+                <?php
+                for($i = 1; $i <= $total_pages; $i++) {
+                    if($i == 1 || $i == $total_pages || ($i >= $page - 2 && $i <= $page + 2)) {
+                        echo "<button class='pagination-button pagination-button-page".($i == $page ? " active" : "")."' onclick='window.location.href=\"?page=$i\"'>$i</button>";
+                    } elseif($i == $page - 3 || $i == $page + 3) {
+                        echo "<button class='pagination-button pagination-button-page'>...</button>";
+                    }
+                }
+                ?>
+                <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
@@ -244,7 +270,6 @@ $result = mysqli_query($conn, $sql);
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title">Add New Product</h3>
-                    <button type="button" class="close-modal" id="closeProductModal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <form id="addProductForm">
@@ -254,24 +279,42 @@ $result = mysqli_query($conn, $sql);
                       </div>
                       <div class="form-group">
                         <label for="productCategory">Category</label>
-                        <select id="productCategory" name="category" required>
-                          <option value="cakes">Cakes</option>
-                          <option value="breads">Breads</option>
-                          <option value="pastries">Pastries</option>
-                          <option value="cookies">Cookies</option>
+                        <select id="productCategory" class="form-select" name="category" required>
+                          <option value="Birthday Cakes">Birthday Cakes</option>
+                          <option value="Wedding Cakes">Wedding Cakes</option>
+                          <option value="Shower Cakes">Shower Cakes</option>
+                          <option value="Cupcakes">Cupcakes</option>
+                          <option value="Breads">Breads</option>
+                          <option value="Celebration">Celebration</option>
                         </select>
                       </div>
                       <div class="form-group">
-                        <label for="productPrice">Price</label>
-                        <input type="number" id="productPrice" name="price" step="0.01" required>
+                        <label for="product-price" class="form-label">Price</label>
+                          <div style="position: relative;">
+                            <div style="position: absolute; top: 0; bottom: 0; left: 0; display: flex; align-items: center; padding-left: 0.75rem;">
+                              <span style="color: var(--gray-500);">₱</spa>
+                            </div>
+                              <input type="text" id="product-price" class="form-textarea" style="min-height: auto; padding-left: 1.75rem;" placeholder="0.00">
+                          </div>
                       </div>
                       <div class="form-group">
-                        <label for="productImage">Product Image</label>
-                        <input type="file" id="productImage" name="image" accept="image/*">
+                        <label for="product-status" class="form-label">Status</label>
+                          <select id="product-status" class="form-select">
+                            <option>In Stock</option>
+                            <option>Low Stock</option>
+                            <option>Out of Stock</option>
+                          </select>
                       </div>
                       <div class="form-group">
-                        <label for="productDescription">Description</label>
-                        <textarea id="productDescription" name="description" rows="3"></textarea>
+                        <label class="form-label">Product Image</label>
+                          <div style="border: 2px dashed var(--gray-300); border-radius: 0.375rem; padding: 1.5rem; text-align: center;">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400);"></i>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-600);">
+                              <span style="color: var(--pink-600); font-weight: 500; cursor: pointer;">Upload a file</span>
+                              or drag and drop
+                            </p>
+                            <p style="font-size: 0.75rem; color: var(--gray-500);">PNG, JPG, GIF up to 10MB</p>
+                          </div>
                       </div>
                     </form>
                 </div>
@@ -289,7 +332,6 @@ $result = mysqli_query($conn, $sql);
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title">Edit Product</h3>
-                    <button class="close-modal" id="closeEditProduct">&times;</button>
                 </div>
                 <div class="modal-body">
                     <form id="editProductForm">
@@ -300,43 +342,52 @@ $result = mysqli_query($conn, $sql);
                       </div>
                       <div class="form-group">
                         <label for="editProductCategory">Category</label>
-                        <select id="editProductCategory" name="category" required>
-                          <option value="cakes">Cakes</option>
-                          <option value="breads">Breads</option>
-                          <option value="pastries">Pastries</option>
-                          <option value="cookies">Cookies</option>
+                        <select id="editProductCategory" class="form-select" name="category" required>
+                          <option value="Birthday Cakes">Birthday Cakes</option>
+                          <option value="Wedding Cakes">Wedding Cakes</option>
+                          <option value="Shower Cakes">Shower Cakes</option>
+                          <option value="Cupcakes">Cupcakes</option>
+                          <option value="Breads">Breads</option>
+                          <option value="Celebration">Celebration</option>
                         </select>
                       </div>
                       <div class="form-group">
-                        <label for="editProductPrice">Price</label>
-                        <input type="number" id="editProductPrice" name="price" step="0.01" required>
+                        <label for="editProductPrice" class="form-label">Price</label>
+                          <div style="position: relative;">
+                            <div style="position: absolute; top: 0; bottom: 0; left: 0; display: flex; align-items: center; padding-left: 0.75rem;">
+                              <span style="color: var(--gray-500);">₱</span>
+                            </div>
+                              <input type="text" id="editProductPrice" class="form-textarea" style="min-height: auto; padding-left: 1.75rem;" placeholder="0.00">
+                          </div>
                       </div>
                       <div class="form-group">
-                        <label for="editProductImage">Product Image</label>
-                        <input type="file" id="editProductImage" name="image" accept="image/*">
+                        <label for="editProductStatus" class="form-label">Status</label>
+                          <select id="editProductStatus" class="form-select">
+                            <option>In Stock</option>
+                            <option>Low Stock</option>
+                            <option>Out of Stock</option>
+                          </select>
                       </div>
                       <div class="form-group">
-                        <label for="editProductDescription">Description</label>
-                        <textarea id="editProductDescription" name="description" rows="3"></textarea>
-                      </div>
-                      <div class="form-group">
-                        <label for="editProductStatus">Status</label>
-                        <select id="editProductStatus" name="status" required>
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
-                        </select>
+                        <label class="form-label">Product Image</label>
+                          <div style="border: 2px dashed var(--gray-300); border-radius: 0.375rem; padding: 1.5rem; text-align: center;">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400);"></i>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-600);">
+                              <span style="color: var(--pink-600); font-weight: 500; cursor: pointer;">Upload a file</span>
+                              or drag and drop
+                            </p>
+                            <p style="font-size: 0.75rem; color: var(--gray-500);">PNG, JPG, GIF up to 10MB</p>
+                          </div>
                       </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button class="modal-button modal-button-secondary" id="cancelEditProduct">Cancel</button>
-                    <button class="modal-button modal-button-primary" id="saveEditProduct">Save Changes</button>
+                    <button type="button" class="modal-button modal-button-secondary" id="cancelEditProduct">Cancel</button>
+                    <button type="submit" class="modal-button modal-button-primary" id="saveEditProduct">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
-  </div>
-
   <script src="products.js"></script>
 </body>
 </html>

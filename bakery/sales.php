@@ -211,13 +211,16 @@ $topSellers = mysqli_query($conn, "
         }
         .top-sellers table {
             width: 100%;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
             border-collapse: collapse;
         }
         .top-sellers th, .top-sellers td {
-            padding: 0.75rem;
+            padding: 0.5rem;
             text-align: left;
             border-bottom: 1px solid #eee;
+        }
+        .top-sellers td.center-align {
+          text-indent: 50px;
         }
         .growth-positive {
             color: #28a745;
@@ -316,7 +319,7 @@ $topSellers = mysqli_query($conn, "
                 <p>+2.5% from last week</p>
             </div>
             <div class="kpi-card">
-                <h3>Items Sold</h3>
+                <h3>Products Sold</h3>
                 <h2><?php echo number_format($stats['items_sold']); ?></h2>
                 <p>+8.2% from last week</p>
             </div>
@@ -354,12 +357,12 @@ $topSellers = mysqli_query($conn, "
         </div>
 
         <div class="top-sellers">
-            <h3>Top 5 Best Sellers This Week</h3>
+            <h3>Top 5 Best Selling This Week</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Product</th>
-                        <th>Units Sold</th>
+                        <th>Products Sold</th>
                         <th>Revenue</th>
                         <th>Growth</th>
                     </tr>
@@ -368,7 +371,7 @@ $topSellers = mysqli_query($conn, "
                     <?php while($product = mysqli_fetch_assoc($topSellers)): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($product['name']); ?></td>
-                        <td><?php echo number_format($product['units_sold']); ?></td>
+                        <td class="center-align"><?php echo number_format($product['units_sold']); ?></td>
                         <td>₱<?php echo number_format($product['revenue'], 2); ?></td>
                         <td class="growth-positive">+<?php echo $product['growth']; ?>%</td>
                     </tr>

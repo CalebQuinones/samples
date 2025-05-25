@@ -51,6 +51,10 @@
               Inquiries
             </a>
           </li>
+            <a href="sales.php" id="salesSidebarLink">
+              <i class="fas fa-chart-line"></i>
+              Sales
+            </a>
         </ul>
       </nav>
     </aside>
@@ -276,7 +280,7 @@
               </div>
               <div class="form-group">
                 <label for="message">Message to Customer (Optional)</label>
-                <textarea id="message" name="message" rows="3" style= "width: 450px; height: 120px; border: 1px solid var(--pink-200); border-radius: 0.375rem; padding: 0.5rem 0.75rem;" placeholder="Add a message to notify the customer about this update..."></textarea>
+                <textarea id="message" name="message" rows="3" style= "width: 420px; height: 120px; border: 1px solid var(--pink-200); border-radius: 0.375rem; padding: 0.5rem 0.75rem;" placeholder="Add a message to notify the customer about this update..."></textarea>
               </div>
             </form>
           </div>

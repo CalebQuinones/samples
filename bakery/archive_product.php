@@ -19,7 +19,7 @@ if (!$productId) {
 }
 
 // Update product status to archived
-$sql = "UPDATE products SET availability = 'Archived' WHERE product_id = ?";
+$sql = "UPDATE products SET status = 'archived' WHERE product_id = ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $productId);
 

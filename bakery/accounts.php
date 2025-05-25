@@ -8,9 +8,23 @@ if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
     exit;
 }
 
-// Fetch all accounts from login table
-$sql = "SELECT * FROM login ORDER BY created_at ASC";
-$result = mysqli_query($conn, $sql);
+// Pagination settings
+$records_per_page = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $records_per_page;
+
+// Get total number of records
+$total_sql = "SELECT COUNT(*) as count FROM login";
+$total_result = mysqli_query($conn, $total_sql);
+$total_records = mysqli_fetch_assoc($total_result)['count'];
+$total_pages = ceil($total_records / $records_per_page);
+
+// Fetch accounts with pagination
+$sql = "SELECT * FROM login ORDER BY created_at ASC LIMIT ? OFFSET ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -200,6 +214,44 @@ $result = mysqli_query($conn, $sql);
                 ?>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <div class="pagination-mobile">
+              <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
+                <i class="fas fa-chevron-left"></i>
+                Previous
+              </button>
+              <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
+                Next
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+            <div class="pagination-desktop">
+              <div class="pagination-info">
+                Showing <span><?php echo min(($page-1) * $records_per_page + 1, $total_records); ?></span> to 
+                <span><?php echo min($page * $records_per_page, $total_records); ?></span> of 
+                <span><?php echo $total_records; ?></span> accounts
+              </div>
+              <div class="pagination-nav">
+                <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <?php
+                for($i = 1; $i <= $total_pages; $i++) {
+                    if($i == 1 || $i == $total_pages || ($i >= $page - 2 && $i <= $page + 2)) {
+                        echo "<button class='pagination-button pagination-button-page".($i == $page ? " active" : "")."' onclick='window.location.href=\"?page=$i\"'>$i</button>";
+                    } elseif($i == $page - 3 || $i == $page + 3) {
+                        echo "<button class='pagination-button pagination-button-page'>...</button>";
+                    }
+                }
+                ?>
+                <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
