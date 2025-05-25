@@ -363,21 +363,6 @@ input[type="password"]:focus {
   box-shadow: 0 0 0 2px var(--pink-500);
 }
 
-/* Style for the reset password button */
-#resetPasswordBtn {
-  background: none;
-  border: none;
-  color: var(--pink-600);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-#resetPasswordBtn:hover {
-  color: var(--pink-800);
-  text-decoration: underline;
-}
-
 .flex {
   display: flex;
 }
