@@ -21,8 +21,10 @@ include 'config.php';
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Menu3.css">
     <link rel="stylesheet" href="order-confirmation.css">
+    <link rel="stylesheet" href="aicakes.css">
     <script src="cart-persistence.js"></script>
     <script src="product-popup.js"></script>
+    <script src="aicakes.js"></script>
 </head>
 <body>
     <div class="top-banner">
@@ -883,15 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle AI Cake Form submission
-    const aiCakeForm = document.getElementById('aiCakeForm');
-    if (aiCakeForm) {
-        aiCakeForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // For now, just close the modal since we're not implementing the AI functionality yet
-            closeAllModals();
-        });
-    }
+    // AI Cake Form submission is handled by aicakes.js
 });
   </script>
 <script>
