@@ -155,11 +155,6 @@ include 'config.php';
 
                         <form id="paymentForm">
                             <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" autocomplete="email" placeholder="Enter your email here..." required>
-                            </div>
-
-                            <div class="form-group">
                                 <label for="fullname">Fullname</label>
                                 <input type="text" id="fullname" name="fullname" autocomplete="name" placeholder="Enter your fullname here..." required>
                             </div>
@@ -446,7 +441,15 @@ include 'config.php';
                             <textarea id="specialInstructions" placeholder="Any special requests or details about your cake design..."></textarea>
                         </div>
                         
-                        <button type="submit" class="submit-order-btn">SUBMIT ORDER</button>
+                        <div class="price-estimate-section">
+                            <h4>Estimated Price Range</h4>
+                            <div class="price-range">
+                                <span id="estimatedPrice">₱0.00</span>
+                            </div>
+                            <p class="price-note">* Final price may vary based on design complexity</p>
+                        </div>
+
+                        <button type="submit" class="submit-order-btn">ADD TO CART</button>
                     </form>
                 </div>
             </div>
@@ -824,7 +827,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cartPopup.classList.remove('active');
             cartPopup.style.display = 'none';
             checkoutModal.style.display = 'block';
-            setTimeout(() => { checkoutModal.classList.add('active'); }, 10);
+            setTimeout(() => checkoutModal.classList.add('active'), 10);
             modalOverlay.style.display = 'block';
             modalOverlay.classList.add('active');
             updateCartUI(); // Update checkout items
@@ -868,27 +871,72 @@ document.addEventListener('DOMContentLoaded', function() {
             const cartItem = e.target.closest('.cart-popup-item');
             if (!cartItem) return;
 
+            // Get either the index (for custom cakes) or id (for regular products)
+            const index = cartItem.dataset.index;
             const productId = cartItem.dataset.id;
 
             // Handle remove button click
             if (e.target.closest('.cart-item-remove')) {
-                removeFromCart(productId);
+                console.log('Remove clicked - index:', index, 'productId:', productId);
+                
+                if (index !== undefined && index !== null) {
+                    // Remove custom cake using index
+                    const indexNum = parseInt(index);
+                    console.log('Removing custom cake at index:', indexNum);
+                    window.cart.splice(indexNum, 1);
+                    localStorage.setItem('cart', JSON.stringify(window.cart));
+                    updateCartUI();
+                    updateCartCount(); // Update the cart count after removal
+                } else if (productId) {
+                    // Remove regular product using id
+                    removeFromCart(productId);
+                }
             }
 
             // Handle quantity buttons
             if (e.target.classList.contains('cart-plus')) {
                 const quantityElement = cartItem.querySelector('.cart-quantity');
                 const currentQuantity = parseInt(quantityElement.textContent);
-                updateCartQuantity(productId, currentQuantity + 1);
+                if (index !== undefined && index !== null) {
+                    // Update custom cake quantity
+                    const indexNum = parseInt(index);
+                    window.cart[indexNum].quantity = currentQuantity + 1;
+                    localStorage.setItem('cart', JSON.stringify(window.cart));
+                    updateCartUI();
+                    updateCartCount();
+                } else if (productId) {
+                    // Update regular product quantity
+                    updateCartQuantity(productId, currentQuantity + 1);
+                }
             }
 
             if (e.target.classList.contains('cart-minus')) {
                 const quantityElement = cartItem.querySelector('.cart-quantity');
                 const currentQuantity = parseInt(quantityElement.textContent);
                 if (currentQuantity > 1) {
-                    updateCartQuantity(productId, currentQuantity - 1);
+                    if (index !== undefined && index !== null) {
+                        // Update custom cake quantity
+                        const indexNum = parseInt(index);
+                        window.cart[indexNum].quantity = currentQuantity - 1;
+                        localStorage.setItem('cart', JSON.stringify(window.cart));
+                        updateCartUI();
+                        updateCartCount();
+                    } else if (productId) {
+                        // Update regular product quantity
+                        updateCartQuantity(productId, currentQuantity - 1);
+                    }
                 } else {
-                    removeFromCart(productId);
+                    if (index !== undefined && index !== null) {
+                        // Remove custom cake
+                        const indexNum = parseInt(index);
+                        window.cart.splice(indexNum, 1);
+                        localStorage.setItem('cart', JSON.stringify(window.cart));
+                        updateCartUI();
+                        updateCartCount();
+                    } else if (productId) {
+                        // Remove regular product
+                        removeFromCart(productId);
+                    }
                 }
             }
         });
@@ -1007,7 +1055,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Gather form data
-            const email = document.getElementById('email').value.trim();
             const fullname = document.getElementById('fullname').value.trim();
             const address = document.getElementById('address').value.trim();
             const deliveryDate = document.getElementById('deliveryDate').value;
@@ -1016,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const cart = window.cart || [];
 
             // Basic validation
-            if (!email || !fullname || !address || !deliveryDate || !paymentMethod || cart.length === 0) {
+            if (!fullname || !address || !deliveryDate || !paymentMethod || cart.length === 0) {
                 alert('Please fill in all required fields and add at least one item to your cart.');
                 return;
             }
@@ -1033,7 +1080,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Prepare order data (with both flat and nested for backend compatibility)
             const orderData = {
                 user_id, // <-- always send user_id
-                email,
                 fullname,
                 address,
                 deliveryDate,
@@ -1042,7 +1088,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 cart: cart,
                 total: total,
                 customer: {
-                    email,
                     fullname,
                     address,
                     deliveryDate,
@@ -1172,6 +1217,409 @@ document.addEventListener('DOMContentLoaded', function() {
                 product.style.display = 'none';
             }
         });
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Price calculation for custom cake
+    const basePrices = {
+        '6': 500.00,
+        '8': 800.00,
+        '10': 1200.00,
+        '12': 1500.00
+    };
+
+    const flavorPrices = {
+        'Vanilla': 0,
+        'Chocolate': 50,
+        'Red Velvet': 100,
+        'Carrot': 80,
+        'Ube': 70
+    };
+
+    const fillingPrices = {
+        'Buttercream': 0,
+        'Chocolate Ganache': 100,
+        'Fresh Fruit': 150,
+        'Custard': 80
+    };
+
+    const frostingPrices = {
+        'Buttercream': 0,
+        'Fondant': 200,
+        'Whipped Cream': 50,
+        'Ganache': 150
+    };
+
+    function updateEstimatedPrice() {
+        const size = document.getElementById('cakeSize').value;
+        const flavor = document.getElementById('cakeFlavor').value;
+        const filling = document.getElementById('fillingType').value;
+        const frosting = document.getElementById('frostingType').value;
+
+        if (!size || !flavor || !filling || !frosting) return;
+
+        const basePrice = basePrices[size] || 0;
+        const flavorPrice = flavorPrices[flavor] || 0;
+        const fillingPrice = fillingPrices[filling] || 0;
+        const frostingPrice = frostingPrices[frosting] || 0;
+
+        const totalPrice = basePrice + flavorPrice + fillingPrice + frostingPrice;
+        document.getElementById('estimatedPrice').textContent = `₱${totalPrice.toFixed(2)}`;
+        
+        // Store the calculated price
+        document.getElementById('cakeDetailsForm').dataset.calculatedPrice = totalPrice;
+    }
+
+    // Add event listeners for price updates
+    ['cakeSize', 'cakeFlavor', 'fillingType', 'frostingType'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', updateEstimatedPrice);
+        }
+    });
+
+    // Handle custom order form submission
+    const cakeDetailsForm = document.getElementById('cakeDetailsForm');
+    if (cakeDetailsForm) {
+        cakeDetailsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Check if user is logged in
+            if (!window.isLoggedIn) {
+                alert('Please log in to place a custom order.');
+                return;
+            }
+
+            // Get form data
+            const formData = new FormData(this);
+            const calculatedPrice = parseFloat(this.dataset.calculatedPrice || 0);
+            
+            // Get the uploaded image
+            const fileInput = document.getElementById('cakePhotoInput');
+            if (!fileInput.files.length) {
+                alert('Please upload a reference photo for your cake.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Create custom cake cart item
+                const customCake = {
+                    type: 'custom',
+                    name: 'Custom Cake',
+                    price: calculatedPrice,
+                    quantity: 1,
+                    image: e.target.result,
+                    details: {
+                        size: document.getElementById('cakeSize').value,
+                        flavor: document.getElementById('cakeFlavor').value,
+                        filling: document.getElementById('fillingType').value,
+                        frosting: document.getElementById('frostingType').value,
+                        instructions: document.getElementById('specialInstructions').value
+                    }
+                };
+
+                // Add to cart
+                if (!window.cart) window.cart = [];
+                window.cart.push(customCake);
+                
+                // Save cart to localStorage
+                localStorage.setItem('cart', JSON.stringify(window.cart));
+
+                // Update cart UI
+                updateCartCount();
+                
+                // Close photo upload modal
+                const photoUploadModal = document.getElementById('photoUploadModal');
+                photoUploadModal.classList.remove('active');
+                modalOverlay.classList.remove('active');
+                setTimeout(() => {
+                    photoUploadModal.style.display = 'none';
+                    modalOverlay.style.display = 'none';
+                }, 300);
+
+                alert('Custom cake added to cart!');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        });
+    }
+
+    // Update cart UI function
+    function updateCartUI() {
+        const cartPopupItems = document.getElementById('cartPopupItems');
+        const orderItemsList = document.getElementById('orderItemsList');
+        let total = 0;
+
+        if (!window.cart || !window.cart.length) {
+            if (cartPopupItems) cartPopupItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+            if (orderItemsList) orderItemsList.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+            document.getElementById('cartTotal').textContent = '₱0.00';
+            return;
+        }
+
+        let cartHTML = '';
+        let checkoutHTML = '';
+
+        window.cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            if (item.type === 'custom') {
+                // Custom cake display in cart
+                cartHTML += `
+                    <div class="cart-popup-item" data-index="${index}" data-type="custom">
+                        <img src="${item.image}" alt="Custom Cake" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h4>${item.name}</h4>
+                            <p>${item.details.size}" ${item.details.flavor}</p>
+                            <p class="cart-item-price">₱${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="cart-minus">-</button>
+                            <span class="cart-quantity">${item.quantity}</span>
+                            <button class="cart-plus">+</button>
+                        </div>
+                        <button class="cart-item-remove">&times;</button>
+                    </div>
+                `;
+
+                // Custom cake display in checkout
+                checkoutHTML += `
+                    <div class="checkout-item">
+                        <img src="${item.image}" alt="Custom Cake" class="checkout-item-image">
+                        <div class="checkout-item-details">
+                            <h4>${item.name}</h4>
+                            <p>${item.details.size}" ${item.details.flavor} cake</p>
+                            <p>Filling: ${item.details.filling}</p>
+                            <p>Frosting: ${item.details.frosting}</p>
+                            <p class="checkout-item-price">₱${item.price.toFixed(2)} x ${item.quantity}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Regular product display (existing code)
+                cartHTML += `
+                    <div class="cart-popup-item" data-index="${index}">
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h4>${item.name}</h4>
+                            <p class="cart-item-price">₱${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="cart-minus">-</button>
+                            <span class="cart-quantity">${item.quantity}</span>
+                            <button class="cart-plus">+</button>
+                        </div>
+                        <button class="cart-item-remove">&times;</button>
+                    </div>
+                `;
+
+                checkoutHTML += `
+                    <div class="checkout-item">
+                        <img src="${item.image}" alt="${item.name}" class="checkout-item-image">
+                        <div class="checkout-item-details">
+                            <h4>${item.name}</h4>
+                            <p class="checkout-item-price">₱${item.price.toFixed(2)} x ${item.quantity}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (cartPopupItems) cartPopupItems.innerHTML = cartHTML;
+        if (orderItemsList) orderItemsList.innerHTML = checkoutHTML;
+        document.getElementById('cartTotal').textContent = `₱${total.toFixed(2)}`;
+    }
+
+    // Update cart count function
+    function updateCartCount() {
+        const cartCount = document.querySelector('.cart-count');
+        if (cartCount) {
+            const count = window.cart ? window.cart.reduce((total, item) => total + item.quantity, 0) : 0;
+            cartCount.textContent = count.toString();
+        }
+    }
+
+    // Load cart from localStorage on page load
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+        window.cart = JSON.parse(savedCart);
+        updateCartCount();
+    }
+});
+</script>
+<style>
+.price-estimate-section {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.price-estimate-section h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.price-range {
+    font-size: 24px;
+    font-weight: bold;
+    color: #E84B8A;
+    margin: 10px 0;
+}
+
+.price-note {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+.preview-container {
+    display: none;
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.preview-image {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #E84B8A;
+    color: white;
+    border: none;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.remove-image-btn:hover {
+    background-color: #d83790;
+}
+
+.upload-area.dragover {
+    background-color: #fce7f3;
+    border-color: #E84B8A;
+}
+
+.file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // File upload and preview functionality
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('cakePhotoInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const uploadPlaceholder = document.querySelector('.upload-placeholder');
+
+    // Handle drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.remove('dragover');
+        });
+    });
+
+    // Handle file drop
+    uploadArea.addEventListener('drop', handleDrop);
+    fileInput.addEventListener('change', handleFiles);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles({ target: { files: files } });
+    }
+
+    function handleFiles(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    displayPreview(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please upload an image file.');
+            }
+        }
+    }
+
+    function displayPreview(imageUrl) {
+        // Clear previous preview
+        previewContainer.innerHTML = '';
+        
+        // Create preview elements
+        const previewImage = document.createElement('img');
+        previewImage.src = imageUrl;
+        previewImage.className = 'preview-image';
+        
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-image-btn';
+        removeButton.innerHTML = '×';
+        removeButton.onclick = removePreview;
+        
+        // Add elements to container
+        previewContainer.appendChild(previewImage);
+        previewContainer.appendChild(removeButton);
+        
+        // Hide placeholder, show preview
+        uploadPlaceholder.style.display = 'none';
+        previewContainer.style.display = 'block';
+    }
+
+    function removePreview() {
+        // Clear file input
+        fileInput.value = '';
+        
+        // Clear preview
+        previewContainer.innerHTML = '';
+        previewContainer.style.display = 'none';
+        
+        // Show placeholder
+        uploadPlaceholder.style.display = 'flex';
     }
 });
 </script>
