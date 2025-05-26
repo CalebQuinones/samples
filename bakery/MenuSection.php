@@ -314,49 +314,48 @@ include 'config.php';
     
         <!-- Custom Cake Modal -->
         <div class="custom-cake-modal" id="customCakeModal">
-            <div class="modal-content">
-                <button class="close-modal" id="closeModal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-                
-                <h2>How would you like to order your cake?</h2>
-                <p class="modal-subtitle">Choose an option below to get started with your custom cake order</p>
-                
-                <div class="order-options">
-                    <div class="order-option">
-                        <div class="option-icon customize-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 21H16" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 17V21" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M17 3H7C5.89543 3 5 3.89543 5 5V13C5 14.1046 5.89543 15 7 15H17C18.1046 15 19 14.1046 19 13V5C19 3.89543 18.1046 3 17 3Z" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9 7H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9 11H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Customize Online</h3>
-                        <p>Design your cake with our easy-to-use online cake builder</p>
+            <button class="close-modal" id="closeModal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            
+            <h2>How would you like to order your cake?</h2>
+            <p class="modal-subtitle">Choose an option below to get started with your custom cake order</p>
+            
+            <div class="order-options">
+                <div class="order-option ai-option">
+                    <div class="option-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 21H16" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 17V21" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 3H7C5.89543 3 5 3.89543 5 5V13C5 14.1046 5.89543 15 7 15H17C18.1046 15 19 14.1046 19 13V5C19 3.89543 18.1046 3 17 3Z" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 7H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 11H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </div>
-                    
-                    <div class="order-option">
-                        <div class="option-icon upload-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M17 8L12 3L7 8" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 3V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Upload a Photo</h3>
-                        <p>Share a photo of a cake design you'd like us to create for you</p>
-                    </div>
+                    <div class="new-feature-badge">NEW</div>
+                    <h3>Build with AICakes</h3>
+                    <p>Generate a cake design with AICakes our AI-powered cake builder</p>
                 </div>
                 
-                <div class="modal-actions">
-                    <button class="start-customizing-btn">START CUSTOMIZING</button>
-                    <button class="choose-later-btn">Choose Later</button>
+                <div class="order-option">
+                    <div class="option-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3L7 8" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Upload a Photo</h3>
+                    <p>Share a photo of a cake design you'd like us to create for you</p>
                 </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="start-customizing-btn">START CUSTOMIZING</button>
+                <button class="choose-later-btn">Choose Later</button>
             </div>
         </div>
 
@@ -641,9 +640,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper to open a modal with overlay
     function openModal(modal) {
+        if (!modal) return;
         modalOverlay.style.display = 'block';
         modal.style.display = 'block';
-        void modalOverlay.offsetWidth;
+        // Force reflow
         void modal.offsetWidth;
         modalOverlay.classList.add('active');
         modal.classList.add('active');
@@ -652,77 +652,100 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper to close all modals
     function closeAllModals() {
-        [customCakeModal, photoUploadModal].forEach(m => {
-            if (m) m.classList.remove('active');
+        const modals = [customCakeModal, photoUploadModal];
+        modals.forEach(modal => {
+            if (modal) {
+                modal.classList.remove('active');
+            }
         });
-        modalOverlay.classList.remove('active');
+        if (modalOverlay) {
+            modalOverlay.classList.remove('active');
+        }
         setTimeout(() => {
-            [customCakeModal, photoUploadModal].forEach(m => {
-                if (m) m.style.display = 'none';
+            modals.forEach(modal => {
+                if (modal) modal.style.display = 'none';
             });
-            modalOverlay.style.display = 'none';
+            if (modalOverlay) modalOverlay.style.display = 'none';
             document.body.style.overflow = 'auto';
         }, 300);
     }
 
     // Open custom order modal
-    if (customOrderBtn && customCakeModal) {
-        customOrderBtn.addEventListener('click', function() {
+    if (customOrderBtn) {
+        customOrderBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             openModal(customCakeModal);
+            // Pre-select the first option
+            if (orderOptions.length > 0) {
+                orderOptions[0].classList.add('selected');
+                if (startCustomizingBtn) {
+                    startCustomizingBtn.textContent = 'START CUSTOMIZING';
+                }
+            }
         });
     }
 
     // Close modals
-    if (closeModal) closeModal.addEventListener('click', closeAllModals);
-    if (closePhotoModal) closePhotoModal.addEventListener('click', closeAllModals);
+    [closeModal, closePhotoModal].forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAllModals();
+            });
+        }
+    });
 
-    // Overlay click closes modals (only if overlay itself is clicked)
+    // Overlay click closes modals
     if (modalOverlay) {
         modalOverlay.addEventListener('click', function(e) {
-            if (e.target === modalOverlay) closeAllModals();
+            if (e.target === modalOverlay) {
+                closeAllModals();
+            }
         });
     }
 
     // Option selection logic
     orderOptions.forEach(option => {
-        option.addEventListener('click', function() {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Remove selected class from all options
             orderOptions.forEach(opt => opt.classList.remove('selected'));
+            // Add selected class to clicked option
             this.classList.add('selected');
-            // Update button text
+            // Update button text based on selection
             const title = this.querySelector('h3')?.textContent?.trim();
             if (startCustomizingBtn) {
-                startCustomizingBtn.textContent = (title === 'Customize Online') ? 'START CUSTOMIZING' : 'UPLOAD PHOTO';
+                startCustomizingBtn.textContent = (title === 'Build with AICakes') ? 'START CUSTOMIZING' : 'UPLOAD PHOTO';
             }
         });
     });
 
     // Start customizing button logic
     if (startCustomizingBtn) {
-        startCustomizingBtn.addEventListener('click', function() {
+        startCustomizingBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             const selected = document.querySelector('.order-option.selected');
-            const title = selected?.querySelector('h3')?.textContent?.trim();
-            if (title === 'Customize Online') {
-                // Redirect or show a message
-                alert('Redirecting to cake customization page...');
-                // window.location.href = 'cake-customizer.html';
-                closeAllModals();
+            if (!selected) {
+                alert('Please select an option to continue.');
+                return;
+            }
+
+            const title = selected.querySelector('h3')?.textContent?.trim();
+            if (title === 'Build with AICakes') {
+                // Redirect to AI cake builder
+                window.location.href = 'ai-cake-builder.php';
             } else if (title === 'Upload a Photo') {
-                // Close custom modal, open photo upload modal
+                // Switch to photo upload modal
                 customCakeModal.classList.remove('active');
                 setTimeout(() => {
                     customCakeModal.style.display = 'none';
                     openModal(photoUploadModal);
                 }, 300);
-            } else {
-                // Default: open customize
-                alert('Redirecting to cake customization page...');
-                // window.location.href = 'cake-customizer.html';
-                closeAllModals();
             }
         });
     }
 
-    // Fix: Choose Later button should just close the modal and overlay
+    // Choose later button
     if (chooseLaterBtn) {
         chooseLaterBtn.addEventListener('click', function(e) {
             e.preventDefault();
