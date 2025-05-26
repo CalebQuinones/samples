@@ -20,7 +20,7 @@ $total_records = mysqli_fetch_assoc($total_result)['count'];
 $total_pages = ceil($total_records / $records_per_page);
 
 // Fetch products with pagination
-$sql = "SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?";
+$sql = "SELECT * FROM products ORDER BY created_at ASC LIMIT ? OFFSET ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
 mysqli_stmt_execute($stmt);
@@ -191,7 +191,20 @@ $result = mysqli_stmt_get_result($stmt);
                         $availability = $row['availability'];
                         
                         // Get availability badge class
-                        $availabilityClass = $availability === 'In Stock' ? 'status-completed' : 'status-cancelled';
+                        $availabilityClass = '';
+                        $availabilityText = '';
+                        $availabilityLower = strtolower(trim($availability));
+                        
+                        if (strpos($availabilityLower, 'low') !== false) {
+                            $availabilityClass = 'status-low-stock';
+                            $availabilityText = 'Low Stock';
+                        } elseif (strpos($availabilityLower, 'out') !== false) {
+                            $availabilityClass = 'status-out-of-stock';
+                            $availabilityText = 'Out of Stock';
+                        } else {
+                            $availabilityClass = 'status-in-stock';
+                            $availabilityText = 'In Stock';
+                        }
                         
                         echo "<tr data-product-id='$productId'>";
                         echo "<td><input type='checkbox' class='product-checkbox' value='$productId'></td>";
@@ -200,7 +213,7 @@ $result = mysqli_stmt_get_result($stmt);
                         echo "<td>$name</td>";
                         echo "<td>$category</td>";
                         echo "<td>₱$price</td>";
-                        echo "<td><span class='status-badge $availabilityClass'>$availability</span></td>";
+                        echo "<td><span class='status-badge $availabilityClass'>$availabilityText</span></td>";
                         echo "<td>
                                 <div class='action-buttons'>
                                     <button class='action-button edit-button' data-product-id='$productId' title='Edit Product'>
@@ -307,13 +320,18 @@ $result = mysqli_stmt_get_result($stmt);
                       </div>
                       <div class="form-group">
                         <label class="form-label">Product Image</label>
-                          <div style="border: 2px dashed var(--gray-300); border-radius: 0.375rem; padding: 1.5rem; text-align: center;">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400);"></i>
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-600);">
-                              <span style="color: var(--pink-600); font-weight: 500; cursor: pointer;">Upload a file</span>
-                              or drag and drop
-                            </p>
-                            <p style="font-size: 0.75rem; color: var(--gray-500);">PNG, JPG, GIF up to 10MB</p>
+                          <div style="border: 2px dashed var(--gray-300); border-radius: 0.375rem; padding: 1.5rem; text-align: center; cursor: pointer;" id="imageUploadArea">
+                            <div id="uploadPlaceholder">
+                              <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400);"></i>
+                              <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-600);">
+                                <span style="color: var(--pink-600); font-weight: 500;">Click to upload</span> or drag and drop
+                              </p>
+                              <p style="font-size: 0.75rem; color: var(--gray-500);">PNG, JPG up to 10MB</p>
+                            </div>
+                            <input type="file" id="productImage" name="productImage" accept="image/*" style="display: none;">
+                            <div id="imagePreview" style="margin-top: 1rem; display: none;">
+                              <img id="previewImage" src="#" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 0.25rem; cursor: default;">
+                            </div>
                           </div>
                       </div>
                     </form>
@@ -334,8 +352,8 @@ $result = mysqli_stmt_get_result($stmt);
                     <h3 class="modal-title">Edit Product</h3>
                 </div>
                 <div class="modal-body">
-                    <form id="editProductForm">
-                      <input type="hidden" id="editProductId">
+                    <form id="editProductForm" enctype="multipart/form-data">
+                      <input type="hidden" id="editProductId" name="product_id">
                       <div class="form-group">
                         <label for="editProductName">Product Name</label>
                         <input type="text" id="editProductName" name="name" required>
@@ -357,27 +375,16 @@ $result = mysqli_stmt_get_result($stmt);
                             <div style="position: absolute; top: 0; bottom: 0; left: 0; display: flex; align-items: center; padding-left: 0.75rem;">
                               <span style="color: var(--gray-500);">₱</span>
                             </div>
-                              <input type="text" id="editProductPrice" class="form-textarea" style="min-height: auto; padding-left: 1.75rem;" placeholder="0.00">
+                              <input type="text" id="editProductPrice" name="price" class="form-textarea" style="min-height: auto; padding-left: 1.75rem;" placeholder="0.00" required>
                           </div>
                       </div>
                       <div class="form-group">
                         <label for="editProductStatus" class="form-label">Status</label>
-                          <select id="editProductStatus" class="form-select">
-                            <option>In Stock</option>
-                            <option>Low Stock</option>
-                            <option>Out of Stock</option>
+                          <select id="editProductStatus" name="availability" class="form-select" required>
+                            <option value="In Stock">In Stock</option>
+                            <option value="Low Stock">Low Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
                           </select>
-                      </div>
-                      <div class="form-group">
-                        <label class="form-label">Product Image</label>
-                          <div style="border: 2px dashed var(--gray-300); border-radius: 0.375rem; padding: 1.5rem; text-align: center;">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--gray-400);"></i>
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-600);">
-                              <span style="color: var(--pink-600); font-weight: 500; cursor: pointer;">Upload a file</span>
-                              or drag and drop
-                            </p>
-                            <p style="font-size: 0.75rem; color: var(--gray-500);">PNG, JPG, GIF up to 10MB</p>
-                          </div>
                       </div>
                     </form>
                 </div>

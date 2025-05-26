@@ -1,6 +1,42 @@
 @import url("https://fonts.googleapis.com/css2?family=Madimi+One&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-in-stock {
+  background-color: var(--green-100);
+  color: var(--green-800);
+}
+
+.status-low-stock {
+  background-color: var(--yellow-100);
+  color: var(--yellow-800);
+}
+
+.status-out-of-stock {
+  background-color: var(--red-100);
+  color: var(--red-800);
+}
+
+.status-customer {
+  background-color: var(--blue-100);
+  color: var(--blue-800);
+}
+
+.status-admin {
+  background-color: var(--pink-100);
+  color: var(--pink-800);
+}
+
 /* Base styles */
 :root {
   --pink-50: #fdf2f8;
@@ -818,8 +854,69 @@ body {
 
 .order-item.completed { background-color: var(--green-100); }
 .order-item.in-progress { background-color: var(--yellow-100); }
-.order-item.pending { background-color: var(--blue-100); }
-.order-item.cancelled { background-color: var(--red-100); }
+/* Calendar order items */
+.calendar-cell .order-item {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  border-left: 3px solid transparent;
+}
+
+.calendar-cell .order-item.pending {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-left-color: #1e40af;
+}
+
+.calendar-cell .order-item.completed,
+.calendar-cell .order-item.delivered {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left-color: #065f46;
+}
+
+.calendar-cell .order-item.processing,
+.calendar-cell .order-item.shipped {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-left-color: #92400e;
+}
+
+.calendar-cell .order-item.cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-left-color: #991b1b;
+}
+
+/* Make sure the product name is bold */
+.calendar-cell .order-item .product-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Customer name styling */
+.calendar-cell .order-item .customer-name {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status badges in calendar */
+.calendar-cell .order-item .status-badge {
+  display: inline-block;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.1rem;
+}
 
 .order-item:hover {
   transform: translateY(-1px);
@@ -937,37 +1034,6 @@ tbody tr:hover {
 .order-id {
   font-weight: 500;
   color: var(--gray-900);
-}
-
-/* Status styles */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0rem 0.5rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.status-completed {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-
-.status-in-progress {
-  background-color: #fef3c7;
-  color: #92400e;
-}
-
-.status-pending {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-.status-cancelled {
-  background-color: #fee2e2;
-  color: #991b1b;
 }
 
 /* Recent inquiries */
@@ -1392,21 +1458,8 @@ tbody tr:hover {
   font-weight: 500;
 }
 
-/* Status badge colors */
-.status-badge.status-in-stock {
-  background-color: var(--green-100);
-  color: var(--green-800);
-}
 
-.status-badge.status-low-stock {
-  background-color: var(--yellow-100);
-  color: var(--yellow-800);
-}
 
-.status-badge.status-out-of-stock {
-  background-color: var(--red-100);
-  color: var(--red-800);
-}
 .edit-button svg {
   width: 1rem;
   height: 1rem;

@@ -119,6 +119,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 editButton.classList.add("edit-button-cancel");
                 if (updateStatusButton) updateStatusButton.style.display = "block";
                 if (updatePaymentButton) updatePaymentButton.style.display = "block";
+                
+                // Get current payment status and ensure correct case
+                const currentPaymentStatus = document.getElementById("paymentStatus").textContent.trim();
+                const formattedPaymentStatus = currentPaymentStatus.charAt(0).toUpperCase() + 
+                    currentPaymentStatus.slice(1).toLowerCase();
+                
+                // Set modal select values
+                if (paymentStatusSelect) {
+                    paymentStatusSelect.value = formattedPaymentStatus;
+                }
+                if (statusSelect) {
+                    statusSelect.value = document.getElementById("orderStatus").textContent.toLowerCase();
+                }
+                
                 // Show the status modal
                 if (statusModal) {
                     showModal(statusModal);
@@ -180,29 +194,74 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     // Update status confirm button click handler
-    if (updateStatusConfirm) {
-        updateStatusConfirm.addEventListener("click", () => {
-            const newStatus = statusSelect.value;
-            const newPaymentStatus = paymentStatusSelect.value;
-            const message = messageTextarea.value;
-    
+if (updateStatusConfirm) {
+    updateStatusConfirm.addEventListener("click", async () => {
+        try {
+            const orderId = getOrderIdFromUrl();
+            if (!orderId) throw new Error('Invalid order ID');
+
+            // Validate payment status
+            const validPaymentStatuses = ['Pending', 'Paid', 'Failed', 'Refunded'];
+            const selectedPaymentStatus = paymentStatusSelect.value;
+            
+            if (!validPaymentStatuses.includes(selectedPaymentStatus)) {
+                throw new Error('Please select a valid payment status');
+            }
+
+            console.log('Updating order with:', {
+                orderId: parseInt(orderId),
+                status: statusSelect.value,
+                paymentStatus: selectedPaymentStatus,
+                message: messageTextarea.value
+            });
+
+            const response = await fetch('update_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    orderId: parseInt(orderId),
+                    status: statusSelect.value,
+                    paymentStatus: selectedPaymentStatus,
+                    message: messageTextarea.value
+                })
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                try {
+                    const errorData = JSON.parse(text);
+                    throw new Error(errorData.message || 'Failed to update order');
+                } catch (e) {
+                    throw new Error('Server error: ' + text);
+                }
+            }
+
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'Update failed');
+            }
+
             // Update the status badge
             if (statusContainer) {
-                statusContainer.innerHTML = "";
                 const statusBadge = document.createElement("span");
-                statusBadge.className = `status-badge status-${newStatus.toLowerCase().replace(" ", "-")}`;
-                statusBadge.textContent = newStatus;
+                const statusValue = statusSelect.value.toLowerCase();
+                const statusDisplay = statusValue.charAt(0).toUpperCase() + statusValue.slice(1);
+                statusBadge.className = `status-badge status-${statusValue.replace(/\s+/g, "-")}`;
+                statusBadge.textContent = statusDisplay;
+                statusContainer.innerHTML = "";
                 statusContainer.appendChild(statusBadge);
             }
 
-            // Update payment info
+            // Update payment status display immediately
             const paymentStatusElement = document.getElementById("paymentStatus");
-            if (paymentStatusElement) paymentStatusElement.textContent = newPaymentStatus;
-    
-            // Close the modal
+            if (paymentStatusElement) {
+                paymentStatusElement.textContent = selectedPaymentStatus;
+            }
+
+            // Close modal and reset state
             closeModal(statusModal);
-            
-            // Reset edit button state
             if (editButton) {
                 isEditing = false;
                 editButton.innerHTML = '<i class="fas fa-edit"></i> Edit Order';
@@ -212,10 +271,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     updateStatusButton.style.display = "none";
                 }
             }
-    
-            alert(`Order Updated\nStatus: ${newStatus}\nPayment Status: ${newPaymentStatus}${message ? "\nMessage: " + message : ""}`);
-        });
-    }
+
+            // Clear the message textarea
+            if (messageTextarea) {
+                messageTextarea.value = '';
+            }
+
+            // Show success message
+            alert('Order updated successfully');
+
+        } catch (error) {
+            console.error('Error updating order:', error);
+            alert(error.message);
+        }
+    });
+}
   
     function getOrderIdFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -272,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (err) {
             // Show error state
-            document.querySelectorAll('.order-info-value, #orderStatus, .customer-info-text').forEach(el => {
+            document.querySelectorAll('.order-info-value, #orderStatus, .customer_info-text').forEach(el => {
                 el.textContent = 'Error loading data';
                 el.style.color = 'red';
             });
@@ -341,17 +411,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     function populatePaymentInfo(order) {
+        // Always use the exact case from the database enum
+        const paymentStatus = order.payment_status;
+        
         const elements = {
-            "paymentType": (order.payment_method || 'N/A').charAt(0).toUpperCase() + (order.payment_method || 'N/A').slice(1),
+            "paymentType": (order.payment_method || 'N/A').charAt(0).toUpperCase() + 
+                (order.payment_method || 'N/A').slice(1),
             "paymentDate": new Date(order.created_at).toLocaleDateString(),
-            "paymentStatus": (order.payment_status || 'Pending').charAt(0).toUpperCase() + (order.payment_status || 'Pending').slice(1)
+            "paymentStatus": paymentStatus
         };
+
+        // Update all payment-related elements
         Object.entries(elements).forEach(([id, value]) => {
             const element = document.getElementById(id);
             if (element) {
                 element.textContent = value;
             }
         });
+
+        // Set the select element value to match the current payment status exactly
+        if (paymentStatusSelect) {
+            paymentStatusSelect.value = paymentStatus;
+        }
     }
   
     function populateDeliveryInfo(order) {
