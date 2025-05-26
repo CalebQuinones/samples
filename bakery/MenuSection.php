@@ -391,6 +391,28 @@ include 'config.php';
                     <h3>Cake Details</h3>
                     <form id="cakeDetailsForm">
                         <div class="form-group">
+                            <label for="cakeType">Cake Type</label>
+                            <select id="cakeType" required>
+                                <option value="" disabled selected>Select type</option>
+                                <option value="wedding">Wedding Cake</option>
+                                <option value="birthday">Birthday Cake</option>
+                                <option value="anniversary">Anniversary Cake</option>
+                                <option value="custom">Custom Cake</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cakeTiers">Number of Tiers</label>
+                            <select id="cakeTiers" required>
+                                <option value="" disabled selected>Select tiers</option>
+                                <option value="1">Single Tier</option>
+                                <option value="2">Two Tiers</option>
+                                <option value="3">Three Tiers</option>
+                                <option value="4">Four Tiers</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="cakeSize">Cake Size</label>
                             <select id="cakeSize" required>
                                 <option value="" disabled selected>Select size</option>
@@ -444,11 +466,113 @@ include 'config.php';
                             <h4>Estimated Price Range</h4>
                             <div class="price-range">
                                 <span id="estimatedPrice">₱0.00</span>
+                                <span class="plus-icon">+</span>
                             </div>
                             <p class="price-note">* Final price may vary based on design complexity</p>
                         </div>
 
                         <button type="submit" class="submit-order-btn">ADD TO CART</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- AICakes Modal -->
+        <div class="aicakes-modal" id="aiCakesModal">
+            <div class="modal-content">
+                <button class="close-modal" id="closeAiModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                
+                <h2>Design Your Dream Cake with AI</h2>
+                <p class="modal-subtitle">Tell us about your perfect cake and let our AI bring your vision to life!</p>
+                
+                <div class="cake-details-section">
+                    <form id="aiCakeForm">
+                        <div class="form-group">
+                            <label for="aiCakeType">Cake Type</label>
+                            <select id="aiCakeType" name="cakeType" required>
+                                <option value="">Select type</option>
+                                <option value="wedding">Wedding Cake</option>
+                                <option value="birthday">Birthday Cake</option>
+                                <option value="anniversary">Anniversary Cake</option>
+                                <option value="custom">Custom Cake</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiCakeTiers">Number of Tiers</label>
+                            <select id="aiCakeTiers" name="cakeTiers" required>
+                                <option value="">Select tiers</option>
+                                <option value="1">Single Tier</option>
+                                <option value="2">Two Tiers</option>
+                                <option value="3">Three Tiers</option>
+                                <option value="4">Four Tiers</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiCakeSize">Cake Size</label>
+                            <select id="aiCakeSize" name="cakeSize" required>
+                                <option value="">Select a size</option>
+                                <option value="6inch">6 inch (serves 8-10)</option>
+                                <option value="8inch">8 inch (serves 12-15)</option>
+                                <option value="10inch">10 inch (serves 20-25)</option>
+                                <option value="12inch">12 inch (serves 30-35)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiCakeFlavor">Cake Flavor</label>
+                            <select id="aiCakeFlavor" name="cakeFlavor" required>
+                                <option value="">Select a flavor</option>
+                                <option value="vanilla">Vanilla</option>
+                                <option value="chocolate">Chocolate</option>
+                                <option value="redvelvet">Red Velvet</option>
+                                <option value="carrot">Carrot</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiFillingType">Filling Type</label>
+                            <select id="aiFillingType" name="fillingType" required>
+                                <option value="">Select a filling</option>
+                                <option value="buttercream">Buttercream</option>
+                                <option value="chocolate">Chocolate Ganache</option>
+                                <option value="fruit">Fresh Fruit</option>
+                                <option value="custard">Custard</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiFrostingType">Frosting Type</label>
+                            <select id="aiFrostingType" name="frostingType" required>
+                                <option value="">Select a frosting</option>
+                                <option value="buttercream">Buttercream</option>
+                                <option value="fondant">Fondant</option>
+                                <option value="ganache">Ganache</option>
+                                <option value="nakedcake">Naked Cake</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiDescription">Describe Your Dream Cake</label>
+                            <textarea id="aiDescription" name="cakeDescription" placeholder="Describe the design, colors, decorations, and any special elements you'd like on your cake..." required></textarea>
+                        </div>
+
+                        <div class="price-estimate-section">
+                            <h4>Estimated Price</h4>
+                            <div class="price-range">
+                                <span id="aiEstimatedPrice">₱0.00</span>
+                                <span class="plus-icon">+</span>
+                            </div>
+                            <p class="price-note">* Final price may vary based on design complexity</p>
+                        </div>
+
+                        <button type="submit" class="magic-button">Let AICakes do the magic</button>
                     </form>
                 </div>
             </div>
@@ -637,6 +761,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const chooseLaterBtn = document.querySelector('.choose-later-btn');
     const photoUploadModal = document.getElementById('photoUploadModal');
     const closePhotoModal = document.getElementById('closePhotoModal');
+    const aiCakesModal = document.getElementById('aiCakesModal');
+    const closeAiModal = document.getElementById('closeAiModal');
 
     // Helper to open a modal with overlay
     function openModal(modal) {
@@ -652,7 +778,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper to close all modals
     function closeAllModals() {
-        const modals = [customCakeModal, photoUploadModal];
+        const modals = [customCakeModal, photoUploadModal, aiCakesModal];
         modals.forEach(modal => {
             if (modal) {
                 modal.classList.remove('active');
@@ -686,7 +812,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Close modals
-    [closeModal, closePhotoModal].forEach(btn => {
+    [closeModal, closePhotoModal, closeAiModal].forEach(btn => {
         if (btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -732,8 +858,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const title = selected.querySelector('h3')?.textContent?.trim();
             if (title === 'Build with AICakes') {
-                // Redirect to AI cake builder
-                window.location.href = 'ai-cake-builder.php';
+                // Switch to AI cakes modal
+                customCakeModal.classList.remove('active');
+                setTimeout(() => {
+                    customCakeModal.style.display = 'none';
+                    openModal(aiCakesModal);
+                }, 300);
             } else if (title === 'Upload a Photo') {
                 // Switch to photo upload modal
                 customCakeModal.classList.remove('active');
@@ -749,6 +879,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (chooseLaterBtn) {
         chooseLaterBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            closeAllModals();
+        });
+    }
+
+    // Handle AI Cake Form submission
+    const aiCakeForm = document.getElementById('aiCakeForm');
+    if (aiCakeForm) {
+        aiCakeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // For now, just close the modal since we're not implementing the AI functionality yet
             closeAllModals();
         });
     }
@@ -1280,23 +1420,59 @@ document.addEventListener('DOMContentLoaded', function() {
         const flavor = document.getElementById('cakeFlavor').value;
         const filling = document.getElementById('fillingType').value;
         const frosting = document.getElementById('frostingType').value;
+        const type = document.getElementById('cakeType').value;
+        const tiers = parseInt(document.getElementById('cakeTiers').value) || 0;
 
-        if (!size || !flavor || !filling || !frosting) return;
-
-        const basePrice = basePrices[size] || 0;
-        const flavorPrice = flavorPrices[flavor] || 0;
-        const fillingPrice = fillingPrices[filling] || 0;
-        const frostingPrice = frostingPrices[frosting] || 0;
-
-        const totalPrice = basePrice + flavorPrice + fillingPrice + frostingPrice;
-        document.getElementById('estimatedPrice').textContent = `₱${totalPrice.toFixed(2)}`;
+        let basePrice = 0;
         
-        // Store the calculated price
-        document.getElementById('cakeDetailsForm').dataset.calculatedPrice = totalPrice;
+        // Base price by size
+        switch(size) {
+            case '6': basePrice = 800; break;
+            case '8': basePrice = 1200; break;
+            case '10': basePrice = 1800; break;
+            case '12': basePrice = 2500; break;
+            default: basePrice = 0;
+        }
+
+        // Additional cost for premium flavors
+        if (['redvelvet', 'carrot', 'ube'].includes(flavor)) {
+            basePrice += 200;
+        }
+
+        // Additional cost for premium fillings
+        if (['ganache', 'fruit'].includes(filling)) {
+            basePrice += 150;
+        }
+
+        // Additional cost for premium frostings
+        if (['fondant', 'ganache'].includes(frosting)) {
+            basePrice += 300;
+        }
+
+        // Additional cost based on cake type
+        switch(type) {
+            case 'wedding': basePrice *= 2; break; // Wedding cakes are most premium
+            case 'anniversary': basePrice *= 1.5; break; // Anniversary cakes are special
+            case 'custom': basePrice *= 1.3; break; // Custom cakes need extra attention
+            // Birthday cakes use base price
+        }
+
+        // Additional cost for multiple tiers (exponential increase for wedding cakes)
+        if (tiers > 1) {
+            if (type === 'wedding') {
+                basePrice *= (1 + ((tiers - 1) * 1.0)); // Each tier adds 100% for wedding cakes
+            } else {
+                basePrice *= (1 + ((tiers - 1) * 0.8)); // Each tier adds 80% for other cakes
+            }
+        }
+
+        // Update the price display
+        const priceElement = document.getElementById('estimatedPrice');
+        priceElement.textContent = `₱${basePrice.toFixed(2)}`;
     }
 
     // Add event listeners for price updates
-    ['cakeSize', 'cakeFlavor', 'fillingType', 'frostingType'].forEach(id => {
+    ['cakeSize', 'cakeFlavor', 'fillingType', 'frostingType', 'cakeType', 'cakeTiers'].forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.addEventListener('change', updateEstimatedPrice);
@@ -1553,6 +1729,44 @@ document.addEventListener('DOMContentLoaded', function() {
     opacity: 0;
     cursor: pointer;
 }
+
+/* Add these styles at the end of your existing styles */
+.spline-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    height: 300px;
+    z-index: 10;
+    pointer-events: none; /* This ensures the container doesn't interfere with form interaction */
+}
+
+spline-viewer {
+    width: 100%;
+    height: 100%;
+}
+
+/* Adjust modal content to accommodate the Spline viewer */
+.aicakes-modal .modal-content {
+    position: relative;
+    padding-right: 340px; /* Add space for the Spline viewer */
+}
+
+/* Media query for smaller screens */
+@media (max-width: 1024px) {
+    .aicakes-modal .modal-content {
+        padding-right: 20px;
+    }
+    
+    .spline-container {
+        position: relative;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 200px;
+        margin-bottom: 20px;
+    }
+}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1643,6 +1857,209 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show placeholder
         uploadPlaceholder.style.display = 'flex';
+    }
+});
+</script>
+<script>
+// AICakes Modal Price Estimation
+function updateAICakesPrice() {
+    const size = document.getElementById('aiCakeSize').value;
+    const flavor = document.getElementById('aiCakeFlavor').value;
+    const filling = document.getElementById('aiFillingType').value;
+    const frosting = document.getElementById('aiFrostingType').value;
+    const type = document.getElementById('aiCakeType').value;
+    const tiers = parseInt(document.getElementById('aiCakeTiers').value) || 0;
+
+    let basePrice = 0;
+    
+    // Base price by size
+    switch(size) {
+        case '6inch': basePrice = 800; break;
+        case '8inch': basePrice = 1200; break;
+        case '10inch': basePrice = 1800; break;
+        case '12inch': basePrice = 2500; break;
+        default: basePrice = 0;
+    }
+
+    // Additional cost for premium flavors
+    if (['redvelvet', 'carrot'].includes(flavor)) {
+        basePrice += 200;
+    }
+
+    // Additional cost for premium fillings
+    if (['chocolate', 'fruit'].includes(filling)) {
+        basePrice += 150;
+    }
+
+    // Additional cost for premium frostings
+    if (['fondant', 'ganache'].includes(frosting)) {
+        basePrice += 300;
+    }
+
+    // Additional cost based on cake type
+    switch(type) {
+        case 'wedding': basePrice *= 2; break; // Wedding cakes are most premium
+        case 'anniversary': basePrice *= 1.5; break; // Anniversary cakes are special
+        case 'custom': basePrice *= 1.3; break; // Custom cakes need extra attention
+        // Birthday cakes use base price
+    }
+
+    // Additional cost for multiple tiers (exponential increase for wedding cakes)
+    if (tiers > 1) {
+        if (type === 'wedding') {
+            basePrice *= (1 + ((tiers - 1) * 1.0)); // Each tier adds 100% for wedding cakes
+        } else {
+            basePrice *= (1 + ((tiers - 1) * 0.8)); // Each tier adds 80% for other cakes
+        }
+    }
+
+    // Add AI design fee
+    basePrice += 500;
+
+    // Update the price display
+    const priceElement = document.getElementById('aiEstimatedPrice');
+    priceElement.textContent = `₱${basePrice.toFixed(2)}`;
+}
+
+// Add event listeners for AICakes form fields
+document.getElementById('aiCakeSize')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiCakeFlavor')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiFillingType')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiFrostingType')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiCakeType')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiCakeTiers')?.addEventListener('change', updateAICakesPrice);
+</script>
+<script>
+// Add this to your existing scripts
+document.addEventListener('DOMContentLoaded', function() {
+    const splineViewer = document.querySelector('spline-viewer');
+    const aiCakesModal = document.getElementById('aiCakesModal');
+    
+    if (splineViewer && aiCakesModal) {
+        aiCakesModal.addEventListener('mousemove', (e) => {
+            // Get the modal's bounding rectangle
+            const rect = aiCakesModal.getBoundingClientRect();
+            
+            // Calculate mouse position relative to the modal
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Calculate rotation based on mouse position
+            const rotateX = (y - rect.height / 2) / 20;
+            const rotateY = (x - rect.width / 2) / 20;
+            
+            // Apply smooth rotation to the Spline viewer
+            splineViewer.style.transform = `rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
+            splineViewer.style.transition = 'transform 0.3s ease-out';
+        });
+        
+        // Reset rotation when mouse leaves the modal
+        aiCakesModal.addEventListener('mouseleave', () => {
+            splineViewer.style.transform = 'rotateX(0) rotateY(0)';
+        });
+    }
+});
+</script>
+
+<!-- Add Spline container outside the modal -->
+<div class="spline-container" id="splineContainer">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
+    <spline-viewer url="https://prod.spline.design/FVZWbQH2B6ndj9UU/scene.splinecode" 
+                   events-target="global"
+                   zoom="0.3"
+                   camera-target="0 0 0"
+                   camera-orbit="-20deg 60deg 10m"></spline-viewer>
+</div>
+
+<style>
+/* Update the Spline container styles */
+.spline-container {
+    position: fixed;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
+    width: 500px;
+    height: 500px;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.spline-container.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+spline-viewer {
+    width: 100%;
+    height: 100%;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 1024px) {
+    .spline-container {
+        position: fixed;
+        top: auto;
+        bottom: 20px;
+        right: 20px;
+        transform: none;
+        width: 200px;
+        height: 200px;
+    }
+}
+</style>
+
+<script>
+// Update the mouse movement and visibility logic
+document.addEventListener('DOMContentLoaded', function() {
+    const splineViewer = document.querySelector('spline-viewer');
+    const splineContainer = document.getElementById('splineContainer');
+    const aiCakesModal = document.getElementById('aiCakesModal');
+    const customCakeModal = document.getElementById('customCakeModal');
+    
+    // Show/hide Spline viewer based on AI modal visibility
+    function toggleSplineVisibility(isVisible) {
+        if (isVisible) {
+            splineContainer.classList.add('visible');
+        } else {
+            splineContainer.classList.remove('visible');
+        }
+    }
+
+    // Listen for AI modal opening/closing
+    if (customCakeModal) {
+        const aiOption = customCakeModal.querySelector('.order-option.ai-option');
+        if (aiOption) {
+            aiOption.addEventListener('click', () => {
+                toggleSplineVisibility(true);
+            });
+        }
+    }
+
+    // Hide Spline when closing modals
+    const closeButtons = document.querySelectorAll('.close-modal, .choose-later-btn');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            toggleSplineVisibility(false);
+        });
+    });
+
+    // Mouse movement effect
+    if (splineViewer) {
+        document.addEventListener('mousemove', (e) => {
+            if (!splineContainer.classList.contains('visible')) return;
+
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = (e.clientY / window.innerHeight) * 2 - 1;
+            
+            const rotateX = y * 10; // Reduced rotation amount
+            const rotateY = x * 10; // Reduced rotation amount
+            
+            splineViewer.style.transform = `rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
+            splineViewer.style.transition = 'transform 0.5s ease-out';
+        });
     }
 });
 </script>
