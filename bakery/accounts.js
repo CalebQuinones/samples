@@ -636,6 +636,7 @@ document.addEventListener("DOMContentLoaded", function() {
     initFormHandlers();
 
     // Add event delegation for edit buttons
+    console.log('Setting up click event listener for edit buttons');
     document.addEventListener('click', function(e) {
         console.log('Click event triggered on:', e.target);
         
@@ -647,6 +648,7 @@ document.addEventListener("DOMContentLoaded", function() {
             e.target.id === 'cancelModal') {
             e.preventDefault();
             e.stopPropagation();
+            console.log('Close button clicked, closing modal');
             window.closeModal();
             return;
         }
@@ -654,43 +656,64 @@ document.addEventListener("DOMContentLoaded", function() {
         // Check if the clicked element is an edit button
         let editBtn = null;
         
-        // Direct click on edit button
-        if (e.target.classList.contains('edit-account-btn')) {
-            editBtn = e.target;
-            console.log('Direct click on edit button');
-        }
-        // Click on icon inside edit button
-        else if (e.target.classList.contains('fa-pen')) {
-            const potentialBtn = e.target.closest('.edit-account-btn');
-            if (potentialBtn) {
-                editBtn = potentialBtn;
-                console.log('Click on pen icon inside edit button');
+        // Check all possible ways the edit button could be clicked
+        const checkEditButton = (element) => {
+            if (!element) return null;
+            
+            // Direct click on edit button
+            if (element.classList && 
+                (element.classList.contains('edit-account-btn') || 
+                 element.classList.contains('edit-button') ||
+                 element.closest('.edit-account-btn') ||
+                 element.closest('.edit-button'))) {
+                return element.classList.contains('edit-account-btn') || element.classList.contains('edit-button') ? 
+                       element : 
+                       (element.closest('.edit-account-btn') || element.closest('.edit-button'));
             }
-        }
-        // Click on action button with edit functionality
-        else if (e.target.closest('.action-button')) {
-            const actionBtn = e.target.closest('.action-button');
-            if (actionBtn.classList.contains('edit-button')) {
-                editBtn = actionBtn;
-                console.log('Click on action button with edit class');
-            } else if (actionBtn.querySelector('.fa-pen')) {
-                editBtn = actionBtn;
-                console.log('Click on action button containing pen icon');
+            
+            // Click on icon inside edit button
+            if (element.classList && 
+                (element.classList.contains('fa-pen') || 
+                 element.querySelector('.fa-pen'))) {
+                const penIcon = element.classList.contains('fa-pen') ? element : element.querySelector('.fa-pen');
+                return penIcon.closest('.edit-account-btn') || penIcon.closest('.edit-button') || penIcon.closest('.action-button');
             }
+            
+            return null;
+        };
+        
+        // Check the clicked element and its parents
+        let currentElement = e.target;
+        while (currentElement && currentElement !== document.documentElement) {
+            editBtn = checkEditButton(currentElement);
+            if (editBtn) break;
+            currentElement = currentElement.parentElement;
         }
         
         if (editBtn) {
+            console.log('Edit button found:', editBtn);
             e.preventDefault();
             e.stopPropagation();
             
-            const userId = editBtn.getAttribute('data-user-id');
+            // Get user ID from data attribute or closest parent with data-user-id
+            let userId = editBtn.getAttribute('data-user-id');
+            if (!userId) {
+                const parentWithId = editBtn.closest('[data-user-id]');
+                if (parentWithId) {
+                    userId = parentWithId.getAttribute('data-user-id');
+                }
+            }
+            
             if (userId) {
                 console.log('Edit button clicked for user ID:', userId);
                 showEditModal(userId);
             } else {
-                console.error('No user ID found on edit button');
+                console.error('No user ID found on edit button or its parents');
                 console.log('Edit button HTML:', editBtn.outerHTML);
+                console.log('Edit button parents:', Array.from(document.elementsFromPoint(e.clientX, e.clientY)));
             }
+        } else {
+            console.log('No edit button found in click path');
         }
     });
 
