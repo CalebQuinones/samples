@@ -574,7 +574,7 @@ include 'config.php';
                             <p class="price-note">* Final price may vary based on design complexity</p>
                         </div>
 
-                        <button type="submit" class="magic-button">Let AICakes do the magic</button>
+                        <button type="submit" class="magic-button">Submit</button>
                     </form>
                 </div>
             </div>
@@ -1254,6 +1254,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 items: cart
             };
 
+            // Check for custom cakes in the cart
+            const hasCustomCakes = cart.some(item => item.type === 'custom' && item.details?.isAIGenerated);
+            
             fetch('process_order.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1280,11 +1283,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.body.style.overflow = 'auto';
                     }, 300);
                 } else {
-                    alert(result.message || 'Order failed. Please try again.');
+                    console.error("Order failed:", result);
+                    alert(result.message || 'Order failed. Please try again. There might be an issue with image size for custom cakes.');
                 }
             })
             .catch(err => {
-                alert('Order failed. Please try again.');
+                console.error("Order error:", err);
+                alert('Order processing failed. This may be due to large custom cake images. Please try again or contact support.');
                 console.error(err);
             });
         });
@@ -1560,13 +1565,18 @@ document.addEventListener('DOMContentLoaded', function() {
             total += itemTotal;
 
             if (item.type === 'custom') {
+                // Get cake details
+                const isAIGenerated = item.details.isAIGenerated ? 'AI-Generated' : '';
+                const cakeType = item.details.cakeType ? `${item.details.cakeType.charAt(0).toUpperCase() + item.details.cakeType.slice(1)}` : '';
+                const tiers = item.details.tiers ? `${item.details.tiers} tier` : '';
+                
                 // Custom cake display in cart
                 cartHTML += `
                     <div class="cart-popup-item" data-index="${index}" data-type="custom">
                         <img src="${item.image}" alt="Custom Cake" class="cart-item-image">
                         <div class="cart-item-details">
                             <h4>${item.name}</h4>
-                            <p>${item.details.size}" ${item.details.flavor}</p>
+                            <p>${item.details.size}" ${item.details.flavor} ${isAIGenerated}</p>
                             <p class="cart-item-price">₱${item.price.toFixed(2)}</p>
                         </div>
                         <div class="cart-item-quantity">
@@ -1583,8 +1593,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="checkout-item">
                         <img src="${item.image}" alt="Custom Cake" class="checkout-item-image">
                         <div class="checkout-item-details">
-                            <h4>${item.name}</h4>
-                            <p>${item.details.size}" ${item.details.flavor} cake</p>
+                            <h4>${item.name} ${isAIGenerated}</h4>
+                            <p>${cakeType} ${tiers} ${item.details.size}" ${item.details.flavor} cake</p>
                             <p>Filling: ${item.details.filling}</p>
                             <p>Frosting: ${item.details.frosting}</p>
                             <p class="checkout-item-price">₱${item.price.toFixed(2)} x ${item.quantity}</p>
