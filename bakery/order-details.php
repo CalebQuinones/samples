@@ -253,7 +253,6 @@
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title">Update Order</h3>
-            <button class="close-modal" id="closeStatusModal">&times;</button>
           </div>
           <div class="modal-body">
             <form id="orderUpdateForm">

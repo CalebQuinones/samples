@@ -19,9 +19,9 @@ if(!isset($_GET['id'])) {
 $userId = mysqli_real_escape_string($conn, $_GET['id']);
 
 // Get user details including customer info
-$sql = "SELECT l.*, c.phone, c.address 
-        FROM login l 
-        LEFT JOIN customerinfo c ON l.user_id = c.user_id 
+$sql = "SELECT l.user_id, l.Fname, l.Lname, l.status, c.phone, c.address
+        FROM login l
+        LEFT JOIN customerinfo c ON l.user_id = c.user_id
         WHERE l.user_id = ?";
 
 $stmt = mysqli_prepare($conn, $sql);
@@ -32,13 +32,9 @@ $result = mysqli_stmt_get_result($stmt);
 if($row = mysqli_fetch_assoc($result)) {
     echo json_encode([
         'success' => true,
-        'user_id' => $row['user_id'],
-        'Fname' => $row['Fname'],
-        'Lname' => $row['Lname'],
-        'email' => $row['email'],
-        'phone' => $row['phone'],
-        'address' => $row['address'],
-        'role' => $row['role'],
+        'user_id' => $row['user_id'], // Ensure user_id is passed
+        'Fname' => $row['Fname'],     // Add Fname
+        'Lname' => $row['Lname'],     // Add Lname
         'status' => $row['status']
     ]);
 } else {
@@ -48,4 +44,4 @@ if($row = mysqli_fetch_assoc($result)) {
 
 mysqli_stmt_close($stmt);
 mysqli_close($conn);
-?> 
+?>

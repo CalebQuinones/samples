@@ -283,6 +283,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function openStatusModal(orderId) {
         if (statusUpdateModal && updateOrderId) {
             updateOrderId.value = orderId;
+            // Get current order status and payment status
+            const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
+            const currentStatus = row.querySelector('.status-badge').textContent.toLowerCase();
+            const currentPayment = row.querySelector('td:nth-child(8)').textContent;
+            
+            // Set current values in modal
+            document.getElementById('newStatus').value = currentStatus;
+            document.getElementById('newPaymentStatus').value = currentPayment;
+            
             statusUpdateModal.style.display = 'block';
             if (modalOverlay) {
                 modalOverlay.style.display = 'flex';
@@ -295,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.style.overflow = 'hidden';
         }
     }
-  
+
     function closeModal(modal) {
         if (modal) {
             modal.classList.remove('active');
@@ -312,76 +321,72 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     function handleStatusUpdate(e) {
-      e.preventDefault()
-      
-      const orderId = updateOrderId.value
-      const status = document.getElementById('newStatus').value
-      const paymentStatus = document.getElementById('newPaymentStatus').value
-      
-      // Send AJAX request to update order status
-      fetch('update_order_status.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          order_id: orderId,
-          status: status,
-          payment_status: paymentStatus
-        }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Update the status in the table
-          const row = document.querySelector(`tr[data-order-id="${orderId}"]`)
-          if (row) {
-            const statusCell = row.querySelector('.status-badge')
-            if (statusCell) {
-              // Remove old status class
-              statusCell.classList.remove('status-completed', 'status-in-progress', 'status-pending', 'status-cancelled')
-              
-              // Add new status class
-              let newStatusClass = 'status-pending'
-              switch (status) {
-                case 'Completed':
-                  newStatusClass = 'status-completed'
-                  break
-                case 'In Progress':
-                  newStatusClass = 'status-in-progress'
-                  break
-                case 'Pending':
-                  newStatusClass = 'status-pending'
-                  break
-                case 'Cancelled':
-                  newStatusClass = 'status-cancelled'
-                  break
-              }
-              
-              statusCell.classList.add(newStatusClass)
-              statusCell.textContent = status
+        e.preventDefault();
+        
+        const orderId = updateOrderId.value;
+        const status = document.getElementById('newStatus').value.toLowerCase();
+        const paymentStatus = document.getElementById('newPaymentStatus').value;
+        const message = document.getElementById('message')?.value || '';
+        
+        fetch('update_order.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                order_id: orderId,
+                status: status,
+                payment_status: paymentStatus,
+                message: message
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                if (row) {
+                    const statusCell = row.querySelector('.status-badge');
+                    if (statusCell) {
+                        // Remove all possible status classes
+                        statusCell.classList.remove(
+                            'status-pending',
+                            'status-processing',
+                            'status-shipped',
+                            'status-delivered',
+                            'status-cancelled'
+                        );
+                        
+                        // Map status values to display classes
+                        const statusMappings = {
+                            'pending': { class: 'status-pending', display: 'Pending' },
+                            'processing': { class: 'status-processing', display: 'Processing' },
+                            'shipped': { class: 'status-shipped', display: 'Shipped' },
+                            'delivered': { class: 'status-delivered', display: 'Delivered' },
+                            'cancelled': { class: 'status-cancelled', display: 'Cancelled' }
+                        };
+                        
+                        const statusInfo = statusMappings[status] || statusMappings['pending'];
+                        statusCell.classList.add(statusInfo.class);
+                        statusCell.textContent = statusInfo.display;
+                    }
+                    
+                    // Update payment status
+                    const paymentCell = row.querySelector('td:nth-child(8)');
+                    if (paymentCell) {
+                        paymentCell.textContent = paymentStatus;
+                    }
+                }
+                
+                closeModal(statusUpdateModal);
+                alert('Order status updated successfully!');
+            } else {
+                alert('Failed to update order status: ' + data.message);
             }
-            
-            // Update payment status
-            const paymentCell = row.querySelector('td:nth-child(7)')
-            if (paymentCell) {
-              paymentCell.textContent = paymentStatus
-            }
-          }
-          
-          // Close the modal
-          closeModal(statusUpdateModal)
-          
-          // Show success message
-          alert('Order status updated successfully!')
-      } else {
-          alert('Failed to update order status: ' + data.message)
-      }
-      })
-      .catch(error => {
-        console.error('Error:', error)
-        alert('An error occurred while updating the order status')
-      })
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the order status');
+        });
     }
   
     // Replace deleteOrder function with archiveOrder
@@ -394,16 +399,23 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify({ order_id: orderId })
         })
         .then(response => response.json())
-        .then(data => {
+        .then(data => {  // Fixed missing parentheses
             if (data.success) {
                 const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
                 if (row) {
                     row.remove();
+                    // Get current visible rows after removal
+                    const remainingRows = getVisibleRows();
+                    // If current page is now empty but there are still rows, go to previous page
+                    if (remainingRows.length > 0 && 
+                        !document.querySelector(`tr[style=""]`)) {
+                        currentPage = Math.max(1, currentPage - 1);
+                    }
                     updateTable();
                 }
                 alert('Order archived successfully!');
             } else {
-                alert('Error archiving order: ' + data.message);
+                alert('Error archiving order: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {

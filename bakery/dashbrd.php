@@ -40,7 +40,7 @@ $sql = "SELECT o.*,
         LEFT JOIN login l ON o.user_id = l.user_id 
         LEFT JOIN order_items oi ON o.order_id = oi.order_id
         GROUP BY o.order_id
-        ORDER BY o.created_at DESC
+        ORDER BY o.created_at ASC
         LIMIT 5";
 $recentOrders = mysqli_query($conn, $sql);
 
