@@ -6,209 +6,177 @@ error_reporting(E_ALL);
 session_start();
 require_once 'config.php';
 
-// Check if the request is a POST request
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Only allow logged-in users
-    if (!isset($_SESSION["user_id"])) {
-        echo json_encode([
-            "message" => "You must be logged in to place an order."
-        ]);
-        exit;
-    }
-    // Always use session user_id, ignore any user_id from POST
-    $userId = $_SESSION["user_id"];
-    // Get the order data from the POST request
-    $rawData = file_get_contents("php://input");
-    error_log("Raw POST data: " . $rawData);
-    
-    $orderData = json_decode($rawData, true);
-    error_log("Decoded order data: " . print_r($orderData, true));
-
-    // --- FIX: Accept both 'items' and 'cart' as the cart array key ---
-    $items = [];
-    if (!empty($orderData['items']) && is_array($orderData['items'])) {
-        $items = $orderData['items'];
-    } elseif (!empty($orderData['cart']) && is_array($orderData['cart'])) {
-        $items = $orderData['cart'];
-    }
-    $orderData['items'] = $items;
-
-    // --- FIX: Accept both 'customer' and flat fields for customer info ---
-    $customer = [];
-    if (!empty($orderData['customer']) && is_array($orderData['customer'])) {
-        $customer = $orderData['customer'];
-    } else {
-        // Try to build customer array from flat fields (as sent by your JS)
-        $customer = [
-            'email' => $orderData['email'] ?? '',
-            'fullname' => $orderData['fullname'] ?? '',
-            'address' => $orderData['address'] ?? '',
-            'deliveryDate' => $orderData['deliveryDate'] ?? '',
-            'paymentMethod' => $orderData['paymentMethod'] ?? '',
-            'deliveryMethod' => $orderData['deliveryOption'] ?? '', // Note: your JS sends 'deliveryOption'
-        ];
-    }
-    $orderData['customer'] = $customer;
-    
-    // Validate the order data structure
-    if (empty($orderData)) {
-        error_log("Empty order data received");
-        echo json_encode(["success" => false, "message" => "No order data received"]);
-        exit;
-    }
-    
-    if (empty($orderData['items'])) {
-        error_log("No items in order data. Full order data: " . print_r($orderData, true));
-        echo json_encode(["success" => false, "message" => "No items in cart"]);
-        exit;
-    }
-
-    if (
-        empty($orderData['customer']['email']) ||
-        empty($orderData['customer']['fullname']) ||
-        empty($orderData['customer']['address']) ||
-        empty($orderData['customer']['deliveryDate']) ||
-        empty($orderData['customer']['paymentMethod']) ||
-        empty($orderData['customer']['deliveryMethod'])
-    ) {
-        echo json_encode(["success" => false, "message" => "No customer information provided"]);
-        exit;
-    }
-    
-    // Validate customer data
-    $customer = $orderData['customer'];
-    $missingFields = [];
-    
-    if (empty($customer['email'])) $missingFields[] = "email";
-    if (empty($customer['fullname'])) $missingFields[] = "fullname";
-    if (empty($customer['address'])) $missingFields[] = "address";
-    if (empty($customer['deliveryDate'])) $missingFields[] = "deliveryDate";
-    if (empty($customer['paymentMethod'])) $missingFields[] = "paymentMethod";
-    if (empty($customer['deliveryMethod'])) $missingFields[] = "deliveryMethod";
-    
-    if (!empty($missingFields)) {
-        echo json_encode([
-            "success" => false, 
-            "message" => "Missing required fields: " . implode(", ", $missingFields)
-        ]);
-        exit;
-    }
-    
-    // Validate delivery method
-    $validDeliveryMethods = ['standard', 'pickup'];
-    if (!in_array($customer['deliveryMethod'], $validDeliveryMethods)) {
-        echo json_encode(["success" => false, "message" => "Invalid delivery method"]);
-        exit;
-    }
-    
-    // Start a transaction
-    mysqli_begin_transaction($conn);
-
-    try {
-        // Calculate delivery fee based on delivery method
-        $deliveryFee = 0;
-        if ($customer['deliveryMethod'] === 'standard') {
-            $deliveryFee = 50; // Standard delivery fee is 50 pesos
-        }
-
-        // Add delivery fee to total amount
-        $totalAmount = isset($orderData['total']) ? floatval($orderData['total']) + $deliveryFee : $deliveryFee;
-
-        // Use the details entered in the checkout form for the order
-        $deliveryDate = $customer['deliveryDate'];
-        $paymentMethod = $customer['paymentMethod'];
-        $deliveryMethod = $customer['deliveryMethod'];
-        $deliveryAddress = $customer['address'];
-        $email = $customer['email'];
-        $fullname = $customer['fullname'];
-
-        // Debug: log all values to be inserted
-        error_log("Order Insert Params: user_id=$userId, email=$email, fullname=$fullname, total_amount=$totalAmount, delivery_address=$deliveryAddress, delivery_method=$deliveryMethod, delivery_date=$deliveryDate, payment_method=$paymentMethod, delivery_fee=$deliveryFee");
-
-        // Insert the order into the orders table
-        // Columns: user_id, email, fullname, total_amount, status, delivery_address, delivery_method, delivery_date, payment_method, created_at, delivery_fee, payment_status
-        // SQL: 9 placeholders for bind_param, status/payment_status set in SQL
-        $sql = "INSERT INTO orders (
-            user_id, email, fullname, total_amount, status, delivery_address, delivery_method, delivery_date, payment_method, created_at, delivery_fee, payment_status
-        ) VALUES (?, ?, ?, ?, 'Pending', ?, ?, ?, ?, NOW(), ?, 'Pending')";
-
-        $stmt = mysqli_prepare($conn, $sql);
-
-        if (!$stmt) {
-            error_log("Prepare failed: " . mysqli_error($conn));
-            throw new Exception("Prepare failed: " . mysqli_error($conn));
-        }
-
-        // user_id (i), email (s), fullname (s), total_amount (d), delivery_address (s), delivery_method (s), delivery_date (s), payment_method (s), delivery_fee (d)
-        // There are 9 placeholders: i, s, s, d, s, s, s, s, d
-        mysqli_stmt_bind_param(
-            $stmt,
-            "issdssssd",
-            $userId,
-            $email,
-            $fullname,
-            $totalAmount,
-            $deliveryAddress,
-            $deliveryMethod,
-            $deliveryDate,
-            $paymentMethod,
-            $deliveryFee
-        );
-
-        if (!mysqli_stmt_execute($stmt)) {
-            error_log("Order insert error: " . mysqli_stmt_error($stmt));
-            throw new Exception("Error inserting order: " . mysqli_stmt_error($stmt));
-        }
-
-        // Get the order ID of the newly inserted order
-        $orderId = mysqli_insert_id($conn);
-
-        // Insert order items
-        foreach ($orderData['items'] as $item) {
-            $sql = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $sql);
-
-            if (!$stmt) {
-                throw new Exception("Prepare failed (order_items): " . mysqli_error($conn));
-            }
-
-            $productId = $item['id'];
-            $quantity = $item['quantity'];
-            $price = $item['price'];
-
-            mysqli_stmt_bind_param($stmt, "iiid", $orderId, $productId, $quantity, $price);
-
-            if (!mysqli_stmt_execute($stmt)) {
-                throw new Exception("Error inserting order item: " . mysqli_error($conn));
-            }
-        }
-
-        // Commit the transaction
-        mysqli_commit($conn);
-
-        // Return success response with order ID
-        echo json_encode([
-            "success" => true,
-            "message" => "Order placed successfully",
-            "orderId" => $orderId
-        ]);
-
-    } catch (Exception $e) {
-        // Rollback the transaction on error
-        mysqli_rollback($conn);
-
-        // Log the error for debugging
-        error_log("Order processing error: " . $e->getMessage());
-
-        echo json_encode([
-            "success" => false,
-            "message" => "Error processing order: " . $e->getMessage()
-        ]);
-    }
-} else {
-    // If not a POST request, return an error
-    echo json_encode(["success" => false, "message" => "Invalid request method"]);
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Please log in to place an order']);
+    exit;
 }
+
+$response = ['success' => false, 'message' => ''];
+
+try {
+    // Get JSON data
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    if (!$data) {
+        throw new Exception('Invalid data received');
+    }
+
+    // Get user's email from login table
+    $user_id = $_SESSION['user_id'];
+    $email_query = "SELECT email FROM login WHERE user_id = ?";
+    $stmt = $conn->prepare($email_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user_data = $result->fetch_assoc();
+    
+    if (!$user_data) {
+        throw new Exception('User information not found');
+    }
+
+    // Start transaction
+    $conn->begin_transaction();
+
+    // Create main order record
+    $order_sql = "INSERT INTO orders (
+        user_id,
+        total_amount,
+        status,
+        delivery_address,
+        delivery_method,
+        delivery_date,
+        payment_method
+    ) VALUES (?, ?, 'Pending', ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($order_sql);
+    $stmt->bind_param(
+        "idssss",
+        $user_id,
+        $data['total'],
+        $data['address'],
+        $data['deliveryOption'],
+        $data['deliveryDate'],
+        $data['paymentMethod']
+    );
+
+    if (!$stmt->execute()) {
+        throw new Exception('Failed to create order: ' . $stmt->error);
+    }
+
+    $order_id = $conn->insert_id;
+
+    // Process cart items
+    foreach ($data['cart'] as $item) {
+        if ($item['type'] === 'custom') {
+            // Handle custom cake order
+            $custom_sql = "INSERT INTO custom_orders (
+                user_id,
+                order_id,
+                cake_size,
+                cake_flavor,
+                filling_type,
+                frosting_type,
+                special_instructions,
+                reference_image,
+                base_price,
+                total_price,
+                delivery_address,
+                delivery_date,
+                delivery_method,
+                payment_method
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            // Save the image
+            $image_data = $item['image'];
+            $image_array = explode(';base64,', $image_data);
+            $image_type_aux = explode('image/', $image_array[0]);
+            $image_type = $image_type_aux[1];
+            $image_base64 = base64_decode($image_array[1]);
+            $file_name = time() . '_' . uniqid() . '_custom_cake.' . $image_type;
+            $upload_dir = __DIR__ . '/uploads/custom_cakes/';
+            if (!file_exists($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            $target_path = $upload_dir . $file_name;
+            file_put_contents($target_path, $image_base64);
+
+            $stmt = $conn->prepare($custom_sql);
+            $itemTotal = $item['price'] * $item['quantity'];
+            $stmt->bind_param(
+                "iissssssddssss",
+                $user_id,
+                $order_id,
+                $item['details']['size'],
+                $item['details']['flavor'],
+                $item['details']['filling'],
+                $item['details']['frosting'],
+                $item['details']['instructions'],
+                $target_path,
+                $item['price'],
+                $itemTotal,
+                $data['address'],
+                $data['deliveryDate'],
+                $data['deliveryOption'],
+                $data['paymentMethod']
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to create custom order: ' . $stmt->error);
+            }
+        } else {
+            // Handle regular product order
+            $order_item_sql = "INSERT INTO order_items (
+                order_id,
+                product_id,
+                quantity,
+                price
+            ) VALUES (?, ?, ?, ?)";
+
+            $stmt = $conn->prepare($order_item_sql);
+            $stmt->bind_param(
+                "iiid",
+                $order_id,
+                $item['id'],
+                $item['quantity'],
+                $item['price']
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to create order item: ' . $stmt->error);
+            }
+        }
+    }
+
+    // Commit transaction
+    $conn->commit();
+
+    $response = [
+        'success' => true,
+        'message' => 'Order placed successfully!',
+        'order_id' => $order_id,
+        'user_email' => $user_data['email']
+    ];
+
+} catch (Exception $e) {
+    // Rollback transaction on error
+    if (isset($conn) && $conn->ping()) {
+        $conn->rollback();
+    }
+
+    $response = [
+        'success' => false,
+        'message' => 'Error processing order: ' . $e->getMessage()
+    ];
+
+    // Delete uploaded file if it exists and there was an error
+    if (isset($target_path) && file_exists($target_path)) {
+        unlink($target_path);
+    }
+}
+
+echo json_encode($response);
 
 error_log("SESSION: " . print_r($_SESSION, true));
 ?>

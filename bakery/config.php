@@ -2,6 +2,13 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+/**
+ * Triple J's Bakery Configuration
+ * 
+ * IMPORTANT: To use the AICakes feature, you must configure a Stability AI API key
+ * in the stability_api.php file. See README.md for more information.
+ */
+
 // Database configuration
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root');
