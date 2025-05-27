@@ -1,96 +1,90 @@
 CREATE DATABASE bakerydb;
 USE bakerydb;
 
--- Create login table first (referenced by multiple tables)
-CREATE TABLE login (
-    user_id INT(11) NOT NULL AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    Fname VARCHAR(255),
-    Lname VARCHAR(255),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    role ENUM('admin', 'staff', 'customer') NOT NULL DEFAULT 'customer',
-    status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
-    PRIMARY KEY (user_id)
-);
-
--- Create products table (referenced by cart and order_items)
-CREATE TABLE products (
-    product_id INT(11) NOT NULL AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    category VARCHAR(50) NOT NULL,
-    image VARCHAR(255),
-    availability ENUM('In Stock', 'Out of Stock') DEFAULT 'In Stock',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    PRIMARY KEY (product_id)
-);
-
--- Create orders table (referenced by order_items)
-CREATE TABLE orders (
-    order_id INT(11) NOT NULL AUTO_INCREMENT,
-    user_id INT(11) NOT NULL,
-    total_amount DECIMAL(10, 2) NOT NULL,
-    status ENUM('Pending', 'Processing', 'Completed', 'Cancelled') DEFAULT 'Pending',
-    delivery_address TEXT NOT NULL,
-    delivery_method ENUM('standard', 'pickup') NOT NULL,
-    delivery_date DATE NOT NULL,
-    payment_method VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    delivery_fee DECIMAL(10, 2) DEFAULT 0.00,
-    payment_status VARCHAR(50) DEFAULT 'Pending',
-    PRIMARY KEY (order_id),
-    FOREIGN KEY (user_id) REFERENCES login(user_id)
-);
-
--- Now create tables that reference the above tables
 CREATE TABLE cart (
-    cart_id INT(11) NOT NULL AUTO_INCREMENT,
+    cart_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT(11) NOT NULL,
     product_id INT(11) NOT NULL,
     quantity INT(11) NOT NULL DEFAULT 1,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    PRIMARY KEY (cart_id),
-    FOREIGN KEY (user_id) REFERENCES login(user_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE TABLE customerinfo (
-    customer_id INT(11) NOT NULL AUTO_INCREMENT,
+    customer_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT(11) UNIQUE,
     phone VARCHAR(20),
     birthday DATE,
     address VARCHAR(255),
     payment VARCHAR(255),
     profpic VARCHAR(255),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    PRIMARY KEY (customer_id),
-    FOREIGN KEY (user_id) REFERENCES login(user_id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE order_items (
-    order_item_id INT(11) NOT NULL AUTO_INCREMENT,
-    order_id INT(11) NOT NULL,
-    product_id INT(11) NOT NULL,
-    quantity INT(11) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    PRIMARY KEY (order_item_id),
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
-);
-
--- Inquiry table can be created anywhere since it has no foreign keys
 CREATE TABLE inquiry (
-    ID INT(255) NOT NULL AUTO_INCREMENT,
+    ID INT(255) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Fname VARCHAR(25) NOT NULL,
     Lname VARCHAR(25) NOT NULL,
     email TEXT NOT NULL,
     Pnum VARCHAR(11) NOT NULL,
     subject VARCHAR(255) NOT NULL,
     msg TEXT NOT NULL,
-    dateSubmitted DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    PRIMARY KEY (ID)
+    dateSubmitted DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP()
 );
+
+CREATE TABLE login (
+    user_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    Fname VARCHAR(255),
+    Lname VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    role ENUM('admin','staff','customer') NOT NULL DEFAULT 'customer',
+    status ENUM('active','inactive') NOT NULL DEFAULT 'active'
+);
+
+CREATE TABLE notifications (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    is_read TINYINT(1) DEFAULT 0
+);
+
+CREATE TABLE order_items (
+    order_item_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    order_id INT(11) NOT NULL,
+    product_id INT(11) NOT NULL,
+    quantity INT(11) NOT NULL,
+    price DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE orders (
+    order_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT(11) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    fullname VARCHAR(255) NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    status ENUM('Pending','Processing','Shipped','Delivered','Cancelled') NOT NULL DEFAULT 'Pending',
+    delivery_address TEXT NOT NULL,
+    delivery_method ENUM('standard','pickup') NOT NULL,
+    delivery_date DATE NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    delivery_fee DECIMAL(10,2) DEFAULT 0.00,
+    payment_status ENUM('Pending','Paid','Failed','Refunded') NOT NULL DEFAULT 'Pending'
+);
+
+CREATE TABLE products (
+    product_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    image VARCHAR(255),
+    availability ENUM('In Stock','Low Stock','Out of Stock') NOT NULL DEFAULT 'In Stock',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP()
+);
+
+
 
 DROP TABLE IF EXISTS custom_orders;
 CREATE TABLE custom_orders (
