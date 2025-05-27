@@ -152,6 +152,7 @@ nav {
 .nav-links ul {
   display: flex;
   list-style: none;
+  margin-left: 140px;
 }
 
 .nav-links ul li {
@@ -362,7 +363,7 @@ nav {
   top: 20px;
   width: 1550px;
   max-width: 100%;
-  left: 1px;
+  left: 0px;
   height: 700px;
   z-index: -8;
   margin-bottom: -160px;
@@ -2043,8 +2044,7 @@ nav {
   left: -10px;
 }
 
-/* New styles for star ratings */
-/* ADD THESE CSS STYLES TO YOUR MENU3.CSS FILE */
+
 
 /* Star ratings */
 .product-rating {

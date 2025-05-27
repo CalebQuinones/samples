@@ -12,8 +12,13 @@ ini_set('display_errors', 1);
 // Database configuration
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root');
+<<<<<<< HEAD
+define('DB_PASSWORD', 'bahalakajan');
+define('DB_NAME', 'bakerydb');
+=======
 define('DB_PASSWORD', '');
 define('DB_NAME', 'bakerydb'); 
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
 
 // Attempt to connect to MySQL database
 $conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
