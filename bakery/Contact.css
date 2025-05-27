@@ -824,6 +824,7 @@ nav {
 .nav-links ul {
   display: flex;
   list-style: none;
+  margin-left: 60px;
 }
 
 .nav-links ul li {

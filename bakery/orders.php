@@ -47,6 +47,7 @@ if (!$result) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Orders - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -90,6 +91,12 @@ if (!$result) {
             <a href="inquiries.php">
               <i class="fas fa-comment-dots"></i>
               Inquiries
+            </a>
+          </li>
+          <li>
+            <a href="sales.php" id="salesSidebarLink">
+              <i class="fas fa-chart-line"></i>
+              Sales
             </a>
           </li>
         </ul>
@@ -138,9 +145,10 @@ if (!$result) {
           <div class="filter-buttons">
             <select class="filter-select" id="statusFilter">
               <option>All Statuses</option>
-              <option>Completed</option>
-              <option>In Progress</option>
+              <option>Delivered</option>
+              <option>Processing</option>
               <option>Pending</option>
+              <option>Shipped</option>
               <option>Cancelled</option>
             </select>
             <select class="filter-select" id="productFilter">
@@ -201,17 +209,20 @@ if (!$result) {
                         
                         // Get status badge class
                         $statusClass = '';
-                        switch ($status) {
-                            case 'Completed':
-                                $statusClass = 'status-completed';
+                        switch (strtolower($status)) {
+                            case 'delivered':
+                                $statusClass = 'status-delivered';
                                 break;
-                            case 'In Progress':
-                                $statusClass = 'status-in-progress';
+                            case 'processing':
+                                $statusClass = 'status-processing';
                                 break;
-                            case 'Pending':
+                            case 'pending':
                                 $statusClass = 'status-pending';
                                 break;
-                            case 'Cancelled':
+                            case 'shipped':
+                                $statusClass = 'status-shipped';
+                                break;
+                            case 'cancelled':
                                 $statusClass = 'status-cancelled';
                                 break;
                             default:
@@ -234,8 +245,8 @@ if (!$result) {
                                     <a class='action-button edit-button' title='Edit Order' href='order-details.php?id=$orderId'>
                                         <i class='fas fa-pen'></i>
                                     </a>
-                                    <button class='action-button delete-button' title='Delete Order' data-order-id='$orderId'>
-                                        <i class='fas fa-trash'></i>
+                                    <button class='action-button archive-button' title='Archive Order' data-order-id='$orderId'>
+                                        <i class='fas fa-archive'></i>
                                     </button>
                                 </div>
                             </td>";
@@ -323,19 +334,25 @@ if (!$result) {
           <div class="form-group">
             <label for="newStatus">Order Status</label>
             <select id="newStatus" required>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="newPaymentMethod">Payment Method</label>
-            <select id="newPaymentMethod" required>
-              <option value="Card">Card</option>
-              <option value="Gcash">GCash</option>
-              <option value="Cash">Cash</option>
+            <label for="newPaymentStatus">Payment Status</label>
+            <select id="newPaymentStatus" required>
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Failed">Failed</option>
+              <option value="Refunded">Refunded</option>
             </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Message to Customer (Optional)</label>
+            <textarea id="message" rows="3" style="width: 100%" placeholder="Add a message to notify the customer about this update..."></textarea>
           </div>
           <div class="form-actions">
             <button type="button" class="cancel-button" id="cancelStatusUpdate">Cancel</button>

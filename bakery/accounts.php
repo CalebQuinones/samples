@@ -2,15 +2,43 @@
 session_start();
 require_once 'config.php';
 
+// Generate CSRF token if not set
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
 // Check if user is logged in and is admin
 if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
     header("location: login.php");
     exit;
 }
 
-// Fetch all accounts from login table
-$sql = "SELECT * FROM login ORDER BY created_at ASC";
-$result = mysqli_query($conn, $sql);
+// Generate CSRF token if not exists
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Set CSRF token for AJAX requests
+header('X-CSRF-Token: ' . $_SESSION['csrf_token']);
+
+// Pagination settings
+$records_per_page = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $records_per_page;
+
+// Get total number of records
+$total_sql = "SELECT COUNT(*) as count FROM login";
+$total_result = mysqli_query($conn, $total_sql);
+$total_records = mysqli_fetch_assoc($total_result)['count'];
+$total_pages = ceil($total_records / $records_per_page);
+
+// Fetch accounts with pagination
+$sql = "SELECT * FROM login ORDER BY created_at ASC LIMIT ? OFFSET ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -18,9 +46,12 @@ $result = mysqli_query($conn, $sql);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
   <title>Accounts - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 <body>
   <div class="container">
@@ -63,6 +94,12 @@ $result = mysqli_query($conn, $sql);
             <a href="inquiries.php">
               <i class="fas fa-comment-dots"></i>
               <span>Inquiries</span>
+            </a>
+          </li>
+          <li>
+            <a href="sales.php" id="salesSidebarLink">
+              <i class="fas fa-chart-line"></i>
+              Sales
             </a>
           </li>
         </ul>
@@ -120,6 +157,7 @@ $result = mysqli_query($conn, $sql);
             <select class="filter-select" id="roleFilter">
               <option value="">All Roles</option>
               <option value="admin">Admin</option>
+              <option value="staff">Staff</option>
               <option value="customer">Customer</option>
             </select>
             <select class="filter-select" id="statusFilter">
@@ -159,8 +197,8 @@ $result = mysqli_query($conn, $sql);
                         $status = $row['status'];
                         $createdAt = date('M j, Y', strtotime($row['created_at']));
                         
-                        $statusClass = $status === 'active' ? 'status-completed' : 'status-cancelled';
-                        $roleClass = $role === 'admin' ? 'status-in-progress' : 'status-pending';
+                        $statusClass = $status === 'active' ? 'status-in-stock' : 'status-out-of-stock';
+                        $roleClass = $role === 'admin' ? 'status-admin' : ($role === 'staff' ? 'status-low-stock' : 'status-customer');
                         
                         echo "<tr>";
                         echo "<td><input type='checkbox' class='account-checkbox' data-id='$userId'></td>";
@@ -171,17 +209,17 @@ $result = mysqli_query($conn, $sql);
                         echo "<td><span class='status-badge $statusClass'>" . ucfirst($status) . "</span></td>";
                         echo "<td>$createdAt</td>";
                         echo "<td>
-                                <div class='action-buttons'>
-                                    <button class='action-button view-button' title='View Details' onclick='showCustomerDetails($userId)'>
-                                        <i class='fas fa-eye'></i>
-                                    </button>
-                                    <button class='action-button edit-button' title='Edit Account' onclick='showEditModal($userId)'>
-                                        <i class='fas fa-pen'></i>
-                                    </button>";
+                                <div class='action-buttons'>";
                         if ($role !== 'admin') {
-                            echo "<button class='action-button delete-button' title='Delete Account' onclick='confirmDeleteAccount($userId)'>
-                                    <i class='fas fa-trash'></i>
-                                  </button>";
+                            echo "<button class='action-button view-button' title='View Details' onclick='showCustomerDetails($userId)'>
+                                    <i class='fas fa-eye'></i>
+                                </button>
+                                <button class='action-button edit-button edit-account-btn' title='Edit Account' data-user-id='$userId'>
+                                    <i class='fas fa-pen'></i>
+                                </button>
+                                <button class='action-button archive-button' title='Archive Account' onclick='confirmArchiveAccount($userId)'>
+                                    <i class='fas fa-archive'></i>
+                                </button>";
                         }
                         echo "</div></td>";
                         echo "</tr>";
@@ -193,47 +231,44 @@ $result = mysqli_query($conn, $sql);
               </tbody>
             </table>
           </div>
-        </div>
 
-        <!-- Customer Details Modal -->
-        <div class="modal" id="customerDetailsModal">
-            <div class="modal-container">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">Customer Details</h3>
-                        <button class="close-modal" id="closeCustomerDetails">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="customer-info">
-                            <div class="info-group">
-                                <label>Phone Number</label>
-                                <p id="customerPhone">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Birthday</label>
-                                <p id="customerBirthday">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Address</label>
-                                <p id="customerAddress">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Payment Method</label>
-                                <p id="customerPayment">Loading...</p>
-                            </div>
-                            <div class="info-group">
-                                <label>Customer Since</label>
-                                <p id="customerCreatedAt">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="modal-button modal-button-secondary" id="closeCustomerDetailsBtn">
-                            Close
-                        </button>
-                    </div>
-                </div>
+          <!-- Pagination -->
+          <div class="pagination">
+            <div class="pagination-mobile">
+              <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
+                <i class="fas fa-chevron-left"></i>
+                Previous
+              </button>
+              <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
+                Next
+                <i class="fas fa-chevron-right"></i>
+              </button>
             </div>
+            <div class="pagination-desktop">
+              <div class="pagination-info">
+                Showing <span><?php echo min(($page-1) * $records_per_page + 1, $total_records); ?></span> to 
+                <span><?php echo min($page * $records_per_page, $total_records); ?></span> of 
+                <span><?php echo $total_records; ?></span> accounts
+              </div>
+              <div class="pagination-nav">
+                <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <?php
+                for($i = 1; $i <= $total_pages; $i++) {
+                    if($i == 1 || $i == $total_pages || ($i >= $page - 2 && $i <= $page + 2)) {
+                        echo "<button class='pagination-button pagination-button-page".($i == $page ? " active" : "")."' onclick='window.location.href=\"?page=$i\"'>$i</button>";
+                    } elseif($i == $page - 3 || $i == $page + 3) {
+                        echo "<button class='pagination-button pagination-button-page'>...</button>";
+                    }
+                }
+                ?>
+                <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -247,7 +282,6 @@ $result = mysqli_query($conn, $sql);
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title">Customer Details</h3>
-            <button class="close-modal" id="closeCustomerDetails">&times;</button>
           </div>
           <div class="modal-body">
             <div class="customer-info">
@@ -273,10 +307,9 @@ $result = mysqli_query($conn, $sql);
               </div>
             </div>
           </div>
+          
           <div class="modal-footer">
-            <button class="modal-button modal-button-secondary" id="closeCustomerDetailsBtn">
-              Close
-            </button>
+            <button class="modal-button" id="cancelModal">Cancel</button>
           </div>
         </div>
       </div>
@@ -288,35 +321,53 @@ $result = mysqli_query($conn, $sql);
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title">Add New Account</h3>
-            <button class="close-modal" id="closeAccount">&times;</button>
           </div>
           <div class="modal-body">
             <form id="addAccountForm">
+              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
               <div class="form-group">
-                <label for="firstName">First Name</label>
-                <input type="text" id="firstName" name="firstName" required>
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" class="form-control" required>
+
               </div>
               <div class="form-group">
-                <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" name="lastName" required>
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="form-control" required>
+
               </div>
               <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" class="form-control" required>
+
               </div>
               <div class="form-group">
                 <label for="role">Role</label>
-                <select id="role" name="role" required>
+                <select id="role" name="role" class="form-select" required>
+                  <option value="" disabled selected>Select a role</option>
                   <option value="customer">Customer</option>
+                  <option value="staff">Staff</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required minlength="8">
+
+              </div>
+              <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                <small class="form-text text-muted">Password must be at least 8 characters long and contain both letters and numbers</small>
+              </div>
+              <div class="form-group form-check">
+                <input type="checkbox" id="status" name="status" class="form-check-input" value="active" checked>
+                <label class="form-check-label" for="status">Active Account</label>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="modal-button modal-button-secondary" id="cancelAccount" onclick="window.closeModal()">Cancel</button>
+                <button type="submit" id="submit" class="modal-button modal-button-primary">Save</button>
+              </div>
             </form>
-          </div>
-          <div class="modal-footer">
-            <button class="modal-button modal-button-secondary" id="cancelAccount">Cancel</button>
-            <button class="modal-button modal-button-primary" id="saveAccount">Save</button>
-          </div>
         </div>
       </div>
     </div>
@@ -327,34 +378,17 @@ $result = mysqli_query($conn, $sql);
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title">Edit Account</h3>
-            <button class="close-modal" id="closeEditModal">&times;</button>
+            <button type="button" class="close-button" id="closeEditModal">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
           <div class="modal-body">
             <form id="accountEditForm">
-              <input type="hidden" id="editUserId">
-              <div class="form-group">
-                <label for="editFirstName">First Name</label>
-                <input type="text" id="editFirstName" name="firstName" required>
-              </div>
-              <div class="form-group">
-                <label for="editLastName">Last Name</label>
-                <input type="text" id="editLastName" name="lastName" required>
-              </div>
-              <div class="form-group">
-                <label for="editEmail">Email</label>
-                <input type="email" id="editEmail" name="email" required>
-              </div>
-              <div class="form-group">
-                <label for="editPhone">Phone</label>
-                <input type="tel" id="editPhone" name="phone">
-              </div>
-              <div class="form-group">
-                <label for="editAddress">Address</label>
-                <textarea id="editAddress" name="address"></textarea>
-              </div>
+              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+              <input type="hidden" id="user_id" name="user_id" value="">
               <div class="form-group">
                 <label for="editStatus">Status</label>
-                <select id="editStatus" name="status" required>
+                <select id="editStatus" name="status" class="form-select" required>
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
@@ -362,8 +396,8 @@ $result = mysqli_query($conn, $sql);
             </form>
           </div>
           <div class="modal-footer">
-            <button class="modal-button modal-button-secondary" id="cancelEdit">Cancel</button>
-            <button class="modal-button modal-button-primary" id="saveChanges">Save Changes</button>
+            <button type="button" class="modal-button modal-button-secondary" id="cancelEdit" onclick="window.closeModal()">Cancel</button>
+            <button type="submit" form="accountEditForm" class="modal-button modal-button-primary">Save Changes</button>
           </div>
         </div>
       </div>

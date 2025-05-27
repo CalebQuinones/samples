@@ -21,8 +21,10 @@ include 'config.php';
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Menu3.css">
     <link rel="stylesheet" href="order-confirmation.css">
+    <link rel="stylesheet" href="aicakes.css">
     <script src="cart-persistence.js"></script>
     <script src="product-popup.js"></script>
+    <script src="aicakes.js"></script>
 </head>
 <body>
     <div class="top-banner">
@@ -155,11 +157,6 @@ include 'config.php';
 
                         <form id="paymentForm">
                             <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" autocomplete="email" placeholder="Enter your email here..." required>
-                            </div>
-
-                            <div class="form-group">
                                 <label for="fullname">Fullname</label>
                                 <input type="text" id="fullname" name="fullname" autocomplete="name" placeholder="Enter your fullname here..." required>
                             </div>
@@ -237,41 +234,84 @@ include 'config.php';
        
 
 
+        <?php
+        // Get category counts
+        $category_counts = array();
+        $total_items = 0;
+        
+        $sql = "SELECT category, COUNT(*) as count FROM products GROUP BY category";
+        $result = mysqli_query($conn, $sql);
+        
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $category_counts[strtolower($row['category'])] = $row['count'];
+                $total_items += $row['count'];
+            }
+        }
+        ?>
         <div class="categories">
             <div class="category-card" id="color">
                 <span class="category-icon">📅</span>
                 <span class="category-name">All</span>
+<<<<<<< HEAD
                 
+=======
+                <span class="category-items"><?php echo $total_items; ?> Items</span>
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
             </div>
             <div class="category-card">
                 <span class="category-icon">🎂</span>
                 <span class="category-name">Birthday Cakes</span>
+<<<<<<< HEAD
                
+=======
+                <span class="category-items"><?php echo isset($category_counts['birthday cakes']) ? $category_counts['birthday cakes'] : 0; ?> Items</span>
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
             </div>
             <div class="category-card">
                 <span class="category-icon">💝</span>
                 <span class="category-name">Wedding Cakes</span>
+<<<<<<< HEAD
             
+=======
+                <span class="category-items"><?php echo isset($category_counts['wedding cakes']) ? $category_counts['wedding cakes'] : 0; ?> Items</span>
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
             </div>
             <div class="category-card">
                 <span class="category-icon">🚿</span>
                 <span class="category-name">Shower Cakes</span>
+<<<<<<< HEAD
                
+=======
+                <span class="category-items"><?php echo isset($category_counts['shower cakes']) ? $category_counts['shower cakes'] : 0; ?> Items</span>
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
             </div>
             <div class="category-card">
                 <span class="category-icon">🧁</span>
                 <span class="category-name">Cupcakes</span>
+<<<<<<< HEAD
                
+=======
+                <span class="category-items"><?php echo isset($category_counts['cupcakes']) ? $category_counts['cupcakes'] : 0; ?> Items</span>
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
             </div>
             <div class="category-card">
                 <span class="category-icon">🥖</span>
                 <span class="category-name">Breads</span>
+<<<<<<< HEAD
               
+=======
+                <span class="category-items"><?php echo isset($category_counts['breads']) ? $category_counts['breads'] : 0; ?> Items</span>
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
             </div>
             <div class="category-card">
                 <span class="category-icon">🍳</span>
                 <span class="category-name">Celebration</span>
+<<<<<<< HEAD
                
+=======
+                <span class="category-items"><?php echo isset($category_counts['celebration']) ? $category_counts['celebration'] : 0; ?> Items</span>
+>>>>>>> 3c953bfc5c84c24a7c61f5b2863c5271c9e6c26c
             </div>
         </div>
 
@@ -304,49 +344,48 @@ include 'config.php';
     
         <!-- Custom Cake Modal -->
         <div class="custom-cake-modal" id="customCakeModal">
-            <div class="modal-content">
-                <button class="close-modal" id="closeModal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-                
-                <h2>How would you like to order your cake?</h2>
-                <p class="modal-subtitle">Choose an option below to get started with your custom cake order</p>
-                
-                <div class="order-options">
-                    <div class="order-option">
-                        <div class="option-icon customize-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 21H16" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 17V21" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M17 3H7C5.89543 3 5 3.89543 5 5V13C5 14.1046 5.89543 15 7 15H17C18.1046 15 19 14.1046 19 13V5C19 3.89543 18.1046 3 17 3Z" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9 7H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M9 11H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Customize Online</h3>
-                        <p>Design your cake with our easy-to-use online cake builder</p>
+            <button class="close-modal" id="closeModal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            
+            <h2>How would you like to order your cake?</h2>
+            <p class="modal-subtitle">Choose an option below to get started with your custom cake order</p>
+            
+            <div class="order-options">
+                <div class="order-option ai-option">
+                    <div class="option-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 21H16" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 17V21" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 3H7C5.89543 3 5 3.89543 5 5V13C5 14.1046 5.89543 15 7 15H17C18.1046 15 19 14.1046 19 13V5C19 3.89543 18.1046 3 17 3Z" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 7H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 11H15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </div>
-                    
-                    <div class="order-option">
-                        <div class="option-icon upload-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M17 8L12 3L7 8" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 3V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Upload a Photo</h3>
-                        <p>Share a photo of a cake design you'd like us to create for you</p>
-                    </div>
+                    <div class="new-feature-badge">NEW</div>
+                    <h3>Build with AICakes</h3>
+                    <p>Generate a cake design with AICakes our AI-powered cake builder</p>
                 </div>
                 
-                <div class="modal-actions">
-                    <button class="start-customizing-btn">START CUSTOMIZING</button>
-                    <button class="choose-later-btn">Choose Later</button>
+                <div class="order-option">
+                    <div class="option-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3L7 8" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3V15" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Upload a Photo</h3>
+                    <p>Share a photo of a cake design you'd like us to create for you</p>
                 </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="start-customizing-btn">START CUSTOMIZING</button>
+                <button class="choose-later-btn">Choose Later</button>
             </div>
         </div>
 
@@ -381,6 +420,28 @@ include 'config.php';
                 <div class="cake-details-section">
                     <h3>Cake Details</h3>
                     <form id="cakeDetailsForm">
+                        <div class="form-group">
+                            <label for="cakeType">Cake Type</label>
+                            <select id="cakeType" required>
+                                <option value="" disabled selected>Select type</option>
+                                <option value="wedding">Wedding Cake</option>
+                                <option value="birthday">Birthday Cake</option>
+                                <option value="anniversary">Anniversary Cake</option>
+                                <option value="custom">Custom Cake</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cakeTiers">Number of Tiers</label>
+                            <select id="cakeTiers" required>
+                                <option value="" disabled selected>Select tiers</option>
+                                <option value="1">Single Tier</option>
+                                <option value="2">Two Tiers</option>
+                                <option value="3">Three Tiers</option>
+                                <option value="4">Four Tiers</option>
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label for="cakeSize">Cake Size</label>
                             <select id="cakeSize" required>
@@ -431,7 +492,117 @@ include 'config.php';
                             <textarea id="specialInstructions" placeholder="Any special requests or details about your cake design..."></textarea>
                         </div>
                         
-                        <button type="submit" class="submit-order-btn">SUBMIT ORDER</button>
+                        <div class="price-estimate-section">
+                            <h4>Estimated Price Range</h4>
+                            <div class="price-range">
+                                <span id="estimatedPrice">₱0.00</span>
+                                <span class="plus-icon">+</span>
+                            </div>
+                            <p class="price-note">* Final price may vary based on design complexity</p>
+                        </div>
+
+                        <button type="submit" class="submit-order-btn">ADD TO CART</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- AICakes Modal -->
+        <div class="aicakes-modal" id="aiCakesModal">
+            <div class="modal-content">
+                <button class="close-modal" id="closeAiModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 6L18 18" stroke="#E84B8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                
+                <h2>Design Your Dream Cake with AI</h2>
+                <p class="modal-subtitle">Tell us about your perfect cake and let our AI bring your vision to life!</p>
+                
+                <div class="cake-details-section">
+                    <form id="aiCakeForm">
+                        <div class="form-group">
+                            <label for="aiCakeType">Cake Type</label>
+                            <select id="aiCakeType" name="cakeType" required>
+                                <option value="">Select type</option>
+                                <option value="wedding">Wedding Cake</option>
+                                <option value="birthday">Birthday Cake</option>
+                                <option value="anniversary">Anniversary Cake</option>
+                                <option value="custom">Custom Cake</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiCakeTiers">Number of Tiers</label>
+                            <select id="aiCakeTiers" name="cakeTiers" required>
+                                <option value="">Select tiers</option>
+                                <option value="1">Single Tier</option>
+                                <option value="2">Two Tiers</option>
+                                <option value="3">Three Tiers</option>
+                                <option value="4">Four Tiers</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiCakeSize">Cake Size</label>
+                            <select id="aiCakeSize" name="cakeSize" required>
+                                <option value="">Select a size</option>
+                                <option value="6inch">6 inch (serves 8-10)</option>
+                                <option value="8inch">8 inch (serves 12-15)</option>
+                                <option value="10inch">10 inch (serves 20-25)</option>
+                                <option value="12inch">12 inch (serves 30-35)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiCakeFlavor">Cake Flavor</label>
+                            <select id="aiCakeFlavor" name="cakeFlavor" required>
+                                <option value="">Select a flavor</option>
+                                <option value="vanilla">Vanilla</option>
+                                <option value="chocolate">Chocolate</option>
+                                <option value="redvelvet">Red Velvet</option>
+                                <option value="carrot">Carrot</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiFillingType">Filling Type</label>
+                            <select id="aiFillingType" name="fillingType" required>
+                                <option value="">Select a filling</option>
+                                <option value="buttercream">Buttercream</option>
+                                <option value="chocolate">Chocolate Ganache</option>
+                                <option value="fruit">Fresh Fruit</option>
+                                <option value="custard">Custard</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiFrostingType">Frosting Type</label>
+                            <select id="aiFrostingType" name="frostingType" required>
+                                <option value="">Select a frosting</option>
+                                <option value="buttercream">Buttercream</option>
+                                <option value="fondant">Fondant</option>
+                                <option value="ganache">Ganache</option>
+                                <option value="nakedcake">Naked Cake</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aiDescription">Describe Your Dream Cake</label>
+                            <textarea id="aiDescription" name="cakeDescription" placeholder="Describe the design, colors, decorations, and any special elements you'd like on your cake..." required></textarea>
+                        </div>
+
+                        <div class="price-estimate-section">
+                            <h4>Estimated Price</h4>
+                            <div class="price-range">
+                                <span id="aiEstimatedPrice">₱0.00</span>
+                                <span class="plus-icon">+</span>
+                            </div>
+                            <p class="price-note">* Final price may vary based on design complexity</p>
+                        </div>
+
+                        <button type="submit" class="magic-button">Submit</button>
                     </form>
                 </div>
             </div>
@@ -445,7 +616,14 @@ include 'config.php';
 
             if ($result && mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
-                    echo '<div class="product-card" data-id="' . $row['product_id'] . '">';
+                    // Get category and availability directly from database
+                    $category = strtolower($row['category']);
+                    $availability = strtolower($row['availability']);
+
+                    echo '<div class="product-card" 
+                              data-id="' . $row['product_id'] . '"
+                              data-category="' . $category . '"
+                              data-availability="' . $availability . '">';
                     echo '<div class="product-image" style="background-image: url(\'' . $row['image'] . '\')"></div>';
                     echo '<div class="product-details">';
                     echo '<h3 class="product-name">' . $row['name'] . '</h3>';
@@ -462,7 +640,11 @@ include 'config.php';
                     echo '<span class="quantity">1</span>';
                     echo '<button class="quantity-btn plus" type="button">+</button>';
                     echo '</div>';
-                    echo '<button class="add-to-order" type="button" data-product-id="' . $row['product_id'] . '" data-product-name="' . htmlspecialchars($row['name']) . '" data-product-price="' . $row['price'] . '" data-product-image="' . $row['image'] . '">Add to order</button>';
+                    echo '<button class="add-to-order" type="button" 
+                                  data-product-id="' . $row['product_id'] . '" 
+                                  data-product-name="' . htmlspecialchars($row['name']) . '" 
+                                  data-product-price="' . $row['price'] . '" 
+                                  data-product-image="' . $row['image'] . '">Add to order</button>';
                     echo '</div>';
                     echo '</div>';
                 }
@@ -813,12 +995,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const chooseLaterBtn = document.querySelector('.choose-later-btn');
     const photoUploadModal = document.getElementById('photoUploadModal');
     const closePhotoModal = document.getElementById('closePhotoModal');
+    const aiCakesModal = document.getElementById('aiCakesModal');
+    const closeAiModal = document.getElementById('closeAiModal');
 
     // Helper to open a modal with overlay
     function openModal(modal) {
+        if (!modal) return;
         modalOverlay.style.display = 'block';
         modal.style.display = 'block';
-        void modalOverlay.offsetWidth;
+        // Force reflow
         void modal.offsetWidth;
         modalOverlay.classList.add('active');
         modal.classList.add('active');
@@ -827,83 +1012,112 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper to close all modals
     function closeAllModals() {
-        [customCakeModal, photoUploadModal].forEach(m => {
-            if (m) m.classList.remove('active');
+        const modals = [customCakeModal, photoUploadModal, aiCakesModal];
+        modals.forEach(modal => {
+            if (modal) {
+                modal.classList.remove('active');
+            }
         });
-        modalOverlay.classList.remove('active');
+        if (modalOverlay) {
+            modalOverlay.classList.remove('active');
+        }
         setTimeout(() => {
-            [customCakeModal, photoUploadModal].forEach(m => {
-                if (m) m.style.display = 'none';
+            modals.forEach(modal => {
+                if (modal) modal.style.display = 'none';
             });
-            modalOverlay.style.display = 'none';
+            if (modalOverlay) modalOverlay.style.display = 'none';
             document.body.style.overflow = 'auto';
         }, 300);
     }
 
     // Open custom order modal
-    if (customOrderBtn && customCakeModal) {
-        customOrderBtn.addEventListener('click', function() {
+    if (customOrderBtn) {
+        customOrderBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             openModal(customCakeModal);
+            // Pre-select the first option
+            if (orderOptions.length > 0) {
+                orderOptions[0].classList.add('selected');
+                if (startCustomizingBtn) {
+                    startCustomizingBtn.textContent = 'START CUSTOMIZING';
+                }
+            }
         });
     }
 
     // Close modals
-    if (closeModal) closeModal.addEventListener('click', closeAllModals);
-    if (closePhotoModal) closePhotoModal.addEventListener('click', closeAllModals);
+    [closeModal, closePhotoModal, closeAiModal].forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAllModals();
+            });
+        }
+    });
 
-    // Overlay click closes modals (only if overlay itself is clicked)
+    // Overlay click closes modals
     if (modalOverlay) {
         modalOverlay.addEventListener('click', function(e) {
-            if (e.target === modalOverlay) closeAllModals();
+            if (e.target === modalOverlay) {
+                closeAllModals();
+            }
         });
     }
 
     // Option selection logic
     orderOptions.forEach(option => {
-        option.addEventListener('click', function() {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Remove selected class from all options
             orderOptions.forEach(opt => opt.classList.remove('selected'));
+            // Add selected class to clicked option
             this.classList.add('selected');
-            // Update button text
+            // Update button text based on selection
             const title = this.querySelector('h3')?.textContent?.trim();
             if (startCustomizingBtn) {
-                startCustomizingBtn.textContent = (title === 'Customize Online') ? 'START CUSTOMIZING' : 'UPLOAD PHOTO';
+                startCustomizingBtn.textContent = (title === 'Build with AICakes') ? 'START CUSTOMIZING' : 'UPLOAD PHOTO';
             }
         });
     });
 
     // Start customizing button logic
     if (startCustomizingBtn) {
-        startCustomizingBtn.addEventListener('click', function() {
+        startCustomizingBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             const selected = document.querySelector('.order-option.selected');
-            const title = selected?.querySelector('h3')?.textContent?.trim();
-            if (title === 'Customize Online') {
-                // Redirect or show a message
-                alert('Redirecting to cake customization page...');
-                // window.location.href = 'cake-customizer.html';
-                closeAllModals();
+            if (!selected) {
+                alert('Please select an option to continue.');
+                return;
+            }
+
+            const title = selected.querySelector('h3')?.textContent?.trim();
+            if (title === 'Build with AICakes') {
+                // Switch to AI cakes modal
+                customCakeModal.classList.remove('active');
+                setTimeout(() => {
+                    customCakeModal.style.display = 'none';
+                    openModal(aiCakesModal);
+                }, 300);
             } else if (title === 'Upload a Photo') {
-                // Close custom modal, open photo upload modal
+                // Switch to photo upload modal
                 customCakeModal.classList.remove('active');
                 setTimeout(() => {
                     customCakeModal.style.display = 'none';
                     openModal(photoUploadModal);
                 }, 300);
-            } else {
-                // Default: open customize
-                alert('Redirecting to cake customization page...');
-                // window.location.href = 'cake-customizer.html';
-                closeAllModals();
             }
         });
     }
 
-    // Fix: Choose Later button should just close the modal and overlay
+    // Choose later button
     if (chooseLaterBtn) {
         chooseLaterBtn.addEventListener('click', function(e) {
             e.preventDefault();
             closeAllModals();
         });
     }
+
+    // AI Cake Form submission is handled by aicakes.js
 });
   </script>
 <script>
@@ -1002,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cartPopup.classList.remove('active');
             cartPopup.style.display = 'none';
             checkoutModal.style.display = 'block';
-            setTimeout(() => { checkoutModal.classList.add('active'); }, 10);
+            setTimeout(() => checkoutModal.classList.add('active'), 10);
             modalOverlay.style.display = 'block';
             modalOverlay.classList.add('active');
             updateCartUI(); // Update checkout items
@@ -1046,27 +1260,72 @@ document.addEventListener('DOMContentLoaded', function() {
             const cartItem = e.target.closest('.cart-popup-item');
             if (!cartItem) return;
 
+            // Get either the index (for custom cakes) or id (for regular products)
+            const index = cartItem.dataset.index;
             const productId = cartItem.dataset.id;
 
             // Handle remove button click
             if (e.target.closest('.cart-item-remove')) {
-                removeFromCart(productId);
+                console.log('Remove clicked - index:', index, 'productId:', productId);
+                
+                if (index !== undefined && index !== null) {
+                    // Remove custom cake using index
+                    const indexNum = parseInt(index);
+                    console.log('Removing custom cake at index:', indexNum);
+                    window.cart.splice(indexNum, 1);
+                    localStorage.setItem('cart', JSON.stringify(window.cart));
+                    updateCartUI();
+                    updateCartCount(); // Update the cart count after removal
+                } else if (productId) {
+                    // Remove regular product using id
+                    removeFromCart(productId);
+                }
             }
 
             // Handle quantity buttons
             if (e.target.classList.contains('cart-plus')) {
                 const quantityElement = cartItem.querySelector('.cart-quantity');
                 const currentQuantity = parseInt(quantityElement.textContent);
-                updateCartQuantity(productId, currentQuantity + 1);
+                if (index !== undefined && index !== null) {
+                    // Update custom cake quantity
+                    const indexNum = parseInt(index);
+                    window.cart[indexNum].quantity = currentQuantity + 1;
+                    localStorage.setItem('cart', JSON.stringify(window.cart));
+                    updateCartUI();
+                    updateCartCount();
+                } else if (productId) {
+                    // Update regular product quantity
+                    updateCartQuantity(productId, currentQuantity + 1);
+                }
             }
 
             if (e.target.classList.contains('cart-minus')) {
                 const quantityElement = cartItem.querySelector('.cart-quantity');
                 const currentQuantity = parseInt(quantityElement.textContent);
                 if (currentQuantity > 1) {
-                    updateCartQuantity(productId, currentQuantity - 1);
+                    if (index !== undefined && index !== null) {
+                        // Update custom cake quantity
+                        const indexNum = parseInt(index);
+                        window.cart[indexNum].quantity = currentQuantity - 1;
+                        localStorage.setItem('cart', JSON.stringify(window.cart));
+                        updateCartUI();
+                        updateCartCount();
+                    } else if (productId) {
+                        // Update regular product quantity
+                        updateCartQuantity(productId, currentQuantity - 1);
+                    }
                 } else {
-                    removeFromCart(productId);
+                    if (index !== undefined && index !== null) {
+                        // Remove custom cake
+                        const indexNum = parseInt(index);
+                        window.cart.splice(indexNum, 1);
+                        localStorage.setItem('cart', JSON.stringify(window.cart));
+                        updateCartUI();
+                        updateCartCount();
+                    } else if (productId) {
+                        // Remove regular product
+                        removeFromCart(productId);
+                    }
                 }
             }
         });
@@ -1185,7 +1444,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Gather form data
-            const email = document.getElementById('email').value.trim();
             const fullname = document.getElementById('fullname').value.trim();
             const address = document.getElementById('address').value.trim();
             const deliveryDate = document.getElementById('deliveryDate').value;
@@ -1194,7 +1452,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const cart = window.cart || [];
 
             // Basic validation
-            if (!email || !fullname || !address || !deliveryDate || !paymentMethod || cart.length === 0) {
+            if (!fullname || !address || !deliveryDate || !paymentMethod || cart.length === 0) {
                 alert('Please fill in all required fields and add at least one item to your cart.');
                 return;
             }
@@ -1211,7 +1469,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Prepare order data (with both flat and nested for backend compatibility)
             const orderData = {
                 user_id, // <-- always send user_id
-                email,
                 fullname,
                 address,
                 deliveryDate,
@@ -1220,7 +1477,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 cart: cart,
                 total: total,
                 customer: {
-                    email,
                     fullname,
                     address,
                     deliveryDate,
@@ -1230,6 +1486,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 items: cart
             };
 
+            // Check for custom cakes in the cart
+            const hasCustomCakes = cart.some(item => item.type === 'custom' && item.details?.isAIGenerated);
+            
             fetch('process_order.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1256,11 +1515,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.body.style.overflow = 'auto';
                     }, 300);
                 } else {
-                    alert(result.message || 'Order failed. Please try again.');
+                    console.error("Order failed:", result);
+                    alert(result.message || 'Order failed. Please try again. There might be an issue with image size for custom cakes.');
                 }
             })
             .catch(err => {
-                alert('Order failed. Please try again.');
+                console.error("Order error:", err);
+                alert('Order processing failed. This may be due to large custom cake images. Please try again or contact support.');
                 console.error(err);
             });
         });
@@ -1277,6 +1538,594 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ...existing code...
 });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all category cards and product cards
+    const categoryCards = document.querySelectorAll('.category-card');
+    const productCards = document.querySelectorAll('.product-card');
+    const filterAvailability = document.getElementById('filterAvailability');
+    const filterSize = document.getElementById('filterSize');
+    const searchInput = document.querySelector('.search-input');
+
+    // Store original products for reset
+    const originalProducts = Array.from(productCards);
+
+    // Add click event to category cards
+    categoryCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove active class from all cards
+            categoryCards.forEach(c => c.style.backgroundColor = '#F3F4F6');
+            // Add active class to clicked card
+            this.style.backgroundColor = '#FFD7E9';
+
+            const category = this.querySelector('.category-name').textContent.toLowerCase();
+            filterProducts();
+        });
+    });
+
+    // Add change event to filter dropdowns
+    filterAvailability.addEventListener('change', filterProducts);
+    filterSize.addEventListener('change', filterProducts);
+
+    // Add input event to search
+    searchInput.addEventListener('input', filterProducts);
+
+    function filterProducts() {
+        const selectedCategory = Array.from(categoryCards).find(card => 
+            card.style.backgroundColor === 'rgb(255, 215, 233)')?.querySelector('.category-name').textContent.toLowerCase() || 'all';
+        const selectedAvailability = filterAvailability.value.toLowerCase();
+        const selectedSize = filterSize.value.toLowerCase();
+        const searchTerm = searchInput.value.toLowerCase();
+
+        originalProducts.forEach(product => {
+            const productName = product.querySelector('.product-name').textContent.toLowerCase();
+            const productPrice = parseFloat(product.querySelector('.product-price').textContent.replace(/[^0-9.]/g, ''));
+            
+            // Get product category (you'll need to add data-category to your PHP product output)
+            const productCategory = product.getAttribute('data-category')?.toLowerCase() || 'all';
+
+            // Category filter
+            const matchesCategory = selectedCategory === 'all' || productCategory === selectedCategory;
+
+            // Availability filter (you'll need to add data-availability to your PHP product output)
+            const productAvailability = product.getAttribute('data-availability')?.toLowerCase() || 'in stock';
+            const matchesAvailability = selectedAvailability === 'availability' || productAvailability === selectedAvailability;
+
+            // Size/Price filter
+            let matchesSize = true;
+            if (selectedSize !== 'size') {
+                if (selectedSize === 'small') matchesSize = productPrice < 200;
+                else if (selectedSize === 'medium') matchesSize = productPrice >= 200 && productPrice <= 500;
+                else if (selectedSize === 'large') matchesSize = productPrice > 500;
+            }
+
+            // Search filter
+            const matchesSearch = productName.includes(searchTerm);
+
+            // Show/hide product based on all filters
+            if (matchesCategory && matchesAvailability && matchesSize && matchesSearch) {
+                product.style.display = '';
+                product.style.animation = 'fadeIn 0.5s ease-out';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Price calculation for custom cake
+    const basePrices = {
+        '6': 500.00,
+        '8': 800.00,
+        '10': 1200.00,
+        '12': 1500.00
+    };
+
+    const flavorPrices = {
+        'Vanilla': 0,
+        'Chocolate': 50,
+        'Red Velvet': 100,
+        'Carrot': 80,
+        'Ube': 70
+    };
+
+    const fillingPrices = {
+        'Buttercream': 0,
+        'Chocolate Ganache': 100,
+        'Fresh Fruit': 150,
+        'Custard': 80
+    };
+
+    const frostingPrices = {
+        'Buttercream': 0,
+        'Fondant': 200,
+        'Whipped Cream': 50,
+        'Ganache': 150
+    };
+
+    function updateEstimatedPrice() {
+        const size = document.getElementById('cakeSize').value;
+        const flavor = document.getElementById('cakeFlavor').value;
+        const filling = document.getElementById('fillingType').value;
+        const frosting = document.getElementById('frostingType').value;
+        const type = document.getElementById('cakeType').value;
+        const tiers = parseInt(document.getElementById('cakeTiers').value) || 0;
+
+        let basePrice = 0;
+        
+        // Base price by size
+        switch(size) {
+            case '6': basePrice = 800; break;
+            case '8': basePrice = 1200; break;
+            case '10': basePrice = 1800; break;
+            case '12': basePrice = 2500; break;
+            default: basePrice = 0;
+        }
+
+        // Additional cost for premium flavors
+        if (['redvelvet', 'carrot', 'ube'].includes(flavor)) {
+            basePrice += 200;
+        }
+
+        // Additional cost for premium fillings
+        if (['ganache', 'fruit'].includes(filling)) {
+            basePrice += 150;
+        }
+
+        // Additional cost for premium frostings
+        if (['fondant', 'ganache'].includes(frosting)) {
+            basePrice += 300;
+        }
+
+        // Additional cost based on cake type
+        switch(type) {
+            case 'wedding': basePrice *= 2; break; // Wedding cakes are most premium
+            case 'anniversary': basePrice *= 1.5; break; // Anniversary cakes are special
+            case 'custom': basePrice *= 1.3; break; // Custom cakes need extra attention
+            // Birthday cakes use base price
+        }
+
+        // Additional cost for multiple tiers (exponential increase for wedding cakes)
+        if (tiers > 1) {
+            if (type === 'wedding') {
+                basePrice *= (1 + ((tiers - 1) * 1.0)); // Each tier adds 100% for wedding cakes
+            } else {
+                basePrice *= (1 + ((tiers - 1) * 0.8)); // Each tier adds 80% for other cakes
+            }
+        }
+
+        // Update the price display
+        const priceElement = document.getElementById('estimatedPrice');
+        priceElement.textContent = `₱${basePrice.toFixed(2)}`;
+    }
+
+    // Add event listeners for price updates
+    ['cakeSize', 'cakeFlavor', 'fillingType', 'frostingType', 'cakeType', 'cakeTiers'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', updateEstimatedPrice);
+        }
+    });
+
+    // Handle custom order form submission
+    const cakeDetailsForm = document.getElementById('cakeDetailsForm');
+    if (cakeDetailsForm) {
+        cakeDetailsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Check if user is logged in
+            if (!window.isLoggedIn) {
+                alert('Please log in to place a custom order.');
+                return;
+            }
+
+            // Get form data
+            const formData = new FormData(this);
+            const calculatedPrice = parseFloat(this.dataset.calculatedPrice || 0);
+            
+            // Get the uploaded image
+            const fileInput = document.getElementById('cakePhotoInput');
+            if (!fileInput.files.length) {
+                alert('Please upload a reference photo for your cake.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Create custom cake cart item
+                const customCake = {
+                    type: 'custom',
+                    name: 'Custom Cake',
+                    price: calculatedPrice,
+                    quantity: 1,
+                    image: e.target.result,
+                    details: {
+                        size: document.getElementById('cakeSize').value,
+                        flavor: document.getElementById('cakeFlavor').value,
+                        filling: document.getElementById('fillingType').value,
+                        frosting: document.getElementById('frostingType').value,
+                        instructions: document.getElementById('specialInstructions').value
+                    }
+                };
+
+                // Add to cart
+                if (!window.cart) window.cart = [];
+                window.cart.push(customCake);
+                
+                // Save cart to localStorage
+                localStorage.setItem('cart', JSON.stringify(window.cart));
+
+                // Update cart UI
+                updateCartCount();
+                
+                // Close photo upload modal
+                const photoUploadModal = document.getElementById('photoUploadModal');
+                photoUploadModal.classList.remove('active');
+                modalOverlay.classList.remove('active');
+                setTimeout(() => {
+                    photoUploadModal.style.display = 'none';
+                    modalOverlay.style.display = 'none';
+                }, 300);
+
+                alert('Custom cake added to cart!');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        });
+    }
+
+    // Update cart UI function
+    function updateCartUI() {
+        const cartPopupItems = document.getElementById('cartPopupItems');
+        const orderItemsList = document.getElementById('orderItemsList');
+        let total = 0;
+
+        if (!window.cart || !window.cart.length) {
+            if (cartPopupItems) cartPopupItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+            if (orderItemsList) orderItemsList.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+            document.getElementById('cartTotal').textContent = '₱0.00';
+            return;
+        }
+
+        let cartHTML = '';
+        let checkoutHTML = '';
+
+        window.cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            if (item.type === 'custom') {
+                // Get cake details
+                const isAIGenerated = item.details.isAIGenerated ? 'AI-Generated' : '';
+                const cakeType = item.details.cakeType ? `${item.details.cakeType.charAt(0).toUpperCase() + item.details.cakeType.slice(1)}` : '';
+                const tiers = item.details.tiers ? `${item.details.tiers} tier` : '';
+                
+                // Custom cake display in cart
+                cartHTML += `
+                    <div class="cart-popup-item" data-index="${index}" data-type="custom">
+                        <img src="${item.image}" alt="Custom Cake" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h4>${item.name}</h4>
+                            <p>${item.details.size}" ${item.details.flavor} ${isAIGenerated}</p>
+                            <p class="cart-item-price">₱${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="cart-minus">-</button>
+                            <span class="cart-quantity">${item.quantity}</span>
+                            <button class="cart-plus">+</button>
+                        </div>
+                        <button class="cart-item-remove">&times;</button>
+                    </div>
+                `;
+
+                // Custom cake display in checkout
+                checkoutHTML += `
+                    <div class="checkout-item">
+                        <img src="${item.image}" alt="Custom Cake" class="checkout-item-image">
+                        <div class="checkout-item-details">
+                            <h4>${item.name} ${isAIGenerated}</h4>
+                            <p>${cakeType} ${tiers} ${item.details.size}" ${item.details.flavor} cake</p>
+                            <p>Filling: ${item.details.filling}</p>
+                            <p>Frosting: ${item.details.frosting}</p>
+                            <p class="checkout-item-price">₱${item.price.toFixed(2)} x ${item.quantity}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Regular product display (existing code)
+                cartHTML += `
+                    <div class="cart-popup-item" data-index="${index}">
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h4>${item.name}</h4>
+                            <p class="cart-item-price">₱${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="cart-minus">-</button>
+                            <span class="cart-quantity">${item.quantity}</span>
+                            <button class="cart-plus">+</button>
+                        </div>
+                        <button class="cart-item-remove">&times;</button>
+                    </div>
+                `;
+
+                checkoutHTML += `
+                    <div class="checkout-item">
+                        <img src="${item.image}" alt="${item.name}" class="checkout-item-image">
+                        <div class="checkout-item-details">
+                            <h4>${item.name}</h4>
+                            <p class="checkout-item-price">₱${item.price.toFixed(2)} x ${item.quantity}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (cartPopupItems) cartPopupItems.innerHTML = cartHTML;
+        if (orderItemsList) orderItemsList.innerHTML = checkoutHTML;
+        document.getElementById('cartTotal').textContent = `₱${total.toFixed(2)}`;
+    }
+
+    // Update cart count function
+    function updateCartCount() {
+        const cartCount = document.querySelector('.cart-count');
+        if (cartCount) {
+            const count = window.cart ? window.cart.reduce((total, item) => total + item.quantity, 0) : 0;
+            cartCount.textContent = count.toString();
+        }
+    }
+
+    // Load cart from localStorage on page load
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+        window.cart = JSON.parse(savedCart);
+        updateCartCount();
+    }
+});
+</script>
+<style>
+.price-estimate-section {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.price-estimate-section h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.price-range {
+    font-size: 24px;
+    font-weight: bold;
+    color: #E84B8A;
+    margin: 10px 0;
+}
+
+.price-note {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+.preview-container {
+    display: none;
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.preview-image {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #E84B8A;
+    color: white;
+    border: none;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.remove-image-btn:hover {
+    background-color: #d83790;
+}
+
+.upload-area.dragover {
+    background-color: #fce7f3;
+    border-color: #E84B8A;
+}
+
+.file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // File upload and preview functionality
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('cakePhotoInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const uploadPlaceholder = document.querySelector('.upload-placeholder');
+
+    // Handle drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.remove('dragover');
+        });
+    });
+
+    // Handle file drop
+    uploadArea.addEventListener('drop', handleDrop);
+    fileInput.addEventListener('change', handleFiles);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles({ target: { files: files } });
+    }
+
+    function handleFiles(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    displayPreview(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please upload an image file.');
+            }
+        }
+    }
+
+    function displayPreview(imageUrl) {
+        // Clear previous preview
+        previewContainer.innerHTML = '';
+        
+        // Create preview elements
+        const previewImage = document.createElement('img');
+        previewImage.src = imageUrl;
+        previewImage.className = 'preview-image';
+        
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-image-btn';
+        removeButton.innerHTML = '×';
+        removeButton.onclick = removePreview;
+        
+        // Add elements to container
+        previewContainer.appendChild(previewImage);
+        previewContainer.appendChild(removeButton);
+        
+        // Hide placeholder, show preview
+        uploadPlaceholder.style.display = 'none';
+        previewContainer.style.display = 'block';
+    }
+
+    function removePreview() {
+        // Clear file input
+        fileInput.value = '';
+        
+        // Clear preview
+        previewContainer.innerHTML = '';
+        previewContainer.style.display = 'none';
+        
+        // Show placeholder
+        uploadPlaceholder.style.display = 'flex';
+    }
+});
+</script>
+<script>
+// AICakes Modal Price Estimation
+function updateAICakesPrice() {
+    const size = document.getElementById('aiCakeSize').value;
+    const flavor = document.getElementById('aiCakeFlavor').value;
+    const filling = document.getElementById('aiFillingType').value;
+    const frosting = document.getElementById('aiFrostingType').value;
+    const type = document.getElementById('aiCakeType').value;
+    const tiers = parseInt(document.getElementById('aiCakeTiers').value) || 0;
+
+    let basePrice = 0;
+    
+    // Base price by size
+    switch(size) {
+        case '6inch': basePrice = 800; break;
+        case '8inch': basePrice = 1200; break;
+        case '10inch': basePrice = 1800; break;
+        case '12inch': basePrice = 2500; break;
+        default: basePrice = 0;
+    }
+
+    // Additional cost for premium flavors
+    if (['redvelvet', 'carrot'].includes(flavor)) {
+        basePrice += 200;
+    }
+
+    // Additional cost for premium fillings
+    if (['chocolate', 'fruit'].includes(filling)) {
+        basePrice += 150;
+    }
+
+    // Additional cost for premium frostings
+    if (['fondant', 'ganache'].includes(frosting)) {
+        basePrice += 300;
+    }
+
+    // Additional cost based on cake type
+    switch(type) {
+        case 'wedding': basePrice *= 2; break; // Wedding cakes are most premium
+        case 'anniversary': basePrice *= 1.5; break; // Anniversary cakes are special
+        case 'custom': basePrice *= 1.3; break; // Custom cakes need extra attention
+        // Birthday cakes use base price
+    }
+
+    // Additional cost for multiple tiers (exponential increase for wedding cakes)
+    if (tiers > 1) {
+        if (type === 'wedding') {
+            basePrice *= (1 + ((tiers - 1) * 1.0)); // Each tier adds 100% for wedding cakes
+        } else {
+            basePrice *= (1 + ((tiers - 1) * 0.8)); // Each tier adds 80% for other cakes
+        }
+    }
+
+    // Add AI design fee
+    basePrice += 500;
+
+    // Update the price display
+    const priceElement = document.getElementById('aiEstimatedPrice');
+    priceElement.textContent = `₱${basePrice.toFixed(2)}`;
+}
+
+// Add event listeners for AICakes form fields
+document.getElementById('aiCakeSize')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiCakeFlavor')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiFillingType')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiFrostingType')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiCakeType')?.addEventListener('change', updateAICakesPrice);
+document.getElementById('aiCakeTiers')?.addEventListener('change', updateAICakesPrice);
 </script>
 </body>
 </html>

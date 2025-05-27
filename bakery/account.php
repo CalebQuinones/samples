@@ -231,14 +231,13 @@ if ($stmt) {
             <div class="main-content">
                 <!-- Personal Info Tab -->
                 <div id="personal-info-tab" class="tab-content active">
-                    <div class="profile-picture-container">
-                        <label for="profile-picture-input">
-                            <div class="profile-picture">
-                                <span class="sr-only">Profile picture</span>
-                                <img id="profile-picture-preview" src="" alt="" style="display: none; width: 100%; height: 100%; border-radius: 9999px; object-fit: cover;">
-                                <img src=" " alt="Profile Picture" class="profile-picture-img" style="width: 100%; height: 100%; border-radius: 9999px; object-fit: cover;">
-                            </div>
-                        </label>
+                    <div class="profile-picture-container" style="text-align: left; margin-left: 0;">
+                        <div class="profile-initials" style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 50%; margin-left: 0;">
+                            <?php 
+                                $initials = strtoupper(substr($Fname, 0, 1) . substr($Lname, 0, 1));
+                                echo htmlspecialchars($initials);
+                            ?>
+                        </div>
                     </div>
                     
                     <div class="form-container">
@@ -287,14 +286,14 @@ if ($stmt) {
                 <!-- Orders Tab -->
                 <div id="orders-tab" class="tab-content">
                     <div class="orders-header">
-                        <h2>Orders (2)</h2>
+                        <h2>Orders (4)</h2>
                     </div>
                     
                     <div class="order-card">
                         <div class="order-header">
                             <div class="order-header-item">
                                 <div class="order-header-label">Order ID</div>
-                                <div class="order-header-value">#ADJW349J</div>
+                                <div class="order-header-value">ORD-025</div>
                             </div>
                             <div class="order-header-item">
                                 <div class="order-header-label">Total Payment</div>
@@ -306,37 +305,37 @@ if ($stmt) {
                             </div>
                             <div class="order-header-item">
                                 <div class="order-header-label">Estimated Delivery</div>
-                                <div class="order-header-value">30 July 2025</div>
+                                <div class="order-header-value">26 May 2025</div>
                             </div>
                         </div>
                         
                         <div class="order-items">
                             <div class="order-item">
-                                <img src="https://via.placeholder.com/60" alt="Strawberry Short Cake" class="order-item-image">
+                                <img src="1.png" alt="Strawberry Short Cake" class="order-item-image">
                                 <div class="order-item-details">
-                                    <div class="order-item-name">Strawberry Short Cake</div>
-                                    <div class="order-item-meta">Php 700.00 | 1 Qty</div>
+                                    <div class="order-item-name">Wedding Cake</div>
+                                    <div class="order-item-meta">Php 600.00 | 1 Qty</div>
                                 </div>
                             </div>
                             <div class="order-item">
-                                <img src="https://via.placeholder.com/60" alt="1 Pack Chocolate Cookies" class="order-item-image">
+                                <img src="8.png" alt="1 Pack Chocolate Cookies" class="order-item-image">
                                 <div class="order-item-details">
-                                    <div class="order-item-name">1 Pack Chocolate Cookies</div>
+                                    <div class="order-item-name">Dog Cake</div>
                                     <div class="order-item-meta">Php 300 | 1 Qty</div>
                                 </div>
                             </div>
                             <div class="order-item">
-                                <img src="https://via.placeholder.com/60" alt="1 Pack Chocolate Cookies" class="order-item-image">
+                                <img src="11.png" alt="1 Pack Chocolate Cookies" class="order-item-image">
                                 <div class="order-item-details">
-                                    <div class="order-item-name">1 Pack Chocolate Cookies</div>
-                                    <div class="order-item-meta">Php 300 | 1 Qty</div>
+                                    <div class="order-item-name">Strawberry Cupcakes</div>
+                                    <div class="order-item-meta">Php 100 | 1 Qty</div>
                                 </div>
                             </div>
                             <div class="order-item">
-                                <img src="https://via.placeholder.com/60" alt="Strawberry Short Cake" class="order-item-image">
+                                <img src="4.png" alt="Strawberry Short Cake" class="order-item-image">
                                 <div class="order-item-details">
-                                    <div class="order-item-name">Strawberry Short Cake</div>
-                                    <div class="order-item-meta">Php 700.00 | 1 Qty</div>
+                                    <div class="order-item-name">Father's Day</div>
+                                    <div class="order-item-meta">Php 300.00 | 1 Qty</div>
                                 </div>
                             </div>
                             
@@ -345,9 +344,6 @@ if ($stmt) {
                                 <span class="status-text">Your Order Status</span>
                             </div>
                             
-                            <div class="order-actions">
-                                <button class="primary-button">Track Order</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -446,31 +442,6 @@ if ($stmt) {
     </footer>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script>
-        const profilePictureInput = document.getElementById('profile-picture-input');
-        const profilePicturePreview = document.getElementById('profile-picture-preview');
-
-        document.querySelector('.profile-picture').addEventListener('click', () => {
-            profilePictureInput.click();
-        });
-
-        profilePictureInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-            
-                    profilePicturePreview.src = e.target.result;
-                    profilePicturePreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-        
-                profilePicturePreview.src = '';
-                profilePicturePreview.style.display = 'none';
-            }
-        });
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Navigation toggle
@@ -748,7 +719,7 @@ if ($stmt) {
         const productId = parseInt(cartItem.dataset.id);
         
         // Handle remove button click
-        if (e.target.closest('.cart-item-remove')) {
+        if e.target.closest('.cart-item-remove')) {
             removeFromCart(productId);
         }
         

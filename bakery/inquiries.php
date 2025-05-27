@@ -8,9 +8,23 @@ if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
     exit;
 }
 
-// Fetch all inquiries from the database
-$sql = "SELECT * FROM inquiry ORDER BY dateSubmitted DESC";
-$result = mysqli_query($conn, $sql);
+// Pagination settings
+$records_per_page = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $records_per_page;
+
+// Get total number of records
+$total_sql = "SELECT COUNT(*) as count FROM inquiry";
+$total_result = mysqli_query($conn, $total_sql);
+$total_records = mysqli_fetch_assoc($total_result)['count'];
+$total_pages = ceil($total_records / $records_per_page);
+
+// Fetch inquiries with pagination
+$sql = "SELECT * FROM inquiry ORDER BY dateSubmitted DESC LIMIT ? OFFSET ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +33,7 @@ $result = mysqli_query($conn, $sql);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inquiries - Bakery Admin Dashboard</title>
   <link rel="stylesheet" href="adminstyles.css">
+  <link rel="stylesheet" href="adminstyles2.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -62,6 +77,12 @@ $result = mysqli_query($conn, $sql);
             <a href="inquiries.php" class="active">
               <i class="fas fa-comment-dots"></i>
               <span>Inquiries</span>
+            </a>
+          </li>
+          <li>
+            <a href="sales.php" id="salesSidebarLink">
+              <i class="fas fa-chart-line"></i>
+              Sales
             </a>
           </li>
         </ul>
@@ -164,8 +185,8 @@ $result = mysqli_query($conn, $sql);
                                 <button class='action-button view-button' data-id='" . $row['ID'] . "' title='View'>
                                     <i class='fas fa-eye'></i>
                                 </button>
-                                <button class='action-button delete-button' data-id='" . $row['ID'] . "' title='Delete'>
-                                    <i class='fas fa-trash'></i>
+                                <button class='action-button delete-button' data-id='" . $row['ID'] . "' title='Archive'>
+                                    <i class='fas fa-archive'></i>
                                 </button>
                               </div></td>";
                         echo "</tr>";
@@ -181,23 +202,35 @@ $result = mysqli_query($conn, $sql);
           <!-- Pagination -->
           <div class="pagination">
             <div class="pagination-mobile">
-              <button class="pagination-button pagination-button-prev" id="prevPageMobile" disabled>
+              <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
+                <i class="fas fa-chevron-left"></i>
                 Previous
               </button>
-              <button class="pagination-button pagination-button-next" id="nextPageMobile">
+              <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
                 Next
+                <i class="fas fa-chevron-right"></i>
               </button>
             </div>
             <div class="pagination-desktop">
               <div class="pagination-info">
-                Showing <span id="startIndex">1</span> to <span id="endIndex">5</span> of <span id="totalItems">8</span> results
+                Showing <span><?php echo min(($page-1) * $records_per_page + 1, $total_records); ?></span> to 
+                <span><?php echo min($page * $records_per_page, $total_records); ?></span> of 
+                <span><?php echo $total_records; ?></span> inquiries
               </div>
-              <div class="pagination-nav" id="paginationNav">
-                <button class="pagination-button pagination-button-prev" id="prevPage" disabled>
+              <div class="pagination-nav">
+                <button class="pagination-button pagination-button-prev" <?php if($page <= 1) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page-1; ?>'">
                   <i class="fas fa-chevron-left"></i>
                 </button>
-                <!-- Page buttons will be added by JavaScript -->
-                <button class="pagination-button pagination-button-next" id="nextPage">
+                <?php
+                for($i = 1; $i <= $total_pages; $i++) {
+                    if($i == 1 || $i == $total_pages || ($i >= $page - 2 && $i <= $page + 2)) {
+                        echo "<button class='pagination-button pagination-button-page".($i == $page ? " active" : "")."' onclick='window.location.href=\"?page=$i\"'>$i</button>";
+                    } elseif($i == $page - 3 || $i == $page + 3) {
+                        echo "<button class='pagination-button pagination-button-page'>...</button>";
+                    }
+                }
+                ?>
+                <button class="pagination-button pagination-button-next" <?php if($page >= $total_pages) echo 'disabled'; ?> onclick="window.location.href='?page=<?php echo $page+1; ?>'">
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
@@ -243,6 +276,7 @@ $result = mysqli_query($conn, $sql);
                 Reply
               </label>
               <textarea
+                style="width: 420px; height: 120px; border: 1px solid var(--pink-200); border-radius: 0.375rem; padding: 0.5rem 0.75rem;"
                 id="replyText"
                 rows="4"
                 class="form-textarea"

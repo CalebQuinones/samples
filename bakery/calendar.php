@@ -1,6 +1,10 @@
 <?php
 session_start();
-require_once '../../config.php';
+require_once 'config.php';
+
+// Prevent PHP errors/warnings from breaking JSON output
+ini_set('display_errors', 0);
+error_reporting(E_ERROR | E_PARSE);
 
 // Check if user is logged in and is admin
 if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
@@ -13,39 +17,38 @@ if(!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "admin"){
 $month = isset($_GET['month']) ? intval($_GET['month']) : date('n');
 $year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 
-// Calculate the first and last day of the month
-$firstDay = date('Y-m-01', strtotime("$year-$month-01"));
-$lastDay = date('Y-m-t', strtotime("$year-$month-01"));
-
-// Fetch orders for the specified month
-$sql = "SELECT o.*, 
-        CONCAT(l.Fname, ' ', l.Lname) as customer_name,
-        GROUP_CONCAT(p.name SEPARATOR ', ') as products
-        FROM orders o 
-        LEFT JOIN login l ON o.user_id = l.user_id 
-        LEFT JOIN order_items oi ON o.order_id = oi.order_id
-        LEFT JOIN products p ON oi.product_id = p.product_id
-        WHERE o.delivery_date BETWEEN ? AND ?
-        GROUP BY o.order_id
-        ORDER BY o.delivery_date ASC";
+$sql = "SELECT 
+    o.order_id as id,
+    o.status,
+    DATE(o.delivery_date) as date,
+    GROUP_CONCAT(p.name SEPARATOR ', ') as products,
+    CONCAT(l.Fname, ' ', l.Lname) as customer
+    FROM orders o
+    JOIN login l ON o.user_id = l.user_id
+    JOIN order_items oi ON o.order_id = oi.order_id
+    JOIN products p ON oi.product_id = p.product_id
+    WHERE MONTH(o.delivery_date) = ? AND YEAR(o.delivery_date) = ?
+    GROUP BY o.order_id, o.status, o.delivery_date, l.Fname, l.Lname
+    ORDER BY o.delivery_date ASC";
 
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "ss", $firstDay, $lastDay);
+mysqli_stmt_bind_param($stmt, "ii", $month, $year);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
-$orders = [];
+$orders = array();
 while ($row = mysqli_fetch_assoc($result)) {
-    $orders[] = [
-        'id' => $row['order_id'],
-        'customer' => $row['customer_name'],
-        'products' => $row['products'],
-        'date' => $row['delivery_date'],
-        'status' => $row['status']
-    ];
+    // Format the date to match JS expected format
+    $row['date'] = date('Y-m-d', strtotime($row['date']));
+    $orders[] = $row;
 }
 
 // Return the orders as JSON
 header('Content-Type: application/json');
 echo json_encode($orders);
-?> 
+
+if (!$conn) {
+    echo json_encode(['error' => 'Database connection failed']);
+    exit;
+}
+?>

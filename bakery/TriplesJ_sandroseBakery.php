@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="figma2.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    
     <link rel="stylesheet" href="order-confirmation.css">
     <script src="cart-manager.js"></script>
 </head>
@@ -415,7 +416,7 @@
             <p class="pp"> 
                 The main goal of our bakery, is to hold a special place in people's hearts. They evoke memories of childhood, family gatherings, and celebrations. The comfort and nostalgia associated with baked goods can make a bakery a cherished destination. This emotional connection is a significant factor in the success of Triple J & Rose's Bakery.
             </p>
-            <a href="Abouts.php"><button class="more-about-us">More About us</button></a>
+            <button class="more-about-us">More About us</button>
         </div>
     </div>
       </section>
@@ -599,6 +600,79 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof updateCartUI === 'function') {
         updateCartUI();
     }
+    
+    // Hero section slider functionality
+    const eventLinks = document.querySelectorAll('.event-nav a');
+    const mainCakeImage = document.querySelector('.hero-image .maincake');
+    const behindImage = document.querySelector('.hero-image .behind');
+    const heroSection = document.querySelector('.hero');
+    
+    // Add click event listeners to event links
+    eventLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            eventLinks.forEach(l => l.classList.remove('active'));
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Get cake image from data attribute
+            const cakeImage = this.getAttribute('data-cake');
+            
+            // Fade out current image
+            mainCakeImage.style.opacity = '0';
+            
+            // Change image source and fade in after a short delay
+            setTimeout(() => {
+                mainCakeImage.src = cakeImage;
+                mainCakeImage.style.opacity = '1';
+            }, 300);
+            
+            // Reset auto-slide timer when manually clicked
+            resetAutoSlideTimer();
+        });
+    });
+    
+    // Function to change to the next slide
+    function nextSlide() {
+        // Find the currently active link
+        const activeLink = document.querySelector('.event-nav a.active');
+        // Get the next link or the first one if at the end
+        const nextLink = activeLink.nextElementSibling || eventLinks[0];
+        
+        // Simulate a click on the next link
+        nextLink.click();
+    }
+    
+    // Auto-slide functionality
+    let slideInterval;
+    
+    function startAutoSlide() {
+        // Change slide every 5 seconds (5000ms)
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+    
+    function resetAutoSlideTimer() {
+        // Clear the existing interval
+        clearInterval(slideInterval);
+        // Start a new interval
+        startAutoSlide();
+    }
+    
+    // Pause auto-slide when hovering over the hero section
+    heroSection.addEventListener('mouseenter', function() {
+        clearInterval(slideInterval);
+    });
+    
+    // Resume auto-slide when mouse leaves the hero section
+    heroSection.addEventListener('mouseleave', function() {
+        startAutoSlide();
+    });
+    
+    // Start auto-slide when page loads
+    startAutoSlide();
 });
 </script>
 <script>
