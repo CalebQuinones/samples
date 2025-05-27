@@ -1,6 +1,6 @@
 // Global functions for account management
 function showCustomerDetails(userId) {
-    fetch(`get_customer_details.php?user_id=${userId}`)
+    fetch(`./get_customer_details.php?user_id=${userId}`)
         .then(response => response.json())
         .then(data => {
             const elements = {
@@ -55,7 +55,7 @@ function showEditModal(userId) {
     window.showModal(accountEditModal);
     
     // Fetch account details
-    fetch(`get_account.php?id=${userId}`)
+    fetch(`./get_account.php?id=${userId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -158,20 +158,19 @@ window.showModal = function(modal) {
     // Hide all other modals first
     document.querySelectorAll('.modal').forEach(m => {
         if (m !== modal) {
-            m.style.display = 'none';
             m.classList.remove('active');
+            m.style.display = 'none';
             m.setAttribute('aria-hidden', 'true');
         }
     });
 
-    // Show the overlay first
+    // Show the overlay
     modalOverlay.style.display = 'flex';
-    // Force reflow to ensure display is applied
-    void modalOverlay.offsetHeight;
     
     // Show the modal
     modal.style.display = 'block';
-    // Force reflow
+    
+    // Trigger reflow to enable CSS transitions
     void modal.offsetHeight;
     
     // Add active classes to trigger the transition
@@ -182,33 +181,32 @@ window.showModal = function(modal) {
     modal.setAttribute('aria-hidden', 'false');
     modal.setAttribute('tabindex', '-1');
     
-    // Prevent body scroll and account for scrollbar
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
+    // Handle body scroll
     document.body.style.overflow = 'hidden';
-    
-    // Store scroll position
-    modal.dataset.scrollY = scrollY;
+    document.body.style.paddingRight = window.innerWidth > document.documentElement.clientWidth ? '15px' : '0';
     
     // Set focus to the modal for better accessibility
     setTimeout(() => {
-        modal.focus();
+        const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusable) focusable.focus();
+        else modal.focus();
     }, 100);
     
-    // Handle click outside to close
+        // Handle click outside to close
     const handleClickOutside = (e) => {
         if (e.target === modalOverlay) {
-            closeModal();
+            e.preventDefault();
+            e.stopPropagation();
+            window.closeModal();
         }
     };
     
     // Handle ESC key
     const handleEscape = (e) => {
-        if (e.key === 'Escape') {
-            closeModal();
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            e.preventDefault();
+            e.stopPropagation();
+            window.closeModal();
         }
     };
     
@@ -224,8 +222,8 @@ window.showModal = function(modal) {
     currentModalOverlayClickHandler = handleClickOutside;
     currentKeydownHandler = handleEscape;
     
-    modalOverlay.addEventListener('click', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    modalOverlay.addEventListener('click', handleClickOutside, { passive: false });
+    document.addEventListener('keydown', handleEscape, { passive: false });
     
     // Initialize close buttons
     initializeCloseButtons(modal);
@@ -243,56 +241,92 @@ window.closeModal = function() {
     console.log('closeModal called');
     
     const modalOverlay = document.getElementById('modalOverlay');
-    const modals = document.querySelectorAll('.modal');
+    const activeModal = document.querySelector('.modal.active');
 
     if (!modalOverlay) {
         console.log('No modal overlay found');
         return;
     }
 
-    // Remove active classes immediately
-    modalOverlay.classList.remove('active');
-    modals.forEach(modal => {
-        modal.classList.remove('active');
-    });
+    // If already hidden, do nothing
+    if (!modalOverlay.classList.contains('active')) {
+        return;
+    }
 
-    // Hide after transition
-    setTimeout(() => {
+    // Remove active classes to trigger the transition
+    modalOverlay.classList.remove('active');
+    if (activeModal) {
+        activeModal.classList.remove('active');
+    }
+
+    // Clean up event listeners first to prevent multiple triggers
+    if (currentModalOverlayClickHandler) {
+        modalOverlay.removeEventListener('click', currentModalOverlayClickHandler);
+        currentModalOverlayClickHandler = null;
+    }
+    if (currentKeydownHandler) {
+        document.removeEventListener('keydown', currentKeydownHandler);
+        currentKeydownHandler = null;
+    }
+
+    // Clean up after the transition
+    const cleanup = () => {
+        // Hide elements
         modalOverlay.style.display = 'none';
-        modals.forEach(modal => {
-            modal.style.display = 'none';
-        });
-        
-        // Clean up event listeners
-        if (currentModalOverlayClickHandler) {
-            modalOverlay.removeEventListener('click', currentModalOverlayClickHandler);
-            currentModalOverlayClickHandler = null;
-        }
-        if (currentKeydownHandler) {
-            document.removeEventListener('keydown', currentKeydownHandler);
-            currentKeydownHandler = null;
+        if (activeModal) {
+            activeModal.style.display = 'none';
         }
         
-        // Re-enable body scroll
+        // Re-enable body scroll and reset padding
         document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
         
         console.log('Modal closed successfully');
-    }, 300); // Match this with your CSS transition duration
+    };
+    
+    // Use requestAnimationFrame to ensure the transition starts
+    requestAnimationFrame(() => {
+        // Handle the transition end event
+        const onTransitionEnd = () => {
+            modalOverlay.removeEventListener('transitionend', onTransitionEnd);
+            cleanup();
+        };
+        
+        modalOverlay.addEventListener('transitionend', onTransitionEnd, { once: true });
+        
+        // Fallback in case transitionend doesn't fire
+        setTimeout(() => {
+            modalOverlay.removeEventListener('transitionend', onTransitionEnd);
+            cleanup();
+        }, 300);
+    });
 };
 
 // Helper function to initialize close buttons
 function initializeCloseButtons(modal) {
-    const closeButtons = modal.querySelectorAll('.close-button, [id*="close"], [id*="cancel"]');
-    closeButtons.forEach(btn => {
-        // Remove existing listeners by cloning
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-        
-        // Add new listener
-        newBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            window.closeModal();
+    // Get all possible close buttons in the modal
+    const closeSelectors = [
+        '.close-button',
+        '[id*="close"]',
+        '[id*="cancel"]',
+        '[data-dismiss="modal"]',
+        '[onclick*="closeModal"]'
+    ];
+    
+    closeSelectors.forEach(selector => {
+        const closeButtons = modal.querySelectorAll(selector);
+        closeButtons.forEach(btn => {
+            // Remove any existing click handlers
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            // Add new click handler
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.closeModal();
+                return false;
+            });
         });
     });
 }
@@ -639,6 +673,12 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log('Setting up click event listener for edit buttons');
     document.addEventListener('click', function(e) {
         console.log('Click event triggered on:', e.target);
+        
+        // Ignore clicks that originate from the sidebar
+        if (e.target.closest('.sidebar')) {
+            console.log('Click originated from sidebar, ignoring');
+            return;
+        }
         
         // Handle close button clicks
         if (e.target.closest('.close-button') || 

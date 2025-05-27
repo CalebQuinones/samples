@@ -313,9 +313,9 @@ $result = mysqli_stmt_get_result($stmt);
                       <div class="form-group">
                         <label for="product-status" class="form-label">Status</label>
                           <select id="product-status" class="form-select">
-                            <option>In Stock</option>
-                            <option>Low Stock</option>
-                            <option>Out of Stock</option>
+                            <option>In Stock (>30)</option>
+                            <option>Low Stock (<5)</option>
+                            <option>Out of Stock (<1)</option>
                           </select>
                       </div>
                       <div class="form-group">
@@ -381,9 +381,9 @@ $result = mysqli_stmt_get_result($stmt);
                       <div class="form-group">
                         <label for="editProductStatus" class="form-label">Status</label>
                           <select id="editProductStatus" name="availability" class="form-select" required>
-                            <option value="In Stock">In Stock</option>
-                            <option value="Low Stock">Low Stock</option>
-                            <option value="Out of Stock">Out of Stock</option>
+                            <option value="In Stock">In Stock(>30)</option>
+                            <option value="Low Stock">Low Stock(<5)</option>
+                            <option value="Out of Stock">Out of Stock(<1)</option>
                           </select>
                       </div>
                     </form>
