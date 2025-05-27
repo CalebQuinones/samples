@@ -995,15 +995,14 @@ main {
 
 .melt {
   position: relative;
-  top: 20px;
-  width: 1550px;
+  top: 7px;
+  width: 1560px;
   max-width: 100%;
-  left: 1px;
-  height: 700px;
+  left: -1px;
+  height: 400px;
+  background-color: #FFD7E9;
   z-index: -8;
   /* Remove the animation property */
-  margin-bottom: -160px;
-  margin-top: -30px;
   transition: transform 0.3s ease-out; /* Add smooth transition */
 }
 

@@ -2,7 +2,7 @@
 // Database configuration
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', 'bahalakajan');
 define('DB_NAME', 'bakerydb');
 
 // Attempt to connect to MySQL database

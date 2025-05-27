@@ -248,8 +248,8 @@
           </div>
         </div>
     </section>
-    <div class>
-        <img src="meltdown2.png" class="melt"></div>
+    <div >
+        <img src="meltdown1.png" class="melt"></div>
     </div>
 
 
@@ -599,6 +599,40 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof updateCartUI === 'function') {
         updateCartUI();
     }
+});
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+  // Select your element
+  const yourElement = document.querySelector('.your-element');
+  
+  if (yourElement) {
+    // Initial position (slightly up)
+    yourElement.style.transform = 'translateY(-30px)';
+    
+    // Maximum scroll position where the effect should complete
+    const maxScrollPosition = 1200; // Adjust this value as needed
+    
+    window.addEventListener('scroll', function() {
+      // Get current scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Calculate how far to move the element
+      if (scrollPosition <= maxScrollPosition) {
+        // Calculate percentage of scroll progress
+        const scrollPercentage = scrollPosition / maxScrollPosition;
+        
+        // Calculate new Y position
+        const newYPosition = -30 + (scrollPercentage * 30);
+        
+        // Apply the transform
+        yourElement.style.transform = `translateY(${newYPosition}px)`;
+      } else {
+        // Keep it at final position once scroll exceeds max
+        yourElement.style.transform = 'translateY(0)';
+      }
+    });
+  }
 });
 </script>
 </body>

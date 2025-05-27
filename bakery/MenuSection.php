@@ -241,37 +241,37 @@ include 'config.php';
             <div class="category-card" id="color">
                 <span class="category-icon">📅</span>
                 <span class="category-name">All</span>
-                <span class="category-items">30 Items</span>
+                
             </div>
             <div class="category-card">
                 <span class="category-icon">🎂</span>
                 <span class="category-name">Birthday Cakes</span>
-                <span class="category-items">20 Items</span>
+               
             </div>
             <div class="category-card">
                 <span class="category-icon">💝</span>
                 <span class="category-name">Wedding Cakes</span>
-                <span class="category-items">10 Items</span>
+            
             </div>
             <div class="category-card">
                 <span class="category-icon">🚿</span>
                 <span class="category-name">Shower Cakes</span>
-                <span class="category-items">5 Items</span>
+               
             </div>
             <div class="category-card">
                 <span class="category-icon">🧁</span>
                 <span class="category-name">Cupcakes</span>
-                <span class="category-items">30 Items</span>
+               
             </div>
             <div class="category-card">
                 <span class="category-icon">🥖</span>
                 <span class="category-name">Breads</span>
-                <span class="category-items">10 Items</span>
+              
             </div>
             <div class="category-card">
                 <span class="category-icon">🍳</span>
                 <span class="category-name">Celebration</span>
-                <span class="category-items">20 Items</span>
+               
             </div>
         </div>
 
@@ -532,6 +532,210 @@ include 'config.php';
       }
     });
   </script>    
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+  // Get all category cards and product cards
+  const categoryCards = document.querySelectorAll(".category-card")
+  const productCards = document.querySelectorAll(".product-card")
+
+  // Add click event listeners to each category card
+  categoryCards.forEach((card) => {
+    card.addEventListener("click", function () {
+      // Remove active class from all category cards
+      categoryCards.forEach((c) => c.removeAttribute("id"))
+
+      // Add active class to the clicked category
+      this.setAttribute("id", "color")
+
+      // Get the selected category name (trim to remove extra spaces)
+      const categoryName = this.querySelector(".category-name").textContent.trim()
+
+      // Filter products based on the selected category
+      filterProducts(categoryName)
+    })
+  })
+
+  // Function to filter products based on category
+  function filterProducts(category) {
+    // If "All" is selected, show all products
+    if (category === "All") {
+      productCards.forEach((card) => {
+        card.style.display = "block"
+      })
+      return
+    }
+
+    // Otherwise, filter products by category
+    productCards.forEach((card) => {
+      // Get product name from the card
+      const productName = card.querySelector(".product-name").textContent.toLowerCase()
+
+      // Check if product name contains the category name
+      // For example, "Chocolate Birthday Cake" should match "Birthday Cakes" category
+      if (productName.includes(category.toLowerCase().replace(" cakes", "").replace("s", ""))) {
+        card.style.display = "block"
+      } else {
+        card.style.display = "none"
+      }
+    })
+  }
+
+  // Initialize with "All" category selected
+  const allCategoryCard = document.querySelector(".category-card:first-child")
+  if (allCategoryCard) {
+    allCategoryCard.setAttribute("id", "color")
+  }
+})
+
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+  // Get all category cards and product cards
+  const categoryCards = document.querySelectorAll(".category-card")
+  const productCards = document.querySelectorAll(".product-card")
+  const productGrid = document.querySelector(".product-grid")
+
+  // Add data-category attribute to each product card
+  // This is a more robust approach than relying on product names
+  productCards.forEach((card) => {
+    const productName = card.querySelector(".product-name").textContent.toLowerCase()
+
+    // Set default category as "other"
+    let category = "other"
+
+    // Determine category based on product name
+    if (productName.includes("birthday")) {
+      category = "birthday"
+    } else if (productName.includes("wedding")) {
+      category = "wedding"
+    } else if (productName.includes("shower")) {
+      category = "shower"
+    } else if (productName.includes("cupcake")) {
+      category = "cupcake"
+    } else if (productName.includes("bread")) {
+      category = "bread"
+    } else if (
+      productName.includes("celebration") ||
+      productName.includes("anniversary") ||
+      productName.includes("party")
+    ) {
+      category = "celebration"
+    }
+
+    // Add the category as a data attribute
+    card.setAttribute("data-category", category)
+  })
+
+  // Add click event listeners to each category card
+  categoryCards.forEach((card) => {
+    card.addEventListener("click", function () {
+      // Remove active class from all category cards
+      categoryCards.forEach((c) => c.removeAttribute("id"))
+
+      // Add active class to the clicked category
+      this.setAttribute("id", "color")
+
+      // Get the selected category name
+      const categoryName = this.querySelector(".category-name").textContent.trim()
+
+      // Filter products based on the selected category
+      filterProducts(categoryName)
+
+      // Add animation class to visible products
+      setTimeout(() => {
+        document.querySelectorAll('.product-card[style="display: block;"]').forEach((card, index) => {
+          card.style.animationDelay = `${index * 0.05}s`
+          card.classList.add("fade-in")
+
+          // Remove animation class after animation completes
+          setTimeout(
+            () => {
+              card.classList.remove("fade-in")
+            },
+            500 + index * 50,
+          )
+        })
+      }, 10)
+    })
+  })
+
+  // Function to filter products based on category
+  function filterProducts(category) {
+    // Show all products if "All" is selected
+    if (category === "All") {
+      productCards.forEach((card) => {
+        card.style.display = "block"
+      })
+      return
+    }
+
+    // Map category names to data-category values
+    const categoryMap = {
+      "Birthday Cakes": "birthday",
+      "Wedding Cakes": "wedding",
+      "Shower Cakes": "shower",
+      Cupcakes: "cupcake",
+      Breads: "bread",
+      Celebration: "celebration",
+    }
+
+    const selectedCategory = categoryMap[category] || category.toLowerCase()
+
+    // Filter products by matching data-category attribute
+    productCards.forEach((card) => {
+      if (card.getAttribute("data-category") === selectedCategory) {
+        card.style.display = "block"
+      } else {
+        card.style.display = "none"
+      }
+    })
+
+    // If no products are visible, show a message
+    const visibleProducts = document.querySelectorAll('.product-card[style="display: block;"]')
+    if (visibleProducts.length === 0) {
+      // Check if no-results message already exists
+      let noResults = document.querySelector(".no-results-message")
+      if (noResults) {
+        noResults = document.createElement("div")
+        noResults.className = "no-results-message"
+        noResults.textContent = "No products found in this category."
+        noResults.style.textAlign = "center"
+        noResults.style.padding = "2rem"
+        noResults.style.width = "100%"
+        productGrid.appendChild(noResults)
+      }
+      noResults.style.display = "block"
+    } else {
+      // Hide no-results message if it exists
+      const noResults = document.querySelector(".no-results-message")
+      if (noResults) {
+        noResults.style.display = "none"
+      }
+    }
+  }
+
+  // Add fade-in animation style
+  const style = document.createElement("style")
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .product-card.fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+      opacity: 0;
+    }
+  `
+  document.head.appendChild(style)
+
+  // Initialize with "All" category selected
+  const allCategoryCard = document.querySelector(".category-card:first-child")
+  if (allCategoryCard) {
+    allCategoryCard.setAttribute("id", "color")
+  }
+})
+
+  </script>
   <script>
     // Intersection Observer to detect when elements enter the viewport
 document.addEventListener('DOMContentLoaded', function() {
