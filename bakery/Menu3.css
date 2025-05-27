@@ -152,6 +152,7 @@ nav {
 .nav-links ul {
   display: flex;
   list-style: none;
+  margin-left: 140px;
 }
 
 .nav-links ul li {
