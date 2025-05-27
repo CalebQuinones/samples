@@ -1,117 +1,302 @@
 // Global functions for account management
 function showCustomerDetails(userId) {
-    fetch(`./get_customer_details.php?user_id=${userId}`)
-        .then(response => response.json())
-        .then(data => {
-            const elements = {
-                'customerPhone': data.phone || 'Not provided',
-                'customerBirthday': data.birthday ? new Date(data.birthday).toLocaleDateString() : 'Not provided',
-                'customerAddress': data.address || 'Not provided',
-                'customerPayment': data.payment || 'Not provided',
-                'customerCreatedAt': new Date(data.created_at).toLocaleDateString()
-            };
-
-            Object.entries(elements).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) element.textContent = value;
-            });
-
-            const customerDetailsModal = document.getElementById('customerDetailsModal');
-            if (customerDetailsModal) {
-                window.showModal(customerDetailsModal);
+    console.log('showCustomerDetails called with userId:', userId);
+    
+    if (!userId) {
+        console.error('No userId provided to showCustomerDetails');
+        alert('Error: No user ID provided');
+        return;
+    }
+    
+    // Get or create customer details modal
+    let customerDetailsModal = document.getElementById('customerDetailsModal');
+    if (!customerDetailsModal) {
+        console.log('Creating customer details modal element');
+        customerDetailsModal = document.createElement('div');
+        customerDetailsModal.id = 'customerDetailsModal';
+        customerDetailsModal.className = 'modal';
+        document.body.appendChild(customerDetailsModal);
+    }
+    
+    // Create modal structure with loading state
+    customerDetailsModal.innerHTML = `
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Customer Details</h3>
+                <button type="button" class="close-button" onclick="window.closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 40px;">
+                    <div style="width: 40px; height: 40px; border: 4px solid #f3f4f6; border-top: 4px solid #db2777; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+                    <p>Loading customer details...</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Show the modal immediately with loading state
+    window.showModal(customerDetailsModal);
+    
+    // Fetch customer details
+    fetch(`./get_customer_details.php?user_id=${encodeURIComponent(userId)}`)
+        .then(response => {
+            console.log('Customer details response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Customer data received:', data);
+            
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid customer data received');
+            }
+            
+            // Check if user was found
+            if (data.error || data.message === 'User not found') {
+                throw new Error('Customer not found');
+            }
+            
+            // Update modal content with customer details
+            const modalBody = customerDetailsModal.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <div class="customer-info">
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Name:</strong> ${data.Fname || ''} ${data.Lname || ''}
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Email:</strong> ${data.email || 'Not provided'}
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Phone:</strong> ${data.phone || 'Not provided'}
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-birthday-cake"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Birthday:</strong> ${data.birthday ? new Date(data.birthday).toLocaleDateString() : 'Not provided'}
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Address:</strong> ${data.address || 'Not provided'}
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Payment Method:</strong> ${data.payment || 'Not provided'}
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Member Since:</strong> ${data.created_at ? new Date(data.created_at).toLocaleDateString() : 'Inactive'}
+                        </div>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <div class="customer-info-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="customer-info-text">
+                            <strong>Status:</strong> 
+                            <span class="status-badge ${data.status === 'active' ? 'status-delivered' : 'status-cancelled'}">
+                                ${data.status ? data.status.charAt(0).toUpperCase() + data.status.slice(1) : 'Inactive'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="modal-button modal-button-secondary" onclick="window.closeModal()">Close</button>
+                </div>
+            `;
+
+            // Update the modal title
+            const modalTitle = customerDetailsModal.querySelector('.modal-title');
+            if (modalTitle) {
+                const fullName = `${data.Fname || ''} ${data.Lname || ''}`.trim() || 'Customer';
+                modalTitle.textContent = `${fullName} - Details`;
+            }
+            
+            console.log('Customer details modal successfully populated');
         })
         .catch(error => {
-            console.error('Error fetching customer details:', error);
-            alert('Failed to load customer details. Please try again.');
+            console.error('Error in showCustomerDetails:', error);
+            
+            // Close modal and show error
+            window.closeModal();
+            alert(`Failed to load customer details: ${error.message}`);
         });
 }
 
 function showEditModal(userId) {
     console.log('showEditModal called with userId:', userId);
     
-    // Get the modal
-    const accountEditModal = document.getElementById('accountEditModal');
-    if (!accountEditModal) {
-        console.error('Edit modal not found');
+    if (!userId) {
+        console.error('No userId provided to showEditModal');
+        alert('Error: No user ID provided');
         return;
     }
     
-    // Show loading state immediately
-    const modalBody = accountEditModal.querySelector('.modal-body');
-    const originalBodyContent = modalBody.innerHTML;
+    // Get the modal element
+    let accountEditModal = document.getElementById('accountEditModal');
+    if (!accountEditModal) {
+        console.log('Creating edit modal element');
+        accountEditModal = document.createElement('div');
+        accountEditModal.id = 'accountEditModal';
+        accountEditModal.className = 'modal';
+        document.body.appendChild(accountEditModal);
+    }
     
-    modalBody.innerHTML = `
-        <div style="padding: 40px; text-align: center; min-height: 150px; display: flex; align-items: center; justify-content: center;">
-            <div>
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-3">Loading account details...</p>
+    // Create modal structure with loading state
+    accountEditModal.innerHTML = `
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Account</h3>
+                <button type="button" class="close-button" onclick="window.closeModal()">&times;</button>
             </div>
-        </div>`;
+            <div class="modal-body">
+                <div style="text-align: center; padding: 40px;">
+                    <div style="width: 40px; height: 40px; border: 4px solid #f3f4f6; border-top: 4px solid #db2777; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+                    <p>Loading account details...</p>
+                </div>
+            </div>
+        </div>
+    `;
     
     // Show the modal immediately with loading state
     window.showModal(accountEditModal);
     
     // Fetch account details
-    fetch(`./get_account.php?id=${userId}`)
+    fetch(`./get_account.php?id=${encodeURIComponent(userId)}`)
         .then(response => {
+            console.log('Edit modal response status:', response.status);
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(account => {
             console.log('Account data received:', account);
             
-            // Restore original modal body content
-            modalBody.innerHTML = originalBodyContent;
-            
-            // Set the user_id field
-            const userIdField = document.getElementById('user_id');
-            if (!userIdField) {
-                console.error('User ID field not found');
-                throw new Error('Required form elements not found');
-            }
-            userIdField.value = account.user_id;
-
-            // Set the status, defaulting to 'active' if not set
-            const status = account.status || 'active';
-            const statusSelect = document.getElementById('editStatus');
-            if (!statusSelect) {
-                console.error('Status select element not found');
-                throw new Error('Required form elements not found');
+            if (!account || typeof account !== 'object') {
+                throw new Error('Invalid account data received');
             }
             
-            // Set the selected status
-            statusSelect.value = status;
+            // Check if account was found
+            if (account.error || account.message === 'Account not found') {
+                throw new Error('Account not found');
+            }
+            
+            // Update modal content with comprehensive edit form
+            const modalBody = accountEditModal.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <form id="accountEditForm">
+                    <input type="hidden" id="user_id" name="user_id" value="${account.user_id || userId}">
+                    
+                    <!-- Personal Information -->
 
-            // Update the modal title to show which account is being edited
+                    
+                    <!-- Account Settings - ONLY Active/Inactive options -->
+                    <div class="form-group">
+                        <label for="editStatus">Account Status</label>
+                        <select id="editStatus" name="status" class="form-select" required>
+                            <option value="active" ${(account.status || 'active') === 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${account.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editRole">User Role</label>
+                        <select id="editRole" name="role" class="form-select">
+                            <option value="customer" ${(account.role || 'customer') === 'customer' ? 'selected' : ''}>Customer</option>
+                            <option value="admin" ${account.role === 'admin' ? 'selected' : ''}>Administrator</option>
+                            <option value="moderator" ${account.role === 'moderator' ? 'selected' : ''}>Moderator</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Additional Information -->
+                    <div class="form-group">
+                        <label for="editAddress">Address</label>
+                        <textarea id="editAddress" name="address" class="form-control" rows="3" placeholder="Optional">${account.address || ''}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editBirthday">Birthday</label>
+                        <input type="date" id="editBirthday" name="birthday" class="form-control" value="${account.birthday || ''}" placeholder="Optional">
+                    </div>
+                    
+                    <!-- Account Information (Read-only) -->
+                    <div class="form-group">
+                        <label>Account Created</label>
+                        <input type="text" class="form-control" value="${account.created_at ? new Date(account.created_at).toLocaleDateString() : 'Unknown'}" readonly style="background-color: #f9fafb; color: #6b7280;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Last Login</label>
+                        <input type="text" class="form-control" value="${account.last_login ? new Date(account.last_login).toLocaleDateString() : 'Never'}" readonly style="background-color: #f9fafb; color: #6b7280;">
+                    </div>
+                </form>
+                
+                <div class="modal-footer">
+                    <button type="button" class="modal-button modal-button-secondary" onclick="window.closeModal()">Cancel</button>
+                    <button type="submit" form="accountEditForm" class="modal-button modal-button-primary">Save Changes</button>
+                </div>
+            `;
+
+            // Update the modal title
             const modalTitle = accountEditModal.querySelector('.modal-title');
             if (modalTitle) {
                 const fullName = `${account.Fname || ''} ${account.Lname || ''}`.trim() || 'User';
-                modalTitle.textContent = `Update Status for ${fullName}`;
+                modalTitle.textContent = `Edit Account - ${fullName}`;
             }
             
-            // Reinitialize the form submit handler
+            // Add form submit handler
             const form = document.getElementById('accountEditForm');
             if (form) {
-                // Remove existing event listeners by cloning the form
-                const newForm = form.cloneNode(true);
-                form.parentNode.replaceChild(newForm, form);
-                
-                // Add new event listener
-                newForm.addEventListener('submit', handleEditFormSubmit);
+                form.addEventListener('submit', handleEditFormSubmit);
             }
             
-            // Reinitialize close button handlers
-            initializeCloseButtons(accountEditModal);
+            console.log('Edit modal successfully populated with account data');
         })
         .catch(error => {
             console.error('Error in showEditModal:', error);
-            alert('Failed to load account details. Please try again. ' + error.message);
+            
+            // Close modal and show error
             window.closeModal();
+            alert(`Failed to load account details: ${error.message}`);
         });
 }
 
@@ -132,25 +317,28 @@ function confirmArchiveAccount(userId) {
                 alert(data.message || 'Error archiving account');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error archiving account. Please try again.');
+        });
     }
 }
 
-// Global variables to store event handlers for proper removal
-let currentModalOverlayClickHandler = null;
-let currentKeydownHandler = null;
-
-// Global modal functions
+// Global modal functions that work with your existing CSS
 window.showModal = function(modal) {
     if (!modal) {
-        console.error('Modal not found');
+        console.error('Modal element not provided to showModal');
         return;
     }
 
-    const modalOverlay = document.getElementById('modalOverlay');
+    // Get or create modal overlay
+    let modalOverlay = document.getElementById('modalOverlay');
     if (!modalOverlay) {
-        console.error('Modal overlay not found');
-        return;
+        console.log('Creating modal overlay');
+        modalOverlay = document.createElement('div');
+        modalOverlay.id = 'modalOverlay';
+        modalOverlay.className = 'modal-overlay';
+        document.body.appendChild(modalOverlay);
     }
 
     console.log('Showing modal:', modal.id);
@@ -160,39 +348,38 @@ window.showModal = function(modal) {
         if (m !== modal) {
             m.classList.remove('active');
             m.style.display = 'none';
-            m.setAttribute('aria-hidden', 'true');
         }
     });
 
-    // Show the overlay
+    // Clear overlay and add the modal
+    modalOverlay.innerHTML = '';
+    modalOverlay.appendChild(modal);
+
+    // Show the overlay and modal
     modalOverlay.style.display = 'flex';
-    
-    // Show the modal
     modal.style.display = 'block';
-    
-    // Trigger reflow to enable CSS transitions
-    void modal.offsetHeight;
-    
-    // Add active classes to trigger the transition
-    modalOverlay.classList.add('active');
-    modal.classList.add('active');
-    
-    // Set modal attributes for accessibility
-    modal.setAttribute('aria-hidden', 'false');
-    modal.setAttribute('tabindex', '-1');
     
     // Handle body scroll
     document.body.style.overflow = 'hidden';
     document.body.style.paddingRight = window.innerWidth > document.documentElement.clientWidth ? '15px' : '0';
     
-    // Set focus to the modal for better accessibility
-    setTimeout(() => {
-        const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-        if (focusable) focusable.focus();
-        else modal.focus();
-    }, 100);
+    // Force reflow and add active classes for your CSS transitions
+    requestAnimationFrame(() => {
+        modalOverlay.classList.add('active');
+        modal.classList.add('active');
+        
+        // Set focus
+        setTimeout(() => {
+            const focusable = modal.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (focusable) {
+                focusable.focus();
+            } else {
+                modal.focus();
+            }
+        }, 100);
+    });
     
-        // Handle click outside to close
+    // Handle click outside to close
     const handleClickOutside = (e) => {
         if (e.target === modalOverlay) {
             e.preventDefault();
@@ -211,38 +398,20 @@ window.showModal = function(modal) {
     };
     
     // Clean up any existing listeners
-    if (currentModalOverlayClickHandler) {
-        modalOverlay.removeEventListener('click', currentModalOverlayClickHandler);
-    }
-    if (currentKeydownHandler) {
-        document.removeEventListener('keydown', currentKeydownHandler);
-    }
+    modalOverlay.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('keydown', handleEscape);
     
-    // Store and add new listeners
-    currentModalOverlayClickHandler = handleClickOutside;
-    currentKeydownHandler = handleEscape;
-    
+    // Add new listeners
     modalOverlay.addEventListener('click', handleClickOutside, { passive: false });
     document.addEventListener('keydown', handleEscape, { passive: false });
     
-    // Initialize close buttons
-    initializeCloseButtons(modal);
-    
-    console.log('Modal shown:', {
-        id: modal.id,
-        display: window.getComputedStyle(modal).display,
-        visibility: window.getComputedStyle(modal).visibility,
-        opacity: window.getComputedStyle(modal).opacity,
-        zIndex: window.getComputedStyle(modal).zIndex
-    });
+    console.log('Modal shown successfully:', modal.id);
 };
 
 window.closeModal = function() {
     console.log('closeModal called');
     
     const modalOverlay = document.getElementById('modalOverlay');
-    const activeModal = document.querySelector('.modal.active');
-
     if (!modalOverlay) {
         console.log('No modal overlay found');
         return;
@@ -250,28 +419,20 @@ window.closeModal = function() {
 
     // If already hidden, do nothing
     if (!modalOverlay.classList.contains('active')) {
+        console.log('Modal already closed');
         return;
     }
 
-    // Remove active classes to trigger the transition
+    const activeModal = modalOverlay.querySelector('.modal');
+
+    // Remove active classes to trigger your CSS transitions
     modalOverlay.classList.remove('active');
     if (activeModal) {
         activeModal.classList.remove('active');
     }
 
-    // Clean up event listeners first to prevent multiple triggers
-    if (currentModalOverlayClickHandler) {
-        modalOverlay.removeEventListener('click', currentModalOverlayClickHandler);
-        currentModalOverlayClickHandler = null;
-    }
-    if (currentKeydownHandler) {
-        document.removeEventListener('keydown', currentKeydownHandler);
-        currentKeydownHandler = null;
-    }
-
-    // Clean up after the transition
-    const cleanup = () => {
-        // Hide elements
+    // Clean up after the transition (matches your CSS transition duration)
+    setTimeout(() => {
         modalOverlay.style.display = 'none';
         if (activeModal) {
             activeModal.style.display = 'none';
@@ -282,54 +443,8 @@ window.closeModal = function() {
         document.body.style.paddingRight = '';
         
         console.log('Modal closed successfully');
-    };
-    
-    // Use requestAnimationFrame to ensure the transition starts
-    requestAnimationFrame(() => {
-        // Handle the transition end event
-        const onTransitionEnd = () => {
-            modalOverlay.removeEventListener('transitionend', onTransitionEnd);
-            cleanup();
-        };
-        
-        modalOverlay.addEventListener('transitionend', onTransitionEnd, { once: true });
-        
-        // Fallback in case transitionend doesn't fire
-        setTimeout(() => {
-            modalOverlay.removeEventListener('transitionend', onTransitionEnd);
-            cleanup();
-        }, 300);
-    });
+    }, 200); // Matches your CSS transition duration
 };
-
-// Helper function to initialize close buttons
-function initializeCloseButtons(modal) {
-    // Get all possible close buttons in the modal
-    const closeSelectors = [
-        '.close-button',
-        '[id*="close"]',
-        '[id*="cancel"]',
-        '[data-dismiss="modal"]',
-        '[onclick*="closeModal"]'
-    ];
-    
-    closeSelectors.forEach(selector => {
-        const closeButtons = modal.querySelectorAll(selector);
-        closeButtons.forEach(btn => {
-            // Remove any existing click handlers
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            
-            // Add new click handler
-            newBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                window.closeModal();
-                return false;
-            });
-        });
-    });
-}
 
 // Make updateBulkActions a global function
 window.updateBulkActions = function() {
@@ -343,32 +458,57 @@ window.updateBulkActions = function() {
     }
 };
 
-// Handle form submission for editing an account
+// Enhanced form submission handler for all fields
 function handleEditFormSubmit(e) {
     e.preventDefault();
 
     const form = e.target;
     const formData = new FormData(form);
-    const status = formData.get('status');
-    const userId = formData.get('user_id');
+    
+    // Get all form values
+    const updateData = {
+        user_id: formData.get('user_id'),
+        first_name: formData.get('first_name'),
+        last_name: formData.get('last_name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        status: formData.get('status'),
+        role: formData.get('role'),
+        address: formData.get('address'),
+        birthday: formData.get('birthday')
+    };
 
-    if (!userId || !status) {
-        alert('Invalid form data');
+    // Basic validation
+    if (!updateData.user_id || !updateData.first_name || !updateData.last_name || !updateData.email) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(updateData.email)) {
+        alert('Please enter a valid email address.');
         return;
     }
 
     // Show loading state
-    const submitBtn = form.querySelector('button[type="submit"]');
+    const submitBtn = document.querySelector('button[type="submit"][form="accountEditForm"]');
+    if (!submitBtn) {
+        console.error('Submit button not found');
+        return;
+    }
+    
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+    submitBtn.innerHTML = '<span style="display: inline-block; width: 16px; height: 16px; border: 2px solid #ffffff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px;"></span> Saving...';
 
+    // Send update request
     fetch('update_account.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `user_id=${encodeURIComponent(userId)}&status=${encodeURIComponent(status)}`
+        body: new URLSearchParams(updateData).toString()
     })
     .then(async response => {
         const data = await response.json().catch(() => ({}));
@@ -382,17 +522,14 @@ function handleEditFormSubmit(e) {
         if (data.success) {
             // Show success message
             const successAlert = `
-                <div class="alert alert-success">
+                <div style="background-color: #d1fae5; color: #065f46; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-check-circle"></i>
-                    ${data.message}
+                    ${data.message || 'Account updated successfully!'}
                 </div>
             `;
 
             // Insert the alert before the form
             form.insertAdjacentHTML('beforebegin', successAlert);
-
-            // Reset form
-            form.reset();
 
             // Close the modal after a short delay
             setTimeout(() => {
@@ -406,12 +543,19 @@ function handleEditFormSubmit(e) {
     .catch(error => {
         console.error('Error:', error);
 
-        // Show error message in a more user-friendly way
+        // Show error message
         const errorMessage = error.data?.errors ?
             Object.values(error.data.errors).flat().join('<br>') :
             (error.message || 'An error occurred while updating the account');
 
-        showFormError(form, errorMessage);
+        const errorAlert = `
+            <div style="background-color: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-exclamation-circle"></i>
+                ${errorMessage}
+            </div>
+        `;
+
+        form.insertAdjacentHTML('beforebegin', errorAlert);
     })
     .finally(() => {
         submitBtn.disabled = false;
@@ -419,246 +563,33 @@ function handleEditFormSubmit(e) {
     });
 }
 
-// Helper function to show error messages under form fields
-function showError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    if (!field) return;
-
-    // Remove any existing error for this field
-    const existingError = field.parentNode.querySelector('.error-message');
-    if (existingError) {
-        existingError.remove();
-    }
-
-    // Add error message
-    const errorElement = document.createElement('div');
-    errorElement.className = 'error-message';
-    errorElement.style.color = '#dc3545';
-    errorElement.style.fontSize = '0.875rem';
-    errorElement.style.marginTop = '0.25rem';
-    errorElement.textContent = message;
-
-    field.parentNode.insertBefore(errorElement, field.nextSibling);
-    field.focus();
-    field.classList.add('is-invalid');
-}
-
-// Helper function to show form-wide error messages
-function showFormError(form, message) {
-    // Remove any existing error messages
-    const existingAlert = form.previousElementSibling;
-    if (existingAlert && existingAlert.classList.contains('alert')) {
-        existingAlert.remove();
-    }
-
-    // Add error message
-    const errorAlert = document.createElement('div');
-    errorAlert.className = 'alert alert-danger';
-    errorAlert.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i>
-        ${message}
-    `;
-
-    form.insertAdjacentElement('beforebegin', errorAlert);
-
-    // Scroll to the error message
-    errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-// Handle form submission for adding a new account
-function handleAddAccountForm(e) {
-    e.preventDefault();
-
-    const form = e.target;
-    const formData = new FormData(form);
-    const submitBtn = form.querySelector('button[type="submit"]');
-
-    // Add null check for submit button
-    if (!submitBtn) {
-        console.error('Submit button not found in form');
-        return;
-    }
-
-    const originalBtnText = submitBtn.innerHTML;
-
-    // Client-side validation
-    const password = formData.get('password');
-    const confirmPassword = formData.get('confirm_password');
-
-    // Clear previous error messages
-    document.querySelectorAll('.error-message').forEach(el => el.remove());
-
-    let isValid = true;
-
-    // Validate password match
-    if (password !== confirmPassword) {
-        showError('confirm_password', 'Passwords do not match');
-        isValid = false;
-    }
-
-    // Validate password strength
-    if (password.length < 8) {
-        showError('password', 'Password must be at least 8 characters long');
-        isValid = false;
-    } else if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-        showError('password', 'Password must contain at least one uppercase letter and one number');
-        isValid = false;
-    }
-
-    // Validate email format
-    const email = formData.get('email');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showError('email', 'Please enter a valid email address');
-        isValid = false;
-    }
-
-    if (!isValid) {
-        return;
-    }
-
-    // Disable submit button to prevent double submission
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
-
-    // Get all form data
-    const formDataObj = {};
-
-    // Convert FormData to object and handle checkboxes
-    for (let [key, value] of formData.entries()) {
-        // Skip confirm_password field as it's not needed in the backend
-        if (key === 'confirm_password') continue;
-
-        // Handle checkboxes
-        if (formData.getAll(key).length > 1) {
-            if (!formDataObj[key]) {
-                formDataObj[key] = [];
-            }
-            formDataObj[key].push(value);
-        } else {
-            formDataObj[key] = value;
-        }
-    }
-
-    // Set status based on checkbox
-    formDataObj['status'] = formDataObj['status'] || 'inactive';
-
-    // Clear any previous error messages
-    const errorMessages = form.querySelectorAll('.alert');
-    errorMessages.forEach(el => el.remove());
-
-    // Get CSRF token from form
-    const csrfToken = form.querySelector('input[name="csrf_token"]').value;
-
-    fetch('add_account.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-Token': csrfToken
-        },
-        body: new URLSearchParams(formDataObj).toString()
-    })
-    .then(async response => {
-        // First, get the response text for debugging
-        const responseText = await response.text();
-        console.log('Raw response:', responseText);
-
-        let data;
-        try {
-            data = JSON.parse(responseText);
-        } catch (e) {
-            console.error('Failed to parse response as JSON:', e);
-            console.error('Response headers:', Object.fromEntries([...response.headers]));
-            throw new Error(`Invalid JSON response from server: ${responseText.substring(0, 100)}...`);
-        }
-
-        if (!response.ok) {
-            const error = new Error(data.message || `Server responded with status ${response.status}`);
-            error.data = data;
-            error.status = response.status;
-            throw error;
-        }
-
-        if (!data || typeof data !== 'object') {
-            throw new Error('Invalid response format from server');
-        }
-
-        return data;
-    })
-    .then(data => {
-        if (data.success) {
-            // Show success message
-            const successHtml = `
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle me-2"></i>
-                    ${data.message || 'Account created successfully!'}
-                </div>`;
-
-            form.innerHTML = successHtml;
-
-            // Close the modal and refresh the page after a short delay
-            setTimeout(() => {
-                window.closeModal();
-                location.reload();
-            }, 2000);
-        } else {
-            throw new Error(data.message || 'Error creating account');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-
-        // Show error message in a user-friendly way
-        const errorMessage = error.data?.message || error.message || 'An error occurred while creating the account';
-        const errorHtml = `
-            <div class="alert alert-danger error-message">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                ${errorMessage}
-            </div>`;
-
-        // Insert error message at the top of the form
-        form.insertAdjacentHTML('afterbegin', errorHtml);
-
-        // Scroll to the error message
-        const errorElement = form.querySelector('.error-message');
-        if (errorElement) {
-            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    })
-    .finally(() => {
-        // Re-enable the submit button
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-        }
-    });
-}
-
 // Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("accounts.js loaded");
-    console.log("DOM fully loaded");
+    console.log("accounts.js loaded and DOM fully loaded");
+
+    // Add CSS animation for spinner
+    if (!document.getElementById('spinner-styles')) {
+        const style = document.createElement('style');
+        style.id = 'spinner-styles';
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 
     // DOM Elements
     const selectAll = document.getElementById("selectAll");
     const clearSelection = document.getElementById("clearSelection");
     const addAccountButton = document.getElementById("addAccountButton");
     const addAccountModal = document.getElementById("addAccountModal");
-    const addAccountForm = document.getElementById('addAccountForm');
-
-    // Initialize form handlers
-    function initFormHandlers() {
-        // Remove any existing event listeners from addAccountForm
-        if (addAccountForm) {
-            const newForm = addAccountForm.cloneNode(true);
-            addAccountForm.parentNode.replaceChild(newForm, addAccountForm);
-            newForm.addEventListener('submit', handleAddAccountForm);
-        }
-    }
 
     // Initialize add account button
     if (addAccountButton && addAccountModal) {
         addAccountButton.addEventListener('click', function() {
+            const addAccountForm = document.getElementById('addAccountForm');
             if (addAccountForm) {
                 addAccountForm.reset();
             }
@@ -666,26 +597,17 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Initialize all form handlers
-    initFormHandlers();
-
-    // Add event delegation for edit buttons
-    console.log('Setting up click event listener for edit buttons');
+    // FIXED EVENT DELEGATION - More specific button detection
     document.addEventListener('click', function(e) {
-        console.log('Click event triggered on:', e.target);
-        
-        // Ignore clicks that originate from the sidebar
+        // Ignore clicks from sidebar
         if (e.target.closest('.sidebar')) {
-            console.log('Click originated from sidebar, ignoring');
             return;
         }
         
         // Handle close button clicks
-        if (e.target.closest('.close-button') || 
-            e.target.classList.contains('fa-times') ||
-            e.target.id === 'closeEditModal' ||
-            e.target.id === 'cancelEdit' ||
-            e.target.id === 'cancelModal') {
+        if (e.target.matches('.close-button, .close-modal') || 
+            e.target.closest('.close-button, .close-modal') ||
+            e.target.classList.contains('fa-times')) {
             e.preventDefault();
             e.stopPropagation();
             console.log('Close button clicked, closing modal');
@@ -693,71 +615,63 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         
-        // Check if the clicked element is an edit button
-        let editBtn = null;
+        // More specific button detection
+        let clickedElement = e.target;
+        let buttonType = null;
+        let userId = null;
         
-        // Check all possible ways the edit button could be clicked
-        const checkEditButton = (element) => {
-            if (!element) return null;
-            
-            // Direct click on edit button
-            if (element.classList && 
-                (element.classList.contains('edit-account-btn') || 
-                 element.classList.contains('edit-button') ||
-                 element.closest('.edit-account-btn') ||
-                 element.closest('.edit-button'))) {
-                return element.classList.contains('edit-account-btn') || element.classList.contains('edit-button') ? 
-                       element : 
-                       (element.closest('.edit-account-btn') || element.closest('.edit-button'));
-            }
-            
-            // Click on icon inside edit button
-            if (element.classList && 
-                (element.classList.contains('fa-pen') || 
-                 element.querySelector('.fa-pen'))) {
-                const penIcon = element.classList.contains('fa-pen') ? element : element.querySelector('.fa-pen');
-                return penIcon.closest('.edit-account-btn') || penIcon.closest('.edit-button') || penIcon.closest('.action-button');
-            }
-            
-            return null;
-        };
-        
-        // Check the clicked element and its parents
-        let currentElement = e.target;
-        while (currentElement && currentElement !== document.documentElement) {
-            editBtn = checkEditButton(currentElement);
-            if (editBtn) break;
-            currentElement = currentElement.parentElement;
+        // Check if we clicked on an icon first
+        if (clickedElement.classList.contains('fa-eye')) {
+            buttonType = 'view';
+            clickedElement = clickedElement.closest('button, a, .action-button');
+        } else if (clickedElement.classList.contains('fa-pen') || clickedElement.classList.contains('fa-edit')) {
+            buttonType = 'edit';
+            clickedElement = clickedElement.closest('button, a, .action-button');
         }
         
-        if (editBtn) {
-            console.log('Edit button found:', editBtn);
+        // If we didn't find a button type from icon, check the button itself
+        if (!buttonType && clickedElement) {
+            if (clickedElement.classList.contains('view-button') || 
+                clickedElement.classList.contains('view-account-btn') ||
+                clickedElement.querySelector('.fa-eye')) {
+                buttonType = 'view';
+            } else if (clickedElement.classList.contains('edit-button') || 
+                       clickedElement.classList.contains('edit-account-btn') ||
+                       clickedElement.querySelector('.fa-pen, .fa-edit')) {
+                buttonType = 'edit';
+            }
+        }
+        
+        // Get user ID if we found a button
+        if (buttonType && clickedElement) {
+            userId = clickedElement.getAttribute('data-user-id') ||
+                     clickedElement.getAttribute('data-id') ||
+                     clickedElement.closest('[data-user-id]')?.getAttribute('data-user-id') ||
+                     clickedElement.closest('[data-id]')?.getAttribute('data-id') ||
+                     clickedElement.closest('tr')?.getAttribute('data-user-id') ||
+                     clickedElement.closest('tr')?.getAttribute('data-id');
+        }
+        
+        // Execute the appropriate action
+        if (buttonType && userId) {
             e.preventDefault();
             e.stopPropagation();
             
-            // Get user ID from data attribute or closest parent with data-user-id
-            let userId = editBtn.getAttribute('data-user-id');
-            if (!userId) {
-                const parentWithId = editBtn.closest('[data-user-id]');
-                if (parentWithId) {
-                    userId = parentWithId.getAttribute('data-user-id');
-                }
-            }
+            console.log(`${buttonType} button clicked for user ID:`, userId);
             
-            if (userId) {
-                console.log('Edit button clicked for user ID:', userId);
+            if (buttonType === 'view') {
+                showCustomerDetails(userId);
+            } else if (buttonType === 'edit') {
                 showEditModal(userId);
-            } else {
-                console.error('No user ID found on edit button or its parents');
-                console.log('Edit button HTML:', editBtn.outerHTML);
-                console.log('Edit button parents:', Array.from(document.elementsFromPoint(e.clientX, e.clientY)));
             }
-        } else {
-            console.log('No edit button found in click path');
+        } else if (buttonType && userId) {
+            console.error(`${buttonType} button found but no user ID`);
+            console.log('Button element:', clickedElement);
+            alert('Error: Could not find user ID. Please refresh the page and try again.');
         }
     });
 
-    // Event Listeners for other elements
+    // Bulk selection handlers
     if (selectAll) {
         selectAll.addEventListener('change', function() {
             const isChecked = this.checked;
@@ -771,13 +685,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Add change event listeners to individual checkboxes
     const accountCheckboxes = document.querySelectorAll('.account-checkbox');
     accountCheckboxes.forEach(checkbox => {
         if (checkbox !== selectAll) {
             checkbox.addEventListener('change', function() {
                 window.updateBulkActions();
-                // Update select all checkbox state
                 if (selectAll) {
                     const allSelected = Array.from(accountCheckboxes)
                         .filter(cb => cb !== selectAll)
@@ -788,7 +700,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Clear selection button
     if (clearSelection) {
         clearSelection.addEventListener('click', () => {
             if (selectAll) selectAll.checked = false;
@@ -799,6 +710,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Initialize on page load
     window.updateBulkActions();
+    console.log('All event listeners initialized successfully');
 });

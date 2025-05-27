@@ -378,9 +378,6 @@ $result = mysqli_stmt_get_result($stmt);
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title">Edit Account</h3>
-            <button type="button" class="close-button" id="closeEditModal">
-              <i class="fas fa-times"></i>
-            </button>
           </div>
           <div class="modal-body">
             <form id="accountEditForm">
